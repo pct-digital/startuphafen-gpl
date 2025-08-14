@@ -1,0 +1,128 @@
+<aside>
+  <ul>
+    @for (item of items; track $index) { @if (item.isActive) {
+    <li
+      [ngClass]="{
+        'bg-primary cursor-pointer transition-all relative': true
+      }"
+      [attr.data-testid]="
+        'header-group-' +
+        (item.type === 'HEADER_GROUP_ITEM' ? item.groupId : 'no-group')
+      "
+      (click)="onCollapse(item)"
+    >
+      <div
+        class="pt-4 py-4 text-center relative flex items-center justify-between gap-4 px-8"
+      >
+        <div class="flex gap-4 items-center">
+          <div class="flex justify-center items-center bg-center bg-no-repeat">
+            <i
+              class="w-8 h-8 bg-contain bg-center bg-no-repeat"
+              [ngStyle]="{
+                    'mask-image': 'url(' + item.icon + ')',
+                    '-webkit-mask-image': 'url(' + item.icon + ')',
+                    'background-color': 'var(--sh-color-primary-contrast)',
+                    'mask-repeat': 'no-repeat',
+                  }"
+            >
+            </i>
+          </div>
+          <span class="text-[16px] leading-[26px] text-center">{{
+            item.label
+          }}</span>
+        </div>
+        <div
+          *ngIf="item.type === 'HEADER_GROUP_ITEM'"
+          class="flex justify-center items-center bg-center bg-no-repeat"
+        >
+          <i
+            class="w-5 h-5 bg-contain bg-center bg-no-repeat"
+            [ngStyle]="{
+                  'mask-image': 'url(/assets/icons/solid/' + (collapsedItem?.id === item.id ? 'triangle-up' : 'triangle-down') + '.svg)',
+                  '-webkit-mask-image':
+                    'url(/assets/icons/solid/' + (collapsedItem?.id === item.id ? 'triangle-up' : 'triangle-down') + '.svg)',
+                  'background-color': 'var(--sh-color-primary-contrast)',
+                  'mask-repeat': 'no-repeat',
+                }"
+          >
+          </i>
+        </div>
+      </div>
+      <div
+        *ngIf="
+          item.type === 'HEADER_GROUP_ITEM' && collapsedItem?.id === item.id
+        "
+        class="bg-[var(--sh-color-secondary-tint)] z-10 pl-[10px] space-y-[25px] py-[25px]"
+        @fadeInOut
+      >
+        @for (collapsable_item of item.children || []; track
+        collapsable_item.id) {
+        <div
+          *ngIf="collapsable_item.isActive"
+          [ngClass]="{
+            'pl-[41px] pr-[10px] w-full flex items-center gap-[16px]': true
+          }"
+          [attr.data-index]="collapsable_item.id"
+          (click)="onClickSubitem(collapsable_item)"
+          [attr.data-testid]="'header-link' + collapsable_item.path"
+        >
+          <div class="flex justify-center items-center bg-center bg-no-repeat">
+            <i
+              class="w-10 h-10 bg-contain bg-center bg-no-repeat"
+              [ngStyle]="{
+                      'mask-image': 'url(' + collapsable_item.icon + ')',
+                      '-webkit-mask-image': 'url(' + collapsable_item.icon + ')',
+                      'background-color': 'var(--sh-color-primary-contrast)',
+                      'mask-repeat': 'no-repeat',
+                    }"
+            >
+            </i>
+          </div>
+          <p class="text-[15px]">{{ collapsable_item.label }}</p>
+        </div>
+        }
+      </div>
+    </li>
+    } }
+    <!-- Login Buttons HERE -->
+    <div class="login-buttons px-8 py-4">
+      @if(hasLogin){
+      <button
+        class="w-full py-3 bg-primary-shade text-primary-contrast flex justify-center items-center gap-2 rounded"
+        (click)="onLogoutClick()"
+        data-testid="mobile-logout-btn"
+      >
+        <i
+          class="w-5 h-5"
+          [ngStyle]="{
+            'mask-image':
+              'url(/assets/icons/thin/arrow-left-from-bracket-sharp-thin.svg)',
+            '-webkit-mask-image':
+              'url(/assets/icons/thin/arrow-left-from-bracket-sharp-thin.svg)',
+            'background-color': 'white',
+            'mask-repeat': 'no-repeat'
+          }"
+        ></i>
+        <span>Abmelden</span>
+      </button>
+      }@else {
+      <button
+        class="w-full py-3 bg-primary-shade text-primary-contrast flex justify-center items-center gap-2 rounded"
+        (click)="onLoginClick()"
+        data-testid="mobile-login-btn"
+      >
+        <i
+          class="w-5 h-5"
+          [ngStyle]="{
+            'mask-image': 'url(/assets/icons/log-in-outline.svg)',
+            '-webkit-mask-image': 'url(/assets/icons/log-in-outline.svg)',
+            'background-color': 'white',
+            'mask-repeat': 'no-repeat'
+          }"
+        ></i>
+        <span>Anmelden</span>
+      </button>
+      }
+    </div>
+  </ul>
+</aside>

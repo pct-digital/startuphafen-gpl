@@ -1,0 +1,83 @@
+<div data-testid="project-items" class="grid lg:grid-cols-2 px-5 gap-4">
+  @for (project of projectList.slice(visibleStartIndex, visibleStartIndex +
+  visibleSliceSize); track $index) {
+  <div class="flex flex-col justify-center items-center">
+    <div
+      class="border rounded-xl flex justify-center items-center text-primary-contrast py-6 px-12 sm:px-28 md:px-40 lg:p-3"
+      style="background-color: rgba(var(--sh-color-primary-rgb), 0.09)"
+    >
+      <div class="flex flex-col justify-center items-center">
+        <span class="text-xl text-center text-secondary my-6">{{
+          project.name
+        }}</span>
+        <div class="flex flex-wrap justify-center items-center gap-x-4">
+          <button
+            (click)="projectEditClick.emit(project.id)"
+            [attr.data-testid]="'editButton'"
+            tabindex="0"
+            (keydown.enter)="projectEditClick.emit(project.id)"
+            class="bg-primary hover:bg-primary-shade rounded-full px-8 h-12 text-lg text-white mb-6"
+          >
+            Bearbeiten
+          </button>
+          @if (!isPopup) {
+          <button
+            (click)="onProjectDeleteClicked(project)"
+            [attr.data-testid]="'deleteButton'"
+            class="hover:bg-primary-shade rounded-full bg-primary w-12 h-12 mb-6 disabled:opacity-50 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+            [disabled]="project.gewASent || project.steErSent"
+          >
+            <div class="flex justify-center ml-0.5">
+              <span
+                [ngStyle]="{
+              'mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
+              '-webkit-mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
+              'background-color': 'white',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+            }"
+                class="w-5 h-5"
+              >
+              </span>
+            </div>
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+
+@if(!isPopup || visibleSliceSize === 1) {
+<div class="flex justify-center mt-5">
+  <button
+    (click)="scrollLeft()"
+    [attr.data-testid]="'scrollLeftButton'"
+    tabindex="0"
+    (keydown.enter)="scrollLeft()"
+    [ngStyle]="{
+              'mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
+              '-webkit-mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
+              'background-color': 'var(--sh-color-primary)',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+            }"
+    class="w-8 h-8 mr-4"
+  ></button>
+  <button
+    (click)="scrollRight()"
+    [attr.data-testid]="'scrollRightButton'"
+    tabindex="0"
+    (keydown.enter)="scrollRight()"
+    [ngStyle]="{
+              'mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
+              '-webkit-mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
+              'background-color': 'var(--sh-color-primary)',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+            }"
+    class="w-8 h-8"
+  ></button>
+</div>
+}

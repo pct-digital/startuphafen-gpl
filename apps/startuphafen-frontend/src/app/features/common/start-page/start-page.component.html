@@ -1,0 +1,128 @@
+<div class="page-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-wrap justify-center pt-16 md:pt-24">
+    <h1
+      data-testid="start-page-title"
+      class="text-4xl md:text-5xl text-secondary text-center font-bold"
+    >
+      {{ getStartPageText()?.title }}
+    </h1>
+  </div>
+
+  <section class="py-6 md:py-12">
+    <div class="w-full mx-auto flex justify-center">
+      <p class="text-lg md:text-xl text-tertiary text-center max-w-4xl">
+        {{ getStartPageText()?.text }}
+      </p>
+    </div>
+  </section>
+
+  <section class="pb-4 md:pb-16 lg:pb-20">
+    <div class="w-full mx-auto">
+      <div
+        data-testid="main-items"
+        class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10"
+      >
+        @for (item of getCardItems(); track $index) {
+        <div shCard class="transition-transform hover:scale-[1.01]">
+          <div class="flex flex-col items-center pt-8 w-full">
+            <span
+              [ngStyle]="{
+                'mask-image': 'url(' + item.icon + ')',
+                '-webkit-mask-image': 'url(' + item.icon + ')',
+                'background-color': 'var(--sh-color-primary)',
+                'background-position': 'center',
+                'mask-repeat': 'no-repeat',
+                'mask-size': 'contain'
+              }"
+              class="w-16 h-16"
+              aria-hidden="true"
+            >
+            </span>
+            <h2
+              class="text-xl md:text-2xl text-center text-secondary font-semibold w-full mt-4"
+            >
+              {{ item.label }}
+            </h2>
+            @if (item.projects) { @if(projects.length !== 0) {
+            <sh-project-list
+              [projectList]="projects"
+              (projectDeleteClick)="deleteProject($event)"
+              (projectEditClick)="editProject($event)"
+              class="py-5 w-full"
+            ></sh-project-list>
+            } @else {
+            <div
+              class="text-lg text-tertiary text-center w-full px-6 md:px-10 mt-4 mb-16"
+            >
+              <p>Du hast noch kein Startup angelegt.</p>
+              <p>Bitte leg über "Mein Startup anlegen" los!</p>
+            </div>
+            } } @else {
+            <div
+              class="text-base md:text-lg text-tertiary text-center w-full px-6 md:px-10 mt-4 flex-grow"
+            >
+              {{ item.discription }}
+            </div>
+            <button
+              (click)="
+                item.action ? triggerAction(item.action) : clickitem(item)
+              "
+              [attr.data-testid]="'home-button-' + item.path"
+              tabindex="0"
+              (keydown.enter)="clickitem(item)"
+              class="bg-primary hover:bg-primary-shade focus:ring-2 focus:ring-primary/50 focus:outline-none rounded-full w-48 md:w-52 h-12 md:h-14 mt-8 text-base md:text-lg text-white mb-6 transition-colors"
+            >
+              {{ item.buttonLabel }}
+            </button>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>
+
+<ng-template #createProjectPopup>
+  <div class="flex flex-col items-center p-12 md:p-20gap-4">
+    <div shCardTitle>Jetzt Startup anlegen</div>
+    <div shCardSubtitle>Wie willst Du Dein Startup nennen?</div>
+    <div shCardInner class="flex flex-col items-center gap-y-4 w-full">
+      <input
+        shInput
+        [(ngModel)]="projectName"
+        type="text"
+        data-testid="project-name-input"
+        class="w-full"
+      />
+      <button shButton (click)="saveProject()" class="w-full md:w-auto">
+        Loslegen!
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deleteProjectPopup>
+  <div class="flex flex-col items-center p-12 md:p-20 gap-4">
+    <div shCardTitle>Projekt löschen</div>
+    <div shCardSubtitle>Möchtest du das Projekt wirklich löschen?</div>
+    <div shCardInner class="flex flex-col items-center">
+      <button
+        shButton
+        (click)="confirmDeleteProject()"
+        data-testid="confirm-delete-button"
+        class="mb-6"
+      >
+        Löschen
+      </button>
+      <button
+        shButton
+        [outline]="true"
+        (click)="closePopup()"
+        data-testid="cancel-delete-button"
+      >
+        Abbrechen
+      </button>
+    </div>
+  </div>
+</ng-template>

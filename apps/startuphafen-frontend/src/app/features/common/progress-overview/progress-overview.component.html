@@ -1,0 +1,47 @@
+<button
+  class="fixed bottom-32 left-5 rounded-full bg-white w-[64px] h-[64px] border shadow-[0_0_23px_rgba(0,0,0,0.188)] z-10 flex items-center justify-center"
+  (click)="openPopup(progressPopupTemplate)"
+>
+  <div class="flex flex-col justify-start items-center">
+    <span
+      [ngStyle]="{
+              'mask-image': 'url(/assets/icons/solid/eye.svg)',
+              '-webkit-mask-image': 'url(/assets/icons/solid/eye.svg)',
+              'background-color': 'var(--sh-color-primary)',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+            }"
+      class="w-[53px] h-[53px]"
+    >
+    </span>
+  </div>
+</button>
+
+<ng-template #progressPopupTemplate>
+  <div class="flex flex-col items-start gap-y-3 pt-20 pl-10">
+    @for (step of questionSteps; track $index) {
+    <div class="flex justify-center items-center">
+      <button
+        class="flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg"
+        [ngClass]="{
+          'bg-primary !text-white': $index < currentStep,
+          'border-2 bg-questionProgress border-questionProgress text-white':
+            $index === currentStep,
+          'border-2 border-primary text-primary': $index > currentStep
+        }"
+      >
+        {{ $index + 1 }}
+      </button>
+      <div
+        class="ml-4 font-bold text-center"
+        [ngClass]="{
+          'text-primary font-semibold': $index <= currentStep,
+          'text-tertiary': $index > currentStep
+        }"
+      >
+        {{ step.question }}
+      </div>
+    </div>
+    }
+  </div>
+</ng-template>

@@ -1,0 +1,106 @@
+<div class="relative pt-16 sm:pt-20 md:pt-24">
+  <div
+    class="absolute top-0 left-0 w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px] xl:h-[550px] bg-questionProgress"
+  >
+    <img
+      src="/assets/icons/sh-cutout.svg"
+      alt=""
+      class="absolute right-0 top-2 w-fit max-w-[120px] sm:max-w-none"
+    />
+  </div>
+  <div class="flex flex-col items-center">
+    <div
+      class="relative z-10 w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] lg:max-w-[90%] xl:max-w-[95%]"
+    >
+      <div
+        class="px-3 sm:px-5 md:px-8 lg:px-16 xl:px-64 pb-6 sm:pb-8 md:pb-10 pt-3 sm:pt-4 md:pt-5"
+      >
+        <section
+          class="py-6 sm:py-8 md:py-10 bg-white border shadow-[0_0_23px_rgba(0,0,0,0.188)] rounded-[10px] sm:rounded-[15px] text-tertiary"
+        >
+          <button
+            size="lg"
+            class="ml-4 sm:ml-6 md:ml-12 lg:ml-16 xl:ml-20 text-[var(--sh-color-primary)] text-[16px] sm:text-[18px] font-semibold hover:underline"
+            (click)="backButtonClicked.emit()"
+            data-testid="faq-article-page-back-button"
+          >
+            <div class="flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 9.715 16.042"
+                class="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 sm:mt-1 mr-1"
+              >
+                <path
+                  id="angle-down-sharp-solid"
+                  d="M8.021,0,8.9.876l6.251,6.2.887.88-1.77,1.756-.883-.876L8.021,3.512,2.653,8.835l-.883.88L0,7.959l.883-.876L7.134.88Z"
+                  transform="translate(0 16.042) rotate(-90)"
+                  fill="var(--sh-color-primary)"
+                />
+              </svg>
+              <div>Zurück</div>
+            </div>
+          </button>
+          <h1
+            data-testid="faq-article-page-title"
+            class="text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] xl:text-[48px] text-primary text-center mx-auto px-4 sm:px-6 md:px-8 leading-tight"
+          >
+            {{ articleData == null ? '' : articleData.title }}
+          </h1>
+          <div class="pb-8 sm:pb-12 md:pb-16 pt-3 sm:pt-4 md:pt-5">
+            <h2
+              class="text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] text-primary text-center px-4 sm:px-6 md:px-8 break-words"
+            >
+              {{ articleData == null ? '' : articleData.subtitle }}
+            </h2>
+          </div>
+          @if(articleData != null){
+          <div
+            class="w-full 3xl:max-w-screen-3xl mx-auto border-1 border-primary"
+          >
+            <div
+              class="px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 2xl:px-48 text-[14px] sm:text-[15px] md:text-[16px] article-content"
+              [innerHTML]="articleData.body"
+            ></div>
+            <p
+              class="px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 2xl:px-48 text-[14px] sm:text-[15px] md:text-[16px] article-content"
+            >
+              Du weißt nicht weiter oder brauchst mehr Informationen?
+              <a
+                role="button"
+                (click)="navigateNetworkRoute()"
+                class="text-primary hover:underline cursor-pointer"
+                >Kontaktiere unsere Beratungspartner digital!</a
+              >
+            </p>
+          </div>
+          }
+          <div class="flex flex-col items-center mt-8 sm:mt-12 md:mt-16">
+            <button
+              shButton
+              size="lg"
+              class="text-white text-[14px] sm:text-[15px] md:text-[16px] hover:bg-primary-shade"
+              (click)="backButtonClicked.emit()"
+              data-testid="faq-article-page-back-button"
+            >
+              <div class="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 9.715 16.042"
+                  fill="currentColor"
+                  class="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 sm:mt-1.5 mr-1 text-white"
+                >
+                  <path
+                    id="angle-down-sharp-solid"
+                    d="M8.021,0,8.9.876l6.251,6.2.887.88-1.77,1.756-.883-.876L8.021,3.512,2.653,8.835l-.883.88L0,7.959l.883-.876L7.134.88Z"
+                    transform="translate(0 16.042) rotate(-90)"
+                  />
+                </svg>
+                <div>Zurück</div>
+              </div>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>

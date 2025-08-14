@@ -1,0 +1,28 @@
+<div class="flex justify-center py-32">
+  <form
+    [formGroup]="form"
+    class="w-full max-w-4xl h-full p-8 rounded-lg border border-black"
+  >
+    <formly-form [model]="model" [fields]="fields" [form]="form"></formly-form>
+    <div class="flex justify-end">
+      <button
+        hlmBtn
+        type="submit"
+        class="mr-5 mt-5 text-primary-contrast bg-primary hover:bg-primary-shade"
+        (click)="saveClicked.emit()"
+        data-testid="save-button"
+      >
+        Speichern
+      </button>
+      <button
+        hlmBtn
+        type="submit"
+        class="mt-5 text-primary-contrast bg-primary hover:bg-primary-shade"
+        (click)="nextClicked.emit()"
+        data-testid="next-button"
+      >
+        Weiter
+      </button>
+    </div>
+  </form>
+</div>

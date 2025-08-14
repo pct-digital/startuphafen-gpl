@@ -1,0 +1,7 @@
+{
+  "name": "@startuphafen/pct-pipeline",
+  "version": "0.0.1",
+  "dependencies": {},
+  "private": true,
+  "executors": "./executors.json"
+}

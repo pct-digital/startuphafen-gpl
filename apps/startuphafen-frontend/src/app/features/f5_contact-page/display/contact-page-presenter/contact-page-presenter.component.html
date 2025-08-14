@@ -1,0 +1,113 @@
+<div class="page-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex flex-wrap justify-center pt-16 md:pt-24">
+    <h1
+      data-testid="contact-page-title"
+      class="text-4xl md:text-5xl text-secondary text-center font-bold"
+    >
+      {{ websiteText[0].title ?? 'Placeholder Title' }}
+    </h1>
+  </div>
+
+  <section class="py-6 md:py-12">
+    <div class="w-full mx-auto flex justify-center">
+      <p class="text-lg md:text-xl text-tertiary text-center max-w-4xl">
+        {{ websiteText[0].text ?? 'Placeholder Text' }}
+      </p>
+    </div>
+  </section>
+
+  <section class="py-8 md:py-16 lg:py-20 mb-12">
+    <div class="w-full mx-auto">
+      <ul class="space-y-12 md:space-y-16">
+        @for(groupContact of contactListGrouped; track groupContact.group) {
+        <div>
+          <h2
+            class="text-2xl md:text-3xl mb-8 md:mb-10 text-primary text-center font-semibold"
+          >
+            {{ groupContact.group }}
+          </h2>
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+          >
+            <li
+              *ngFor="let contact of groupContact.contact; let index = index"
+              class="border rounded-2xl shadow-md transition-transform hover:scale-[1.01]"
+            >
+              <section
+                hlmCard
+                class="h-full overflow-hidden bg-white rounded-2xl flex flex-col"
+                [attr.data-testid]="'contact-item-' + contact.name"
+              >
+                <div
+                  hlmCardHeader
+                  class="flex items-center justify-center pt-6"
+                >
+                  <img
+                    class="rounded-full w-28 h-28 md:w-36 md:h-36 object-cover"
+                    [src]="contact.foto.url"
+                    alt="Contact image"
+                  />
+                </div>
+                <div
+                  hlmCardContent
+                  class="flex-1 flex flex-col items-center p-6"
+                >
+                  <h3
+                    class="text-xl md:text-2xl text-primary text-center font-semibold"
+                  >
+                    {{ contact.name }}
+                  </h3>
+                  <p
+                    class="text-tertiary text-base md:text-lg text-center mt-1"
+                  >
+                    {{ contact.funktion }}
+                  </p>
+                  <p
+                    class="text-tertiary font-bold text-base md:text-lg mt-6 text-center"
+                  >
+                    {{ contact.unternehmen }}
+                  </p>
+                  <p
+                    class="text-tertiary text-base md:text-lg text-center break-words"
+                  >
+                    {{ contact.mailadresse }}
+                  </p>
+                  <p class="text-tertiary text-base md:text-lg text-center">
+                    {{ contact.telefon }}
+                  </p>
+                  <div
+                    [attr.data-testid]="'contact-item-link-' + contact.name"
+                    class="mt-auto pt-8 flex justify-center items-center gap-x-3"
+                  >
+                    <a
+                      [href]="contact.kontaktlink"
+                      target="_blank"
+                      class="text-primary text-base md:text-lg hover:text-primary-shade hover:underline text-center focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md px-2 py-1"
+                      >Termin buchen</a
+                    >
+                    <span
+                      [ngStyle]="{
+                        'mask-image':
+                          'url(/assets/icons/solid/calendar-days-sharp-solid.svg)',
+                        '-webkit-mask-image':
+                          'url(/assets/icons/solid/calendar-days-sharp-solid.svg)',
+                        'background-color': 'var(--sh-color-primary)',
+                        'background-position': 'center',
+                        'mask-repeat': 'no-repeat',
+                        'mask-size': 'contain'
+                      }"
+                      class="w-8 h-8"
+                      aria-hidden="true"
+                    >
+                    </span>
+                  </div>
+                </div>
+              </section>
+            </li>
+          </div>
+        </div>
+        }
+      </ul>
+    </div>
+  </section>
+</div>

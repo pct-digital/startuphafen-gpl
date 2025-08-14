@@ -1,0 +1,208 @@
+@if (!isPopup) {
+<div class="relative">
+  <div class="absolute top-0 left-0 w-full h-[550px] bg-questionProgress">
+    <img
+      src="/assets/icons/sh-cutout.svg"
+      alt=""
+      class="absolute right-0 top-2 w-fit"
+    />
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col items-center pt-16 md:pt-24">
+      <h1
+        data-testid="faq-page-title"
+        class="text-4xl md:text-5xl text-white text-center font-bold"
+      >
+        Wissensportal & FAQ
+      </h1>
+    </div>
+
+    <div class="flex items-center justify-center mt-10 md:mt-16">
+      <form
+        [formGroup]="faqFormGroup"
+        (ngSubmit)="submit()"
+        data-testid="faq-form"
+        class="flex items-center w-full max-w-2xl bg-white shadow-xl rounded-full pr-2 transition-all duration-200"
+      >
+        <input
+          formControlName="search"
+          #searchInput
+          type="search"
+          data-testid="search-input"
+          class="flex-grow text-base md:text-lg py-4 md:py-6 px-6 text-tertiary font-medium focus:outline-none border-0 focus:ring-0 rounded-full"
+          placeholder="Suche nach Artikeln und FAQs..."
+        />
+        <button
+          type="submit"
+          class="bg-primary text-white py-2 px-4 md:px-6 rounded-full flex items-center justify-center shadow-xl hover:bg-primary-shade focus:ring-2 focus:ring-primary/50 focus:outline-none z-10 transition-colors"
+        >
+          <span
+            [ngStyle]="{
+              'mask-image':
+                'url(/assets/icons/solid/magnifying-glass-sharp-solid.svg)',
+              '-webkit-mask-image':
+                'url(/assets/icons/solid/magnifying-glass-sharp-solid.svg)',
+              'background-color': 'white',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+              'mask-size': 'contain'
+            }"
+            class="w-6 h-6 md:w-7 md:h-7"
+            aria-hidden="true"
+          >
+          </span>
+          <span class="ml-2">Suche starten</span>
+        </button>
+      </form>
+    </div>
+
+    <section class="mt-24 md:mt-32 mb-20">
+      <div class="w-full mx-auto">
+        @if (isArticleSearch) {
+        <div class="mb-10">
+          <h2
+            class="text-2xl md:text-3xl text-primary text-center font-semibold mb-6"
+          >
+            Suchergebnisse
+          </h2>
+          @if (isArticleNotFound) {
+          <p class="text-lg text-tertiary text-center">
+            Keine Ergebnisse gefunden.
+          </p>
+          }
+        </div>
+        }
+
+        <div
+          data-testid="main-items"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          @if (!isArticleSearch) { @for (category of categories; track $index) {
+          @for (article of articles; track $index) { @if(category.categoryName
+          === article.articleCategory?.categoryName){
+          <div
+            class="bg-white border shadow-lg rounded-2xl flex justify-center items-center text-primary-contrast min-h-[26rem] transition-transform hover:scale-[1.01]"
+          >
+            <div
+              class="flex flex-col items-center gap-y-8 w-full py-8 px-6 md:px-8"
+            >
+              <img
+                [src]="article.icon?.url"
+                alt=""
+                class="w-24 h-24 object-contain"
+              />
+              <span
+                class="text-xl md:text-2xl font-semibold text-center text-secondary w-full mt-2 overflow-hidden"
+                >{{ article.title }}
+              </span>
+              <a
+                role="button"
+                tabindex="0"
+                (click)="articleClicked.emit(article.documentId)"
+                (keydown.enter)="articleClicked.emit(article.documentId)"
+                [attr.data-testid]="'article-item-' + article.title"
+                class="text-primary text-lg flex justify-center items-center hover:text-primary-shade hover:underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md px-2 py-1 mt-auto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 9.715 16.042"
+                  class="w-4 h-4 mr-2"
+                >
+                  <path
+                    id="angle-down-sharp-solid"
+                    d="M26.721,156.415l.883-.876,6.251-6.2.887-.88-1.77-1.756-.883.876L26.721,152.9l-5.368-5.323-.883-.88-1.77,1.756.883.876,6.251,6.2Z"
+                    transform="translate(-146.7 34.742) rotate(-90)"
+                    fill="var(--sh-color-primary)"
+                  />
+                </svg>
+                Weiterlesen
+              </a>
+            </div>
+          </div>
+          } } } } @else { @for (article of articleSearchResults; track $index) {
+          <div
+            class="bg-white border shadow-lg rounded-2xl flex justify-center items-center text-primary-contrast min-h-[26rem] transition-transform hover:scale-[1.01]"
+          >
+            <div
+              class="flex flex-col items-center gap-y-8 w-full py-8 px-6 md:px-8"
+            >
+              <img
+                [src]="article.icon?.url"
+                alt=""
+                class="w-24 h-24 object-contain"
+              />
+              <span
+                class="text-xl md:text-2xl font-semibold text-center text-secondary w-full mt-2"
+                >{{ article.title }}
+              </span>
+              <a
+                role="button"
+                tabindex="0"
+                (click)="articleClicked.emit(article.documentId)"
+                (keydown.enter)="articleClicked.emit(article.documentId)"
+                [attr.data-testid]="'article-item-' + article.title"
+                class="text-primary text-lg flex justify-center items-center hover:text-primary-shade hover:underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-md px-2 py-1 mt-auto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 9.715 16.042"
+                  class="w-4 h-4 mr-2"
+                >
+                  <path
+                    id="angle-down-sharp-solid"
+                    d="M26.721,156.415l.883-.876,6.251-6.2.887-.88-1.77-1.756-.883.876L26.721,152.9l-5.368-5.323-.883-.88-1.77,1.756.883.876,6.251,6.2Z"
+                    transform="translate(-146.7 34.742) rotate(-90)"
+                    fill="var(--sh-color-primary)"
+                  />
+                </svg>
+                Weiterlesen
+              </a>
+            </div>
+          </div>
+          } }
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="relative max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 my-16 md:my-24">
+    <section>
+      <h2
+        class="text-3xl md:text-4xl text-primary text-center font-bold mb-10 md:mb-16"
+      >
+        FAQ/Häufig gestellte Fragen
+      </h2>
+      @if(faqList.length > 0){
+      <sh-faq-accordion
+        [faqList]="faqList"
+        [isPopup]="isPopup"
+      ></sh-faq-accordion>
+      }
+    </section>
+  </div>
+</div>
+} @else {
+
+<div
+  class="w-full max-w-4xl mx-auto px-4 py-6 md:p-8"
+  style="transform: scale(0.95)"
+>
+  <h2 class="text-2xl md:text-3xl text-primary text-center font-bold mb-8">
+    FAQ/Häufig gestellte Fragen
+  </h2>
+  @if(faqList.length > 0){
+  <div class="w-full">
+    <sh-faq-accordion
+      [faqList]="faqList"
+      [isPopup]="isPopup"
+    ></sh-faq-accordion>
+  </div>
+  }
+</div>
+
+}

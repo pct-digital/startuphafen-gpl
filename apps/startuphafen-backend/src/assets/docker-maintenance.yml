@@ -1,0 +1,14 @@
+services:
+  maintenance:
+    image: nginxinc/nginx-unprivileged:1.27.3-alpine
+    volumes:
+      - ./nginx/maintenance/maintenance.html:/usr/share/nginx/html/maintenance.html:ro
+      - ./nginx/maintenance/maintenance.conf.template:/etc/nginx/templates/maintenance.conf.template:ro
+      - ./nginx/ssl:/etc/ssl-conf:ro
+      - ../../../../certbot/conf:/etc/letsencrypt:ro
+      - ../../../../certbot/www:/var/www/certbot:ro
+    environment:
+      APP_HOST: '${APP_HOST}'
+    ports:
+      - '80:8080'
+      - '443:8443'

@@ -1,0 +1,169 @@
+[
+  {
+    "name": "Antragstellende Person",
+    "label": "Antragstellende Person",
+    "formItems": [
+      {
+        "name": "Nachname",
+        "label": "Nachname",
+        "type": "string"
+      },
+      {
+        "name": "Vorname",
+        "label": "Vorname",
+        "type": "string"
+      },
+      {
+        "name": "Anrede",
+        "label": "Anrede",
+        "type": "string"
+      },
+      {
+        "name": "Titel",
+        "label": "Titel",
+        "type": "string"
+      },
+      {
+        "name": "Geburtsdatum",
+        "label": "Geburtsdatum",
+        "type": "date"
+      },
+      {
+        "name": "Staatsangehörigkeit",
+        "label": "Staatsangehörigkeit",
+        "type": "string"
+      },
+      {
+        "name": "Telefonnummer",
+        "label": "Telefonnummer",
+        "type": "string"
+      },
+      {
+        "name": "EMail",
+        "label": "EMail",
+        "type": "string"
+      },
+      {
+        "name": "Adresse",
+        "label": "Adresse",
+        "formItems": [
+          {
+            "name": "Straße",
+            "label": "Straße",
+            "type": "string"
+          },
+          {
+            "name": "Hausnummer",
+            "label": "Hausnummer",
+            "type": "string"
+          },
+          {
+            "name": "PLZ",
+            "label": "PLZ",
+            "type": "string"
+          },
+          {
+            "name": "Ort",
+            "label": "Ort",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Betriebsdaten",
+    "label": "Betriebsdaten",
+    "formItems": [
+      {
+        "name": "Betriebsstätte",
+        "label": "Betriebsstätte",
+        "formItems": [
+          {
+            "name": "Straße",
+            "label": "Straße",
+            "type": "string"
+          },
+          {
+            "name": "Hausnummer",
+            "label": "Hausnummer",
+            "type": "string"
+          },
+          {
+            "name": "PLZ",
+            "label": "PLZ",
+            "type": "string"
+          },
+          {
+            "name": "Ort",
+            "label": "Ort",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Angemeldete Tätigkeit",
+        "label": "Angemeldete Tätigkeit",
+        "formItems": [
+          {
+            "name": "Nebenerwerb",
+            "label": "Nebenerwerb",
+            "type": "boolean"
+          },
+          {
+            "name": "Beginn",
+            "label": "Beginn",
+            "type": "date"
+          },
+          {
+            "name": "Beschreibung",
+            "label": "Beschreibung",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Vorliegende Erlaubnis",
+        "label": "Vorliegende Erlaubnis",
+        "formItems": [
+          {
+            "name": "Erlaubnis liegt vor",
+            "label": "Erlaubnis liegt vor",
+            "type": "boolean"
+          },
+          {
+            "name": "Ausstellende Behörde",
+            "label": "Ausstellende Behörde",
+            "type": "string"
+          },
+          {
+            "name": "Ausstellungsdatum",
+            "label": "Ausstellungsdatum",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Vorliegende Handwerkskarte",
+        "label": "Vorliegende Handwerkskarte",
+        "formItems": [
+          {
+            "name": "Handwerkskarte liegt vor",
+            "label": "Handwerkskarte liegt vor",
+            "type": "boolean"
+          },
+          {
+            "name": "Name der Handwerkskammer",
+            "label": "Name der Handwerkskammer",
+            "type": "string"
+          },
+          {
+            "name": "Ausstellungsdatum",
+            "label": "Ausstellungsdatum",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "outputCapture": "direct-nodejs",
+  "version": 2,
+  "cli": "nx",
+  "title": "Funtional Acceptance Tester",
+  "description": "Needs a production build of an app to run our cucumber accptance tests against it using the docker-local configuration.",
+  "type": "object",
+  "properties": {
+    "headed": {
+      "type": "boolean",
+      "description": "Tells the executor to run in headed mode or not.",
+      "default": false
+    },
+    "noexit": {
+      "type": "boolean",
+      "description": "Tells Cypress not to automatically exit. Useful in debugging",
+      "default": false
+    },
+    "restrict": {
+      "type": "string",
+      "description": "Optional, restricts the run to the given spec files."
+    },
+    "documentationVideos": {
+      "type": "boolean",
+      "description": "Set to true to generate documentation videos: run tests in slow motion and patch Cypress to add overlays. Meant to be used as a prepartion step to generate the documentation page, which needs these videos.",
+      "default": false
+    },
+    "documentationScreenshots": {
+      "type": "boolean",
+      "description": "Set to true to run the screenshot taking test cases",
+      "default": false
+    },
+    "size": {
+      "type": "string",
+      "description": "Set to web, iphone_65, iphone_55 or ipad_129 for various screen sizes to be used, meant for screenshots. The default value is android for a typical android size",
+      "default": "android"
+    },
+    "skipBuild": {
+      "type": "boolean",
+      "default": false,
+      "description": "Should the app build be skiped before it is tested? Default is false, which build the app on each new test start."
+    },
+    "noDockerLog": {
+      "type": "boolean",
+      "default": false,
+      "description": "When set true this means the log data from all docker containers is not printed to stdout, but instead written to a file called 'docker.log'. Meant for github actions."
+    },
+    "frontendAppName": {
+      "type": "string",
+      "description": "Mandatory field, which specify the frontend part for the current e2e test"
+    },
+    "backendAppName": {
+      "type": "string",
+      "description": "Mandatory field, which specify the backend part for the current e2e test"
+    },
+    "buildScriptName": {
+      "type": "string",
+      "description": "A script name from package.json to build the apps"
+    },
+    "e2eAppName": {
+      "type": "string",
+      "description": "Mandatory field, spcecify the name of the e2e app"
+    },
+    "baseDockerFilePath": {
+      "type": "string",
+      "description": "Optional field to control the path to the base docker compose file for the test run. Relative to 'dist/apps/<backendAppName>' Defaults to 'assets/docker-compose.yml'.",
+      "default": "assets/docker-compose.yml"
+    },
+    "extendDockerFilePath": {
+      "type": "string",
+      "description": "Optional field to control the path to the docker compose file to extend the base docker compose file during the test run. Relative to 'dist/apps/<backendAppName>'",
+      "default": "assets/docker-compose-e2e.yml"
+    },
+    "extraDockerFilePath": {
+      "type": "string",
+      "description": "Optional extra docker compose file. Default is empty, meaning unused",
+      "default": ""
+    },
+    "baseUrl": {
+      "type": "string",
+      "description": "Possible values: web or app, controls the base URL, which will be set to browse either localhost on port 'WEB_PORT' in portal mode or 'APP_PORT' in app mode",
+      "default": "web"
+    }
+  }
+}

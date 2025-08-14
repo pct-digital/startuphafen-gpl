@@ -1,0 +1,95 @@
+---
+layout: baselayout.hbs
+title: Anwendungsdokumentation
+relativeLocation: "./"
+---
+
+<div class="m-8">
+
+    <div>
+        <h1 class="text-base lg:text-3xl font-bold mb-4">Automatische Anwendungs- und Akzeptanztestdokumentation</h1>
+    </div>
+
+    <div class="text-xs lg:text-base flex gap-1 lg:gap-4">
+
+        <div>
+            Dies ist die Dokumentationsseite der Anwendung.
+            Die verschiedenen Funktionen wurden im Rahmen des Userstory Mappings bestimmt und
+            durch die Ausarbeitung von verschiedenen Anwendungsbeispielen in weiteren Workshops konkretisiert.
+        </div>
+
+        <div>
+                Diese Anwendungsbeispiele sind auf den jeweiligen Unterseiten beschrieben und mit Videos der automatischen Tests visualisiert.
+                In diesen Video sind Interaktionen mit der Anwendung farblich markiert: <span class="font-bold" style="color: rgba(255, 50, 50, 0.8)">Klicks</span>,
+                <span class="font-bold" style="color: rgba(50, 255, 50, 0.8)">Tastatureingaben</span>, 
+                <span class="font-bold" style="color: rgba(50, 50, 255, 0.8)">Überprüfte Bereiche</span>.
+        </div>
+    </div>
+
+    <div class="text-xs mt-1">
+        Version: <br/>
+        <pre>{{ version }}</pre>
+    </div>
+
+    <div>
+
+        <h1 class="lg:text-xl font-bold mt-2 mb-4">Testübersicht</h1>
+
+        <div class="flex justify-center text-xs lg:text-base">
+            <table>
+                <tr>
+                    <th>
+                        Link
+                    </th>
+                    <th class="hidden lg:table-cell">
+                        Funktion
+                    </th>
+                    <th>Szenario</th>
+                    <th>Status</th>
+                </tr>
+
+                {{#each features}}
+
+                    {{#each this.rules}}
+
+                        {{#each this.scenarios}}
+
+                            <tr class="odd:bg-slate-200">
+
+                                <td class="px-2 py-1 border border-black border-collapse text-center">
+                                    <a href="feature/{{slugify ../../this.file}}/#scenario-{{this.slugName}}">#</a>
+                                </td>
+
+                                <td class="px-2 py-1 border border-black border-collapse hidden lg:table-cell">
+                                    {{../../this.name}}
+                                </td>
+
+                                <td class="px-2 py-1 border border-black border-collapse">
+                                    {{this.name}}
+                                </td>
+                                <td class="px-2 py-1 border border-black border-collapse text-center">
+                                    {{#if this.isImplemented}}
+                                        &#9989;
+                                    {{/if}}
+
+                                    {{#unless this.isImplemented}}
+                                        &#10060;
+                                    {{/unless}}
+                                </td>
+
+                            </tr>
+
+                        {{/each}}
+
+                    {{/each}}
+
+                {{/each}}
+
+            </table>
+
+        </div>
+
+
+    </div>
+
+</div>

@@ -1,0 +1,100 @@
+services:
+  database:
+    container_name: 'startuphafen-database-e2e-${API_PORT}-${WEB_PORT}'
+    restart: unless-stopped
+    init: true
+    image: postgres:15.5-bookworm
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      TZ: 'Europe/Berlin'
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U app']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: startuphafen-backend-e2e-${API_PORT}-${WEB_PORT}
+    restart: unless-stopped
+    init: true
+    image: node:20.11.1-bookworm
+    user: 'node'
+    working_dir: /home/node
+    volumes:
+      - ../:/home/node/app:rw
+    environment:
+      NODE_OPTIONS: --max-old-space-size=4196
+      TZ: 'Europe/Berlin'
+    depends_on:
+      database:
+        condition: service_healthy
+    # this is a little different than in staging or in production, as the while loop in sh provides a simple auto-restart for the server during e2e tests
+    # this is necessary because docker auto-restarts use an exponential wait time if the process restarts "too much"
+    command: "/bin/sh -c '(while :; do node --enable-source-maps /home/node/app/main.js --config e2e; sleep 0.1 ; done;)'"
+
+  keycloak-database:
+    container_name: 'startuphafen-keycloak-database-${API_PORT}-${WEB_PORT}'
+    restart: unless-stopped
+    init: true
+    image: postgres:15.5-bookworm
+    environment:
+      POSTGRES_USER: kc
+      POSTGRES_PASSWORD: kc
+      POSTGRES_DB: kc
+      TZ: 'Europe/Berlin'
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kc']
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 2s
+      retries: 5
+
+  keycloak:
+    container_name: 'startuphafen-keycloak-${API_PORT}-${WEB_PORT}'
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-database/kc
+      KC_DB_USERNAME: kc
+      KC_DB_PASSWORD: kc
+      KC_HOSTNAME: 'http://localhost:${WEB_PORT:-4000}/kc'
+      KC_HOSTNAME_ADMIN: 'http://localhost:${WEB_PORT:-4000}/kc-admin'
+    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    depends_on:
+      keycloak-database:
+        condition: service_healthy
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ../../../../.devcontainer/keycloak/imports:/opt/keycloak/data/import
+      - ./keycloak/entrypoint.sh:/entrypoint.sh
+      - ./keycloak/themes:/opt/keycloak/themes
+
+  maildev:
+    restart: unless-stopped
+    container_name: 'startuphafen-maildev-${API_PORT}-${WEB_PORT}'
+    image: maildev/maildev
+    ports:
+      - '${MAIL_DEV_PORT:-1080}:1080'
+    command: maildev -v --log-mail-contents
+    healthcheck:
+      test: 'wget -O - http://127.0.0.1:1080/healthz || exit 1'
+      start_interval: 1s
+      start_period: 30s
+
+  nginx:
+    container_name: 'startuphafen-nginx-${API_PORT}-${WEB_PORT}'
+    environment:
+      WEB_APP_CONFIG_FILE: '/config-parts/e2e.conf'
+    volumes:
+      - ../../startuphafen-frontend:/usr/share/nginx/html:ro
+    ports:
+      - '${WEB_PORT:-4000}:8080'

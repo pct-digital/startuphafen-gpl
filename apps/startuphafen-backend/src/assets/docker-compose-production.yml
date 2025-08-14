@@ -1,0 +1,19 @@
+services:
+  maildev:
+    environment:
+      # This is used to disable/enable maildev on prod servers via the CI-var DEPLOY_DOCKER_ENV
+      # setting this to 1080 makes it reachable, setting it to 9999 makes it unreachable
+      MAILDEV_WEB_PORT: ${MAILDEV_WEB_PORT}
+
+  backend:
+    command: "/bin/sh -c 'node --enable-source-maps /home/node/app/main.js --config production'"
+
+  nginx:
+    environment:
+      WEB_APP_CONFIG_FILE: '/config-parts/production.conf'
+
+  keycloak:
+    entrypoint: ['/bin/bash', '/entrypoint-prod.sh']
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ./keycloak/entrypoint-prod.sh:/entrypoint-prod.sh

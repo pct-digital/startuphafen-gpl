@@ -1,0 +1,78 @@
+<div
+  class="w-full transition-all duration-200"
+  [ngClass]="{
+    'xl:w-3/5 mx-auto': !isPopup,
+    'max-w-full': isPopup
+  }"
+>
+  @for (faq of faqs; track $index) {
+  <div class="mb-6">
+    <button
+      tab="0"
+      (click)="toggleFaq(faq)"
+      (keydown.enter)="toggleFaq(faq)"
+      class="w-full px-4 md:px-8 lg:px-16 py-4 md:py-6 flex justify-between items-center transition-shadow duration-200"
+      [ngClass]="{
+        'rounded-t-xl rounded-b-none shadow-sm': faq.isOpen,
+        'rounded-xl shadow-sm hover:shadow-lg': !faq.isOpen,
+      }"
+      [ngStyle]="
+      {
+        'background-color': isPopup? 'rgba(var(--ion-color-primary-rgb), 0.09)': 'white',
+      }
+      "
+    >
+      <span
+        class="text-lg md:text-xl font-bold text-left flex-1 mr-4"
+        [ngClass]="{
+          'text-primary': faq.isOpen,
+          'text-tertiary': !faq.isOpen
+        }"
+        >{{ faq.header }}</span
+      >
+      @if (!faq.isOpen) {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 22.955 14.01"
+        class="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
+      >
+        <path
+          id="angle-down-sharp-solid"
+          d="M30.177,160.71l1.263-1.263,8.945-8.945,1.269-1.269L39.122,146.7l-1.263,1.263-7.681,7.681L22.5,147.969,21.233,146.7,18.7,149.233l1.263,1.263,8.945,8.945Z"
+          transform="translate(-18.7 -146.7)"
+          fill="var(--sh-color-primary)"
+        />
+      </svg>
+
+      } @else {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 22.955 14.01"
+        class="w-4 h-4 md:w-5 md:h-5 flex-shrink-0"
+      >
+        <path
+          id="angle-down-sharp-solid"
+          d="M30.178,146.7l1.263,1.263,8.945,8.945,1.269,1.269-2.533,2.532-1.263-1.263-7.682-7.681L22.5,159.441l-1.263,1.269L18.7,158.177l1.263-1.263,8.945-8.945Z"
+          transform="translate(-18.7 -146.7)"
+          fill="var(--sh-color-tertiary)"
+        />
+      </svg>
+
+      }
+    </button>
+
+    <div [@expandCollapse]="faq.isOpen ? 'expanded' : 'collapsed'">
+      <div
+        class="px-4 md:px-8 lg:px-16 py-4 rounded-b-xl"
+        [ngStyle]="
+      {
+        'background-color': isPopup? 'rgba(var(--ion-color-primary-rgb), 0.09)': 'white',
+      }
+      "
+      >
+        <div [innerHTML]="faq.content" class="py-2"></div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

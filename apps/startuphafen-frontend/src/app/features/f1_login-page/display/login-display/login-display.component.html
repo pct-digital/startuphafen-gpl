@@ -1,0 +1,40 @@
+<div
+  class="flex justify-center items-center min-h-[80vh] p-4"
+  data-testid="login-container"
+>
+  <div shCard>
+    <h2 shCardTitle data-testid="login-title">
+      {{ title }}
+    </h2>
+    <p shCardSubtitle>{{ subtitle }}</p>
+
+    <div shCardInner>
+      <div shCardContent>
+        <p [innerHTML]="content" data-testid="login-content"></p>
+      </div>
+
+      <div
+        class="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:justify-center"
+      >
+        <button
+          shButton
+          data-testid="login-button"
+          (click)="onLogin()"
+          aria-label="Login to your account"
+        >
+          {{ loginButton }}
+        </button>
+
+        <button
+          shButton
+          [outline]="true"
+          data-testid="register-button"
+          aria-label="Create a new account"
+          (click)="onRegister()"
+        >
+          {{ registerButton }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

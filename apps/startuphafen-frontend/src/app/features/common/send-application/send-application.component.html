@@ -1,0 +1,98 @@
+<div shCard data-testid="send-application-card" class="px-8 w-full">
+  <div shCardTitle data-testid="send-application-card-title">{{ title }}</div>
+  <div class="flex flex-row gap-4">
+    <div shCardSubtitle data-testid="send-application-card-subtitle">
+      {{ subtitle
+      }}{{
+        subtitle == null
+          ? ''
+          : applicationType === 'elster'
+          ? ': Finanzamt'
+          : applicationType === 'gewerbeamt'
+          ? ': Gewerbeamt'
+          : ''
+      }}
+    </div>
+    <div>
+      <img
+        src="/assets/icons/solid/check-solid.svg"
+        alt="icon"
+        *ngIf="sendDisabled"
+        class="size-12 filter-green relative -top-4"
+      />
+    </div>
+  </div>
+  <span shCardContent data-testid="send-application-card-content">
+    {{ content }}
+  </span>
+  <div class="mt-8">
+    <button
+      shButton
+      [disabled]="downloadDisabled"
+      [outline]="true"
+      (click)="clickDownloadData()"
+      data-testid="send-application-donwload-data-btn"
+      tabindex="0"
+      [style]="downloadVisible ? 'display: ' : 'display: none'"
+    >
+      <img
+        src="/assets/icons/solid/file-pdf-sharp-solid.svg"
+        alt="icon"
+        class="size-6"
+      />
+      Angaben herunterladen
+    </button>
+  </div>
+  <div class="mt-2">
+    <button
+      shButton
+      [disabled]="sendDisabled || lockSend"
+      (click)="clickSend()"
+      data-testid="send-application-send-data-btn"
+      tabindex="1"
+    >
+      <img
+        src="/assets/icons/solid/envelope-sharp-solid-white.svg"
+        alt="icon"
+        class="size-6"
+      />
+      <div>
+        An das
+        {{
+          applicationType === 'elster'
+            ? 'Finanzamt'
+            : applicationType === 'gewerbeamt'
+            ? 'Gewerbeamt'
+            : ''
+        }}
+        senden
+      </div>
+    </button>
+  </div>
+</div>
+@if(errorMessage != null) {
+<div shCard class="mt-4 mx-auto max-w-[calc(100vw-2rem)] sm:max-w-lg w-full">
+  <div shCardTitle class="text-red-500">{{ errorCardTitle }}</div>
+  <div shCardContent class="px-4 sm:px-6">
+    <div class="flex flex-col space-y-3">
+      <span class="text-red-500 font-semibold">Hinweis</span>
+      <span class="text-sm sm:text-base break-words"
+        >Bitte leg Dein Startup neu an. Aufgrund von gesetzlich festgelegten
+        Abhängigkeiten innerhalb des Fragenflows kannst Du abgeschlossene
+        Eingaben nicht mehr ändern.</span
+      >
+    </div>
+    @for( error of errorMessage; track $index){
+    <div class="flex flex-col space-y-1 mt-4">
+      <span class="text-red-500 font-semibold text-sm sm:text-base"
+        >Error #{{ $index + 1 }}:
+      </span>
+      <span
+        class="text-xs sm:text-sm break-all font-mono bg-gray-100 p-2 rounded border overflow-hidden"
+        >{{ error }}</span
+      >
+    </div>
+    }
+  </div>
+</div>
+}

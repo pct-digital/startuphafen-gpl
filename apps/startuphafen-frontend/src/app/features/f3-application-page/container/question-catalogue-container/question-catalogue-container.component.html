@@ -1,0 +1,103 @@
+<!-- <sh-loader></sh-loader> -->
+<div class="w-full flex flex-col items-center justify-start pt-20 gap-2">
+  <div
+    class="absolute top-28 left-0 w-full h-[400px]"
+    style="
+      background-color: rgba(var(--sh-color-primary-rgb), 0.2);
+      pointer-events: none;
+    "
+  >
+    <img
+      src="/assets/icons/sh-cutout.svg"
+      alt=""
+      class="absolute right-0 top-2 w-fit"
+    />
+  </div>
+
+  @if(endReached){
+  <div class="mt-12 flex flex-col justify-center items-center">
+    @if (!roles.includes("bundID-high")) {
+    <div shCard class="max-w-[778px] z-10">
+      <div shCardTitle>Du darfst Deinen Antrag nicht abschicken!</div>
+      <div shCardSubtitle>
+        Du hast dich noch nicht mit Deinem Personalausweis über BundID
+        verifiziert. Hole das nun nach indem Du Deinen Ausweis in Deinem BundID
+        Konto hinterlegst und Dich neu anmeldest, oder Dich direkt mit Deinem
+        Personalausweis anmeldest. Im Anschluss kannst Du Deine Anträge
+        abschicken.
+      </div>
+    </div>
+    } @else {
+    <div class="gap-8 flex flex-col lg:flex-row z-10">
+      <sh-send-application
+        class="p-4"
+        [sendDisabled]="steErSent"
+        [title]="isGewADisabled ? '' : 'Schritt 1'"
+        [downloadDisabled]="downloadDisabled"
+        [errorMessage]="errorMessage"
+        [errorCardTitle]="'Fehler bei der Übertragung'"
+        [applicationType]="'elster'"
+        (sendData)="sendData()"
+        [subtitle]="projectName"
+        (downloadData)="downloadData()"
+        content="Sende jetzt Deine steuerliche Erfassung ab!"
+      ></sh-send-application>
+      @if(!isGewADisabled) {
+      <sh-send-application
+        class="p-4"
+        [applicationType]="'gewerbeamt'"
+        [title]="'Schritt 2'"
+        (sendData)="sendOZGData()"
+        [sendDisabled]="gewASent"
+        [lockSend]="!steErSent"
+        [downloadVisible]="false"
+        [subtitle]="projectName"
+        content="Sende jetzt Deine Gewerbeanmeldung ab"
+      ></sh-send-application>
+      }
+    </div>
+    }
+  </div>
+  }@else if (!newestVersion) {
+  <div shCard class="w-72 lg:w-96 z-10">
+    <div shCardTitle>Wichtig: Projektversion nicht aktuell !</div>
+    <div shCardSubtitle>
+      Deine Projektversion ist nicht mehr aktuell mit unserer Quelle. Bitte
+      erstelle ein neues Projekt. Wir entschuldigen Uns für die Umstände.
+    </div>
+  </div>
+  } @else {
+  <sh-questionflow-top-tracker
+    [currentStep]="currentStep"
+    [maxLength]="
+      questionCatalogue?.catalogue == null
+        ? 0
+        : questionCatalogue?.catalogue?.length ?? 0
+    "
+    [questionIndex]="questionCatalogue?.questionIndex ?? 0"
+    class="z-10"
+  ></sh-questionflow-top-tracker>
+  <sh-question-catalogue-form-template
+    [currentStep]="currentStep"
+    (nextClicked)="onNextClicked($event.formData)"
+    (previousClicked)="onPreviousClicked()"
+    [projectTitle]="projectName"
+    [question]="questionCatalogue?.currentQuestion ?? null"
+  ></sh-question-catalogue-form-template>
+
+  }
+</div>
+<ng-template #DownloadNotice>
+  <div shCard class="flex flex-col items-center justify-center">
+    <div shCardTitle>Wichtig: Protokoll jetzt speichern!</div>
+    <div shCardSubtitle>
+      Bitte speichere das Protokoll Deiner steuerlichen Erfassung jetzt ab. Aus
+      Datenschutzgründen werden Deine Informationen nicht auf startuphafen.sh
+      gespeichert und Du kannst im Nachgang nicht mehr über startuphafen.sh auf
+      das Protokoll zugreifen.
+    </div>
+    <div class="button-container flex justify-center items-center">
+      <div shButton (click)="close()">Ok</div>
+    </div>
+  </div>
+</ng-template>

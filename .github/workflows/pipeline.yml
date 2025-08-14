@@ -1,0 +1,246 @@
+name: 1 - The startuphafen pipeline
+run-name: 'Pipeline triggered by ${{ github.actor }} with commit "${{ github.event.head_commit.message }}"'
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+
+jobs:
+  prepare:
+    runs-on: buildjet-2vcpu-ubuntu-2204
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      # Init node, later steps will always need it
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+        # cache node_modules and friends
+      - uses: actions/checkout@v4
+        with:
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - name: Cache node modules
+        id: cache
+        uses: buildjet/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: npm ci
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: check for @only tag in feature files
+        run: node ./tools/pipeline/search-at-only-in-feature-files.js
+
+      # - run: npm run testdeploy
+
+      # run nx affected and create artifact with affected packages/apps
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+        with:
+          # Our PRs are based on dev, not main or master
+          main-branch-name: 'dev'
+          # The first commit
+          fallback-sha: '36e66a11be0e91ddfee2170d40a67c5c0cd76091'
+          workflow-id: 'pipeline.yml'
+      - name: Create commit stage jobs
+        run: node ./tools/pipeline/create-commit-jobs.js ${{ env.NX_BASE }} ${{ env.NX_HEAD }}
+      - name: Create artifact with affected
+        uses: actions/upload-artifact@v4
+        with:
+          name: affected-projects
+          path: affected.json
+      - id: set-matrix
+        run: echo "matrix=$(cat job-matrix.json)" >> $GITHUB_OUTPUT
+
+  commit-checks:
+    needs: prepare
+    runs-on: buildjet-2vcpu-ubuntu-2204
+    if: ${{ needs.prepare.outputs.matrix != '{}' }}
+    strategy:
+      matrix: ${{fromJson(needs.prepare.outputs.matrix)}}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/checkout@v4
+
+      - name: Cache node modules
+        id: cache
+        uses: buildjet/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+      - name: run commit checks
+        # Some parts of the code may need a framebuffer -> use xvfb-run
+        run: xvfb-run node ./tools/pipeline/run-commit-job.js ${{ matrix.check }}
+
+  build:
+    needs: prepare
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: sudo timedatectl set-timezone Europe/Berlin
+
+      - uses: actions/checkout@v4
+
+      - name: Cache node modules
+        id: cache
+        uses: buildjet/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+
+      # Clean any previous build
+      - run: rm -rf dist
+
+      # First call for the purpose of the build
+      - run: node ./tools/pipeline/version.js startuphafen
+      - run: npm run build
+
+      # Second call for the purpose of the version.json file
+      - run: node ./tools/pipeline/version.js startuphafen
+
+      # -y to keep symlinks
+      - run: zip -y -q -r startuphafen-rc.zip dist
+
+      - name: Create artifact with release-candidate zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: startuphafen-rc
+          path: startuphafen-rc.zip
+          # these release-candidates are primarily meant to be used further down the pipeline
+          # no need to keep them for longer than 1 day
+          retention-days: 1
+
+  # running acceptance tests and release in one job,
+  # so that a slow test of some app does not slow down the release of another app
+  accept-and-release:
+    needs:
+      - build
+      - commit-checks
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    outputs:
+      tag_name: ${{ env.TAG_NAME }}
+    steps:
+      ###
+      ###
+      ### Init
+      ###
+      ###
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/checkout@v4
+
+      - name: Download the release candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: startuphafen-rc
+
+      - run: unzip -q startuphafen-rc.zip
+
+      - name: Cache node modules
+        id: cache
+        uses: buildjet/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+          key: cache-node-modules-${{ hashFiles('package-lock.json') }}
+
+      ###
+      ###
+      ### Acceptance tests
+      ###
+      ###
+      - run: npm run e2e-ci
+
+      - name: Create artifact with detailed cypress logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: startuphafen-cypress-logs
+          path: apps/startuphafen-e2e/logs
+          retention-days: 7
+
+      - name: Create artifact with cypress debug videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: startuphafen-videos
+          path: apps/startuphafen-e2e/video
+          retention-days: 7
+
+      ###
+      ###
+      ### Create release
+      ###
+      ###
+
+      - name: Check if release should be created
+        id: should_release
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/dev" || "${{ github.ref }}" =~ ^refs/heads/hotfix/ ]]; then
+            echo "should_create=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_create=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get tag name
+        run: echo "TAG_NAME=$(node ./tools/pipeline/output-versions.js startuphafen)" >> $GITHUB_ENV
+
+      - name: Export tag name
+        run: echo "TAG_NAME=${{ env.TAG_NAME }}" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        if: steps.should_release.outputs.should_create == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/' + process.env.TAG_NAME,
+              sha: context.sha
+            })
+
+      - name: Create Release
+        if: steps.should_release.outputs.should_create == 'true'
+        id: create_release
+        uses: shogo82148/actions-create-release@v1
+        with:
+          tag_name: refs/tags/${{ env.TAG_NAME }}
+          release_name: ${{ env.TAG_NAME }}
+
+      - run: mv dist/ ${{ env.TAG_NAME }}
+
+      - run: zip -q -r ${{ env.TAG_NAME }}.zip ${{ env.TAG_NAME }}
+
+      - uses: shogo82148/actions-upload-release-asset@v1
+        if: steps.should_release.outputs.should_create == 'true'
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.TAG_NAME }}.zip
+
+  auto-deploy-staging:
+    needs: accept-and-release
+    if: github.ref == 'refs/heads/dev'
+    uses: './.github/workflows/lib_deploy.yml'
+    with:
+      release: ${{ needs.accept-and-release.outputs.tag_name }}
+      target: startuphafen-staging
+    secrets: inherit

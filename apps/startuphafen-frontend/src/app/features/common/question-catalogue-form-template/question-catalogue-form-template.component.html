@@ -1,0 +1,157 @@
+<div
+  class="carousel-container relative w-full flex flex-col items-center justify-start pt-4 sm:pt-8 px-2 sm:p-4 mb-4"
+>
+  <!-- Main carousel card -->
+  <div
+    class="relative flex items-center justify-center w-full px-2 sm:px-8 lg:px-20"
+  >
+    <!-- Navigation button - Previous -->
+    <button
+      type="button"
+      (click)="onPreviousClicked()"
+      [disabled]="currentStep === 0 || isAnimating"
+      class="nav-button flex-shrink-0 bg-[var(--sh-color-primary-tint)] hover:bg-[var(--sh-color-primary)] border border-gray-300 rounded-full p-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mr-8 hidden lg:block"
+      data-testid="previous-button"
+      aria-label="Previous question"
+    >
+      <svg
+        class="w-6 h-6 text-white"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+
+    <!-- Card container -->
+    <div
+      class="w-full sm:w-[90vw] lg:w-[66.67vw] max-w-6xl mx-auto flex-shrink-0"
+    >
+      <div
+        [@fadeSlide]="animationState"
+        (@fadeSlide.done)="onAnimationDone($event)"
+        class="carousel-card bg-white rounded-2xl shadow-xl border border-gray-200 transform w-full min-w-0 will-change-transform"
+        style="backface-visibility: hidden; transform-style: preserve-3d"
+      >
+        <!-- Card Header -->
+        <div
+          class="bg-gradient-to-r from-sky-600 to-sky-800 rounded-t-2xl p-4 sm:p-6 text-white w-full"
+        >
+          <div class="flex items-center justify-between w-full">
+            <div class="min-w-0 flex-1">
+              <h2
+                class="text-xl sm:text-2xl font-bold mb-2 truncate"
+                *ngIf="projectTitle !== ''"
+              >
+                {{ projectTitle }}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-4 sm:p-6 lg:p-8 w-full min-h-[300px] relative">
+          <form [formGroup]="form" class="space-y-6 w-full">
+            <div class="formly-form-container w-full">
+              <formly-form
+                [fields]="fields"
+                [form]="form"
+                class="space-y-4 w-full"
+              >
+              </formly-form>
+            </div>
+          </form>
+        </div>
+
+        <!-- Card Footer -->
+        <div
+          class="border-t border-gray-200 bg-gray-50 rounded-b-2xl p-4 sm:p-6 lg:hidden"
+        >
+          <div class="flex justify-between items-center gap-3">
+            <button
+              type="button"
+              (click)="onPreviousClicked()"
+              [disabled]="currentStep === 0 || isAnimating"
+              class="nav-button inline-flex items-center px-3 sm:px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              data-testid="previous-button-footer"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Zurück
+            </button>
+
+            <div class="flex items-center space-x-2">
+              <div class="flex space-x-1">
+                <!-- Pagination dots could go here if needed -->
+              </div>
+            </div>
+
+            <button
+              type="button"
+              (click)="onNextClicked()"
+              [disabled]="isAnimating || !form.valid"
+              class="nav-button inline-flex items-center px-4 sm:px-6 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-sky-600 to-sky-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex-shrink-0"
+              data-testid="next-button"
+            >
+              Weiter
+              <svg
+                class="w-4 h-4 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation button - Next -->
+    <button
+      type="button"
+      (click)="onNextClicked()"
+      [disabled]="isAnimating || !form.valid"
+      class="nav-button flex-shrink-0 bg-[var(--sh-color-primary-tint)] hover:bg-[var(--sh-color-primary)] border border-gray-300 rounded-full p-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ml-8 hidden lg:block"
+      data-testid="next-button-floating"
+      aria-label="Next question"
+    >
+      <svg
+        class="w-6 h-6 text-white"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </button>
+  </div>
+</div>

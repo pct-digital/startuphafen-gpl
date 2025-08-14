@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "executors": {
+    "doc-builder": {
+      "implementation": "./src/executors/doc-builder/executor",
+      "schema": "./src/executors/doc-builder/schema.json",
+      "description": "doc-builder executor"
+    },
+    "entities-builder": {
+      "implementation": "./src/executors/entities-builder/executor",
+      "schema": "./src/executors/entities-builder/schema.json",
+      "description": "builds the entities files for a project from the database definition"
+    },
+    "acceptance-test-executor": {
+      "implementation": "./src/executors/acceptance-test-executor/executor",
+      "schema": "./src/executors/acceptance-test-executor/schema.json",
+      "description": "Version 2 of the PCT e2e testrunner, based on the production-ready docker-compose build of the apps with all legacy issues removed."
+    }
+  }
+}

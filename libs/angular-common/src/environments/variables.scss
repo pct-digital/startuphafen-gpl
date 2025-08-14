@@ -1,0 +1,153 @@
+// Ionic Variables and Theming. For more info, please see:
+// http://ionicframework.com/docs/theming/
+
+/** Ionic CSS Variables **/
+:root {
+  --sh-color-primary: #1a7bab;
+  --sh-color-primary-rgb: 0, 126, 181;
+  --sh-color-primary-contrast: #f3f3f3;
+  --sh-color-primary-contrast-rgb: 255, 255, 255;
+  --sh-color-primary-shade: #006f9f;
+  --sh-color-primary-tint: #1a8bbc;
+
+  --sh-color-secondary: #007eb5;
+  --sh-color-secondary-rgb: 0, 159, 227;
+  --sh-color-secondary-contrast: #bccbe5;
+  --sh-color-secondary-contrast-rgb: 188, 203, 229;
+  --sh-color-secondary-shade: #1d2f57;
+  --sh-color-secondary-tint: #374973;
+
+  --sh-color-tertiary: #556063;
+  --sh-color-tertiary-rgb: 61, 61, 61;
+  --sh-color-tertiary-contrast: #d9d9d9;
+  --sh-color-tertiary-contrast-rgb: 217, 217, 217;
+  --sh-color-tertiary-shade: #363636;
+  --sh-color-tertiary-tint: #505050;
+
+  --sh-color-nav-background: #f3f3f3;
+
+  --sh-color-tooltip: #d8eff6;
+
+  --sh-color-success: #bccf00;
+  --sh-color-success-rgb: 188, 207, 0;
+  --sh-color-success-contrast: #39322d;
+  --sh-color-success-contrast-rgb: 57, 50, 45;
+  --sh-color-success-shade: #a5b600;
+  --sh-color-success-tint: #c3d41a;
+
+  --sh-color-warning: #ffc409;
+  --sh-color-warning-rgb: 255, 196, 9;
+  --sh-color-warning-contrast: #373432;
+  --sh-color-warning-contrast-rgb: 55, 52, 50;
+  --sh-color-warning-shade: #e0ac08;
+  --sh-color-warning-tint: #ffca22;
+
+  --sh-color-danger: #ae0109;
+  --sh-color-danger-rgb: 174, 1, 9;
+  --sh-color-danger-contrast: #f2f9f6;
+  --sh-color-danger-contrast-rgb: 226, 249, 246;
+  --sh-color-danger-shade: #990108;
+  --sh-color-danger-tint: #e12b34;
+
+  --sh-color-light: #f3f3f3;
+  --sh-color-light-rgb: 237, 237, 237;
+  --sh-color-light-contrast: #574c4c;
+  --sh-color-light-contrast-rgb: 87, 76, 76;
+  --sh-color-light-shade: #e5e5e5;
+  --sh-color-light-tint: #f4f4f4;
+
+  --sh-color-medium: #4b4b4b;
+  --sh-color-medium-rgb: 75, 75, 75;
+  --sh-color-medium-contrast: #e7e7e7;
+  --sh-color-medium-contrast-rgb: 231, 231, 231;
+  --sh-color-medium-shade: #424242;
+  --sh-color-medium-tint: #5d5d5d;
+
+  --sh-color-dark: #2d2d2d;
+  --sh-color-dark-rgb: 45, 45, 45;
+  --sh-color-dark-contrast: #c9c9c9;
+  --sh-color-dark-contrast-rgb: 201, 201, 201;
+  --sh-color-dark-shade: #282828;
+  --sh-color-dark-tint: #424242;
+
+  --sh-background-color: #f3f3f3;
+  //--sh-background-color: var(--sh-color-light);
+  --sh-background-color-shade: var(--sh-color-light-shade);
+  --sh-background-color-contrast: var(--sh-color-light-contrast);
+  --sh-background-color-tint: var(--sh-color-light-tint);
+  --sh-text-color: var(--sh-color-dark-tint);
+
+  --sh-color-rest-mull: #cccccc;
+  --sh-color-bio: #b0d89c;
+  --sh-color-wert: #fff799;
+  --sh-color-paper: #77bee0;
+  --sh-color-prim: rgb(238, 127, 1);
+  --sh-color-header: var(--sh-color-primary-shade);
+  --sh-color-others: #333;
+
+  --sh-color-step-950: #1e1e1e;
+  --sh-color-step-900: #2a2a2a;
+  --sh-color-step-850: #363636;
+  --sh-color-step-800: #414141;
+  --sh-color-step-750: #4d4d4d;
+  --sh-color-step-700: #595959;
+  --sh-color-step-650: #656565;
+  --sh-color-step-600: #717171;
+  --sh-color-step-550: #7d7d7d;
+  --sh-color-step-500: #898989;
+  --sh-color-step-450: #d1d3d1;
+  --sh-color-step-400: #d1d3d1;
+  --sh-color-step-350: #acacac;
+  --sh-color-step-300: #b8b8b8;
+  --sh-color-step-250: #c4c4c4;
+  --sh-color-step-200: #d0d0d0;
+  --sh-color-step-150: #dbdbdb;
+  --sh-color-step-100: #e7e7e7;
+  --sh-color-step-50: #f3f3f3;
+
+  @media (prefers-color-scheme: dark) {
+    --sh-background-color: #f3f3f3;
+    --sh-background-color-shade: var(--sh-color-light-shade);
+    --sh-background-color-contrast: var(--sh-color-light-contrast);
+    --sh-background-color-tint: var(--sh-color-light-tint);
+
+    --sh-color-content: var(--sh-color-medium);
+    --sh-color-content-contrast: var(--sh-color-medium-contrast);
+
+    --sh-color-light: #2d2d2d;
+    --sh-color-light-rgb: 45, 45, 45;
+    --sh-color-light-contrast: #c9c9c9;
+    --sh-color-light-contrast-rgb: 201, 201, 201;
+    --sh-color-light-shade: #292929;
+    --sh-color-light-tint: #444444;
+
+    --sh-color-dark: #ededed;
+    --sh-color-dark-rgb: 237, 237, 237;
+    --sh-color-dark-contrast: #574c4c;
+    --sh-color-dark-contrast-rgb: 87, 76, 76;
+    --sh-color-dark-shade: #d1d1d1;
+    --sh-color-dark-tint: #efefef;
+
+    --sh-text-color: var(--sh-color-dark);
+
+    --sh-color-step-50: #1e1e1e;
+    --sh-color-step-100: #2a2a2a;
+    --sh-color-step-150: #363636;
+    --sh-color-step-200: #414141;
+    --sh-color-step-250: #4d4d4d;
+    --sh-color-step-300: #595959;
+    --sh-color-step-350: #656565;
+    --sh-color-step-400: #717171;
+    --sh-color-step-450: #7d7d7d;
+    --sh-color-step-500: #898989;
+    --sh-color-step-550: #d1d3d1;
+    --sh-color-step-600: #d1d3d1;
+    --sh-color-step-650: #acacac;
+    --sh-color-step-700: #b8b8b8;
+    --sh-color-step-750: #c4c4c4;
+    --sh-color-step-800: #d0d0d0;
+    --sh-color-step-850: #dbdbdb;
+    --sh-color-step-900: #e7e7e7;
+    --sh-color-step-950: #f3f3f3;
+  }
+}

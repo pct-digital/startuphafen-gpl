@@ -1,0 +1,18 @@
+<sh-header
+  (logoutClick)="logout()"
+  (loginClick)="login()"
+  [hasLogin]="isLoggedIn"
+  [items]="getItems()"
+  [activeRootUrlSegment]="getRootPath()"
+  (navigationClick)="onNavigation($event)"
+></sh-header>
+
+<ng-template #LogoutNotice>
+  <div shCard class="flex flex-col items-center justify-center">
+    <div shCardTitle>Hinweis</div>
+    <div shCardSubtitle>Bitte schließe nach dem Abmelden deinen Browser</div>
+    <div class="button-container flex justify-center items-center">
+      <div shButton (click)="close()">Ok</div>
+    </div>
+  </div>
+</ng-template>

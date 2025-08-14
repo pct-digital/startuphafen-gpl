@@ -1,0 +1,128 @@
+server {
+    server_name ${NGINX_HOST};
+    listen ${MAIN_PORT};
+    
+    http2 on;
+
+    # prevent wrong ports to be included in redirects
+    absolute_redirect off;
+
+    gzip on; 
+    gzip_vary on; 
+    gzip_min_length 1024; 
+    gzip_proxied expired no-cache no-store private auth; 
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/json application/javascript;
+    gzip_disable "MSIE [1-6]\.";
+
+    
+    error_page 502 /maintenance.html;
+    
+    location = /maintenance.html {
+        alias /etc/maintenance/maintenance.html;
+        internal;
+    }
+
+    location /trpc {
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_pass http://${BACKEND_HOST}/trpc;
+
+        client_max_body_size 100M;
+        add_header Cache-Control "no-store";
+    }
+
+    # proxy all requests for the keycloak health endpoint to the right path:
+    location /kc/health/ {
+        proxy_pass          http://keycloak:9000/health/;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+
+    # proxy all requests for the keycloak metrics endpoint to the right path:
+#    location /kc/metrics/ {
+#        proxy_pass          http://keycloak:9000/metrics/;
+#        proxy_set_header    Host               $host;
+#        proxy_set_header    X-Real-IP          $remote_addr;
+#        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+#        proxy_set_header    X-Forwarded-Host   $host;
+#        proxy_set_header    X-Forwarded-Server $host;
+#        proxy_set_header    X-Forwarded-Port   $server_port;
+#        proxy_set_header    X-Forwarded-Proto  $scheme;
+#    }
+
+    location /kc/js/ {
+        proxy_pass          http://keycloak:8180/js/;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+
+    location /kc/realms/ {
+        proxy_pass          http://keycloak:8180/realms/;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+
+    location /kc/resources/ {
+        proxy_pass          http://keycloak:8180/resources/;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+
+    location /kc/robots.txt {
+        proxy_pass          http://keycloak:8180/robots.txt;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+
+    location /kc-admin/ {
+        proxy_pass          http://keycloak:8180/;
+        proxy_set_header    Host               $host;
+        proxy_set_header    X-Real-IP          $remote_addr;
+        proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host   $host;
+        proxy_set_header    X-Forwarded-Server $host;
+        proxy_set_header    X-Forwarded-Port   $server_port;
+        proxy_set_header    X-Forwarded-Proto  $scheme;
+    }
+    
+    include ${WEB_APP_CONFIG_FILE};
+    
+    ${SSL_LINE1}
+    ${SSL_LINE2}
+    ${SSL_LINE3}
+}
+
+server {
+    listen ${REDIRECT_PORT};
+
+    if ($host = ${NGINX_HOST}) {
+        return 301 https://$host$request_uri;
+    }
+
+    return 404;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "server-entity-engine",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/entity-engine/server/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project server-entity-engine --web",
+  "targets": {}
+}

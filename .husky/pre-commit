@@ -1,0 +1,12 @@
+git stash push -q --keep-index
+
+staged_files=$(git diff --cached --name-only --diff-filter=d)
+if [ -n "$staged_files" ]; then
+    node ./tools/scripts/search-at-only-in-feature-files.js
+fi
+
+RESULT=$?
+
+git stash pop -q
+
+exit $RESULT

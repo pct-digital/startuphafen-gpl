@@ -1,0 +1,23 @@
+<button
+  class="fixed bottom-52 left-5 lg:left-[80px] rounded-full lg:rounded-[45px] bg-white w-[64px] lg:w-[74px] h-[64px] lg:h-[128px] border shadow-[0_0_23px_rgba(0,0,0,0.188)] z-10"
+  (click)="openPopup(faqPopupTemplate)"
+>
+  <div class="flex flex-col justify-start items-center">
+    <span
+      [ngStyle]="{
+      'mask-image': 'url(/assets/icons/solid/circle-question-sharp-solid.svg)',
+      '-webkit-mask-image': 'url(/assets/icons/solid/circle-question-sharp-solid.svg)',
+      'background-color': 'var(--sh-color-primary)',
+      'background-position': 'center',
+      'mask-repeat': 'no-repeat',
+    }"
+      class="w-[53px] h-[53px] lg:mb-2"
+    >
+    </span>
+    <p class="text-[24px] text-primary hidden lg:block">FAQ</p>
+  </div>
+</button>
+
+<ng-template #faqPopupTemplate>
+  <sh-faq-page-container [isPopup]="true"></sh-faq-page-container>
+</ng-template>

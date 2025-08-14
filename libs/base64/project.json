@@ -1,0 +1,9 @@
+{
+  "name": "base64",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/base64/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project base64 --web",
+  "targets": {}
+}

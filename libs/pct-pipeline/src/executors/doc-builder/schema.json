@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "version": 2,
+  "cli": "nx",
+  "title": "DocBuilder executor",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "The name of the app to be tested, expected to be located in dist/apps/<app> when this executor is run"
+    },
+    "skipBuild": {
+      "type": "boolean",
+      "default": false,
+      "description": "Skip building the documentation videos. Primary use for development of the doc builder."
+    }
+  },
+  "required": ["app"]
+}

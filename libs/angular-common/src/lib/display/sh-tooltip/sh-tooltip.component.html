@@ -1,0 +1,19 @@
+<div class="tooltip z-50" (click)="onTooltipClick($event)">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="w-6 h-6 text-[var(--sh-color-tertiary)]"
+    viewBox="0 0 31.989 31.989"
+  >
+    <path
+      id="circle-info-sharp-solid"
+      d="M15.994,31.989A15.994,15.994,0,1,0,0,15.994,15.994,15.994,0,0,0,15.994,31.989Zm-2.5-11h1.5v-4H12V14h6v7h2v3H12v-3Zm4.5-9H14V8h4Z"
+      fill="currentColor"
+    />
+  </svg>
+
+  <span
+    class="tooltiptext"
+    [class.mobile-visible]="isMobile && isTooltipVisible"
+    >{{ content }}</span
+  >
+</div>

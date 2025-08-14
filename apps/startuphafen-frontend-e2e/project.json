@@ -1,0 +1,47 @@
+{
+  "name": "startuphafen-frontend-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/startuphafen-frontend-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["startuphafen-frontend"],
+  "// targets": "to see all targets run: nx show project startuphafen-frontend-e2e --web",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/startuphafen-frontend-e2e/cypress.config.ts",
+        "devServerTarget": "startuphafen-frontend:serve:development",
+        "testingType": "e2e",
+        "browser": "chrome"
+      },
+      "configurations": {
+        "production": {
+          "skipServe": true
+        }
+      }
+    },
+    "test-accept": {
+      "executor": "@startuphafen/pct-pipeline:acceptance-test-executor",
+      "options": {
+        "e2eAppName": "startuphafen-frontend-e2e",
+        "frontendAppName": "startuphafen-frontend",
+        "backendAppName": "startuphafen-backend",
+        "buildScriptName": "build"
+      }
+    },
+    "doc": {
+      "executor": "@startuphafen/pct-pipeline:doc-builder",
+      "options": {
+        "app": "startuphafen"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/startuphafen-frontend-e2e",
+        "commands": ["tsc -p tsconfig.json --noEmit"]
+      }
+    }
+  }
+}
