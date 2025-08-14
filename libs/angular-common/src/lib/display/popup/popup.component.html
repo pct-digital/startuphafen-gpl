@@ -1,0 +1,35 @@
+<div
+  class="overflow-y-scroll overflow-x-clip fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-white shadow-[0_0_23px_rgba(0,0,0,0.188)] rounded-[15px] border"
+  [ngStyle]="{
+    height: height ? height + 'vh' : null,
+    width: width ? width + 'vw' : null,
+    maxHeight: height && height > 90 ? '${height}vh' : '90vh',
+    maxWidth: width && width > 90 ? '${width}vw' : '90wh'
+  }"
+>
+  <button class="fixed top-2 right-2 z-40" (click)="close()">
+    <div class="flex flex-col justify-start items-center">
+      <span
+        [ngStyle]="{
+              'mask-image': 'url(/assets/icons/thin/xmark-sharp-thin.svg)',
+              '-webkit-mask-image': 'url(/assets/icons/thin/xmark-sharp-thin.svg)',
+              'background-color': 'var(--sh-color-primary)',
+              'background-position': 'center',
+              'mask-repeat': 'no-repeat',
+            }"
+        class="w-7 h-7"
+      >
+      </span>
+    </div>
+  </button>
+
+  <ng-container *ngIf="content">
+    <ng-container *ngTemplateOutlet="content; context: context"></ng-container>
+  </ng-container>
+</div>
+
+<div
+  class="fixed inset-0 z-20 flex items-center justify-center"
+  style="background-color: rgba(var(--sh-color-primary-rgb), 0.8)"
+  (click)="close()"
+></div>

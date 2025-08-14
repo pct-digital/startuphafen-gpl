@@ -1,0 +1,163 @@
+secrets:
+  backend_secrets.json:
+    file: '../../backend_secrets.json'
+
+services:
+  serverfluent:
+    networks:
+      local:
+        ipv4_address: '172.42.0.33'
+    container_name: startuphafen-fluentd
+    restart: unless-stopped
+    image: fluent/fluentd:v1.18-1
+    user: root
+    ports:
+      - '127.0.0.1:24224:24224'
+      - '127.0.0.1:24224:24224/udp'
+    volumes:
+      - /opt/startuphafen/logs/:/opt/startuphafen/logs/:rw
+      - ./fluentd/server_fluentd.conf:/fluentd/etc/fluent.conf:ro
+
+  nginx:
+    volumes:
+      - ./nginx/maintenance/maintenance.html:/etc/maintenance/maintenance.html:ro
+      - ../../startuphafen-frontend:/usr/share/nginx/html:ro
+      - ./nginx/ssl:/etc/ssl-conf:ro
+      - ../../../../certbot/conf:/etc/letsencrypt:ro
+      - ../../../../certbot/www:/var/www/certbot:ro
+      - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh
+    environment:
+      NGINX_HOST: '${APP_HOST}'
+      MAIN_PORT: 8443 ssl http2
+      REDIRECT_PORT: 8080
+      SSL_LINE1: 'ssl_certificate /etc/letsencrypt/live/${APP_HOST}/fullchain.pem;'
+      SSL_LINE2: 'ssl_certificate_key /etc/letsencrypt/live/${APP_HOST}/privkey.pem;'
+      SSL_LINE3: include /etc/ssl-conf/options-ssl-nginx.conf;
+      WEB_APP_CONFIG_FILE: '/config-parts/staging.conf'
+    ports:
+      - '80:8080'
+      - '443:8443'
+    networks:
+      local:
+        ipv4_address: '172.42.0.8'
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: nginx
+    depends_on:
+      - serverfluent
+
+  maildev:
+    networks:
+      local:
+        ipv4_address: '172.42.0.42'
+    container_name: startuphafen-maildev
+    restart: unless-stopped
+    image: maildev-custom
+    build:
+      context: ./maildev
+    environment:
+      MAILDEV_BASE_PATHNAME: '/maildev'
+      MAILDEV_MAIL_DIRECTORY: /tmp/maildev
+    healthcheck:
+      test: 'wget -O - http://127.0.0.1:1080/maildev/healthz || exit 1'
+      start_interval: 1s
+      start_period: 30s
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - maildev:/tmp/maildev
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: maildev
+    depends_on:
+      - serverfluent
+
+  backend:
+    container_name: startuphafen-backend
+    restart: unless-stopped
+    init: true
+    image: node:22.12.0-bookworm
+    user: node
+    working_dir: /home/node
+    volumes:
+      - ../:/home/node/app:ro
+    environment:
+      NODE_OPTIONS: --max-old-space-size=4196
+      NODE_ENV: production
+      TZ: 'Europe/Berlin'
+      HOST: '0.0.0.0'
+    command: "/bin/sh -c 'node --enable-source-maps /home/node/app/main.js --config staging'"
+    secrets:
+      - backend_secrets.json
+    networks:
+      local:
+        ipv4_address: '172.42.0.7'
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: backend
+    depends_on:
+      - serverfluent
+
+  keycloak:
+    networks:
+      local:
+        ipv4_address: '172.42.0.12'
+    environment:
+      # these are overwritten by an .env file at deployment time, which is placed on the server via gitlab CI
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+      KC_PROXY_HEADERS: xforwarded
+      KC_DB: postgres
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HOSTNAME: 'https://${APP_HOST}/kc'
+      KC_HOSTNAME_ADMIN: 'https://${APP_HOST}/kc-admin'
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ./keycloak/entrypoint.sh:/entrypoint.sh
+      - ./keycloak/themes:/opt/keycloak/themes
+    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: keycloak
+    depends_on:
+      - serverfluent
+
+  certbot:
+    image: certbot/certbot:v1.32.2
+    restart: unless-stopped
+    init: true
+    container_name: startuphafen-certbot
+    user: root
+    volumes:
+      - ../../../certbot/conf:/etc/letsencrypt
+      - ../../../certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path /var/www/certbot/; sleep 12h & wait $${!}; done;'"
+    networks:
+      local:
+        ipv4_address: '172.42.0.9'
+
+networks:
+  local:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.42.0.0/16
+          gateway: 172.42.0.1
+
+volumes:
+  maildev:
+  pgdata:
+    external: true
+    name: pgdata
+  kcpgdata:
+    external: true
+    name: kcpgdata

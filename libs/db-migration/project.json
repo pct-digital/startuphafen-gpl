@@ -1,0 +1,9 @@
+{
+  "name": "db-migration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/db-migration/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project db-migration --web",
+  "targets": {}
+}

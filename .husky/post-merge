@@ -1,0 +1,1 @@
+npx git-pull-run --pattern "package-lock.json" --command "npm install"

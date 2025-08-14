@@ -1,0 +1,24 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Startuphafen Database",
+      "Group": "Password=Username",
+      "Port": 5432,
+      "Username": "app",
+      "Host": "database",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres",
+      "DBRestriction": "app"
+    },
+    "2": {
+      "Name": "Keycloak Database",
+      "Group": "Password=Username",
+      "Port": 5432,
+      "Username": "kc",
+      "Host": "keycloak-database",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres",
+      "DBRestriction": "kc"
+    }
+  }
+}

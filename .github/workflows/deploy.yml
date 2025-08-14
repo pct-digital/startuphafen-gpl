@@ -1,0 +1,28 @@
+name: 2 - Deploy Startuphafen
+run-name: 'Deploy ${{inputs.target}} / ${{inputs.release}}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release Tag'
+        type: string
+        required: false
+      target:
+        description: 'Target environment'
+        type: environment
+        required: true
+        default: startuphafen-staging
+      skip-keycloak-import:
+        description: 'Ignore existing keycloak? Enter DELETE_USERS, cause that is what that means! Discuss with team before using this option.'
+        type: string
+        required: false
+
+jobs:
+  call-deploy:
+    uses: './.github/workflows/lib_deploy.yml'
+    with:
+      release: ${{inputs.release}}
+      target: ${{inputs.target}}
+      skip-keycloak-import: ${{inputs.skip-keycloak-import}}
+    secrets: inherit

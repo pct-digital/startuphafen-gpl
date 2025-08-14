@@ -1,0 +1,32 @@
+#scroll-content {
+  max-height: calc(100vh - 45px);
+  overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  #scroll-content {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  code[class='language-gherkin'] {
+    font-size: 11px !important;
+  }
+
+  pre {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+  }
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

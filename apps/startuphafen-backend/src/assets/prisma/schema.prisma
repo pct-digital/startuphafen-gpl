@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ShUser {
+  id String @id
+  name String?
+  city String
+  postalCode String
+  country String
+  street String
+  firstName String
+  lastName String
+  dateOfBirth String
+  phoneNumber String
+  cellPhoneNumber String
+  email String
+  title String?
+  academicTitle String?
+  roles String[]
+  projects Project[]
+  shProjects ShProject[]
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  name String
+  user ShUser @relation(fields: [userId], references: [id])
+  userId String
+  progress Int @default(0)
+  questionTracking QuestionTracking[]
+  answers Answers[]
+  flagTracking FlagTracking[]
+  steErSent Boolean @default(false)
+  gewASent Boolean @default(false)
+}
+
+model QuestionTracking {
+  id Int @id @default(autoincrement())
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int 
+  strapiQuestionFlowId String
+  strapiQDictPosIndex Int
+  posIndex Int
+}
+
+model Answers {
+  id Int @id @default(autoincrement())
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int 
+  key String
+  type String @default("string")
+  strapiAnswerId Int
+  xmlKey String
+  flowId String
+  value String
+}
+
+model FlagTracking {
+  id Int @id @default(autoincrement())
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int 
+  qId String
+  flag String
+}
+
+
+model ShProject {
+  id Int @id @default(autoincrement())
+  name String
+  user ShUser @relation(fields: [userId], references: [id])
+  userId String
+  progress Int @default(0)
+  questionTracking ShQuestionTracking[]
+  answers ShAnswers[]
+  steErSent Boolean @default(false)
+  gewASent Boolean @default(false)
+  catalogueVersion ShCatalogueVersions @relation(fields: [versionId], references: [id])
+  versionId Int
+}
+
+model ShQuestionTracking {
+  id Int @id @default(autoincrement())
+  project ShProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int 
+  strapiQuestionId String
+  posIndex Int
+}
+
+model ShAnswers {
+  id Int @id @default(autoincrement())
+  project ShProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int 
+  key String
+  type String @default("string")
+  strapiAnswerId String
+  xmlKey String
+  catalogueId String
+  value String
+}
+
+model ShCatalogueVersions{
+  id Int @id @default(autoincrement())
+  projects ShProject[]
+  catalogueJSON String
+  catalogueId String
+  createdAt DateTime
+}

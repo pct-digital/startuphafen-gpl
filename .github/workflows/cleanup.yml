@@ -1,0 +1,35 @@
+name: 3 - Cleanup old releases
+run-name: Delete releases older than ${{ inputs.days }} days
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Delete releases older than X days'
+        required: true
+        type: number
+        default: 180
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          # Calculate cutoff date
+          cutoff=$(date -d "$DAYS days ago" +%s)
+
+          # Get all releases and process them
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${{ github.repository }}/releases | \
+          jq -r '.[] | select(.created_at | fromdateiso8601 < '$cutoff') | .id' | \
+          while read -r release_id; do
+            echo "Deleting release $release_id..."
+            gh api \
+              --method DELETE \
+              /repos/${{ github.repository }}/releases/$release_id
+          done

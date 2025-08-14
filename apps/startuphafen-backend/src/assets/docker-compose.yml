@@ -1,0 +1,41 @@
+services:
+  nginx:
+    container_name: startuphafen-nginx
+    restart: unless-stopped
+    init: true
+    image: nginxinc/nginx-unprivileged:1.27.3-alpine
+    environment:
+      NGINX_HOST: localhost
+      MAIN_PORT: 8080
+      TZ: 'Europe/Berlin'
+      REDIRECT_PORT: 8443
+      SSL_LINE1: ''
+      SSL_LINE2: ''
+      SSL_LINE3: ''
+      BACKEND_HOST: 'backend:5000'
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/config-parts:/config-parts:ro
+
+  keycloak:
+    container_name: startuphafen-keycloak
+    init: true
+    restart: unless-stopped
+    image: startuphafen-keycloak:26.1.0
+    environment:
+      KC_HTTP_PORT: 8180
+      KC_LOG_CONSOLE_COLOR: 'true'
+      TZ: 'Europe/Berlin'
+    build:
+      context: ./keycloak
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+        ]
+      start_interval: 1s
+      start_period: 1m
+      interval: 10s
+      timeout: 5s
+      retries: 5

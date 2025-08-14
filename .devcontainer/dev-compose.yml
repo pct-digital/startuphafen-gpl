@@ -1,0 +1,122 @@
+services:
+  devcontainer:
+    container_name: 'startuphafen-devcontainer'
+    build:
+      context: ../../../../.devcontainer
+      dockerfile: Dockerfile
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ../../../../:/workspace:cached
+      - $HOME/.ssh:/home/node/.ssh:ro
+    command: sleep infinity
+
+  database:
+    container_name: startuphafen-database
+    restart: unless-stopped
+    init: true
+    image: postgres:15.5-bookworm
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+      TZ: 'Europe/Berlin'
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U app']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ../../../../:/workspace:cached
+
+  keycloak-database:
+    container_name: startuphafen-keycloak-database
+    restart: unless-stopped
+    init: true
+    image: postgres:15.5-bookworm
+    environment:
+      POSTGRES_USER: kc
+      POSTGRES_PASSWORD: kc
+      POSTGRES_DB: kc
+      TZ: 'Europe/Berlin'
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kc']
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 2s
+      retries: 5
+
+  keycloak:
+    ports:
+      - 28080:8180
+    #extra_hosts:
+    ## default IP, fond from the command "ip a". If we want to use local database in host machine
+    #  - "host.docker.internal:172.17.0.1"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_PROXY_HEADERS: xforwarded
+      KC_DB: postgres
+      #KC_DB_URL: jdbc:postgresql://host.docker.internal:5432/kc
+      KC_DB_URL: jdbc:postgresql://keycloak-database/kc
+      KC_DB_USERNAME: kc
+      KC_DB_PASSWORD: kc
+      KC_HOSTNAME: http://localhost:4000/kc
+      KC_HOSTNAME_ADMIN: http://localhost:4000/kc-admin
+      KC_HTTP_PORT: 8180
+      KC_LOG_CONSOLE_COLOR: 'true'
+      TZ: 'Europe/Berlin'
+    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    depends_on:
+      keycloak-database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'",
+        ]
+      start_interval: 1s
+      start_period: 60s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ../../../../.devcontainer/keycloak/imports:/opt/keycloak/data/import
+      - ./keycloak/entrypoint.sh:/entrypoint.sh
+      - ./keycloak/themes:/opt/keycloak/themes
+
+  maildev:
+    container_name: startuphafen-maildev
+    image: maildev/maildev
+    ports:
+      - '1080:1080'
+    healthcheck:
+      test: 'wget -O - http://127.0.0.1:1080/healthz || exit 1'
+      start_interval: 1s
+      start_period: 30s
+  nginx:
+    environment:
+      BACKEND_HOST: 'devcontainer:5000'
+      WEB_APP_CONFIG_FILE: '/config-parts/devcontainer.conf'
+    ports:
+      - '4000:8080'
+
+  pgadmin:
+    container_name: startuphafen-pgadmin
+    image: dpage/pgadmin4:8.12.0
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@mycomp.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - '3838:80'
+    volumes:
+      # Relative to the location of the docker-compose.yml of the startuphafen-backend
+      - ../../../../.devcontainer/pgadmin/servers.json:/pgadmin4/servers.json

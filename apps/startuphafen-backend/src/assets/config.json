@@ -1,0 +1,38 @@
+{
+  "express": {
+    "host": "0.0.0.0",
+    "port": 5000
+  },
+  "knex": {
+    "client": "pg",
+    "connection": {
+      "host": "database",
+      "port": 5432,
+      "user": "app",
+      "database": "app",
+      "password": "app"
+    },
+    "asyncStackTraces": true
+  },
+  "mail": {
+    "host": "maildev",
+    "port": 1025,
+    "user": "sh",
+    "password": "sh",
+    "from": "test@datatogo.de"
+  },
+  "allowedOrigins": [],
+  "keycloak": {
+    "jwksUri": "http://keycloak:8180/realms/startuphafen/protocol/openid-connect/certs",
+    "host": "http://keycloak:8180",
+    "user": "admin",
+    "password": "admin"
+  },
+  "watermarkConfig": {
+    "text": ""
+  },
+  "dbMigration": {},
+  "eric": {
+    "devMode": true
+  }
+}

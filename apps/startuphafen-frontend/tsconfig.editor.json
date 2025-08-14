@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "../../libs/angular-common/src/lib/services/path.service.ts",
+    "../../libs/angular-common/src/lib/services/init.service.ts",
+    "../../libs/startuphafen-common/src/lib/helpers/formDataBuilder.ts"
+  ],
+  "compilerOptions": {},
+  "exclude": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}

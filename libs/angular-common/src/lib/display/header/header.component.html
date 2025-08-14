@@ -1,0 +1,126 @@
+<header class="w-full mx-auto bg-header">
+  <nav
+    class="w-full flex text-primary-contrast items-center justify-between relative"
+  >
+    <div class="flex items-center">
+      <div
+        class="w-[150px] h-[90px] xl:w-[250px] xl:h-[120px] bg-white text-black flex items-center justify-center"
+      >
+        <img
+          src="/assets/icons/startuphafen-logo.svg"
+          class="cursor-pointer"
+          (click)="onLogoClick()"
+        />
+      </div>
+      <sh-navigation
+        [activeRootUrlSegment]="activeRootUrlSegment"
+        (navigationClick)="onClickNavigation($event)"
+        class="hidden xl:flex"
+        [items]="items"
+      ></sh-navigation>
+      <sh-mobile-drawer
+        (navigationClick)="onClickNavigation($event)"
+        *ngIf="showMobileDrawer"
+        (loginClick)="loginClick.emit()"
+        (logoutClick)="logoutClick.emit()"
+        class="w-full absolute z-20 left-0 top-full bg-primary overflow-auto xl:hidden"
+        [items]="items"
+        [hasLogin]="hasLogin"
+        [ngStyle]="{ height: 'calc(100vh - 88px)' }"
+        @fadeInOut
+      ></sh-mobile-drawer>
+    </div>
+
+    <ul class="flex">
+      <li
+        class="bg-primary cursor-pointer transition-all w-[116px] relative group xl:hidden"
+        (click)="showMobileDrawer = !showMobileDrawer"
+      >
+        <div class="h-2 group-hover:bg-primary-shade"></div>
+        <div
+          class="pt-2 pb-2 xl:pt-4 xl:pb-6 text-center relative group-hover:bg-primary-shade"
+        >
+          <div
+            class="flex justify-center items-center bg-center bg-no-repeat mx-auto mb-[8px] xl:mb-[12px]"
+          >
+            <i
+              *ngIf="!showMobileDrawer"
+              class="w-8 h-8 bg-contain bg-center bg-no-repeat"
+              [ngStyle]="{
+                'mask-image': 'url(/assets/icons/thin/bars-sharp-thin.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/thin/bars-sharp-thin.svg)',
+                'background-color': 'var(--sh-color-primary-contrast)',
+                'mask-repeat': 'no-repeat',
+              }"
+            ></i>
+            <i
+              *ngIf="showMobileDrawer"
+              class="w-8 h-8 bg-contain bg-center bg-no-repeat"
+              [ngStyle]="{
+                'mask-image': 'url(/assets/icons/thin/xmark-sharp-thin.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/thin/xmark-sharp-thin.svg)',
+                'background-color': 'var(--sh-color-primary-contrast)',
+                'mask-repeat': 'no-repeat',
+              }"
+            ></i>
+          </div>
+          <span class="text-[16px] text-center">Menu</span>
+        </div>
+      </li>
+      <li
+        (click)="loginClick.emit()"
+        *ngIf="!hasLogin"
+        data-testid="login-btn"
+        class="hidden xl:block bg-primary cursor-pointer transition-all w-[116px] h-[120px] relative hover:bg-primary-shade"
+      >
+        <div class="h-2"></div>
+        <div class="pt-[24px] pb-1 text-center relative h-[108px]">
+          <div
+            class="flex justify-center items-center bg-center bg-no-repeat mx-auto mb-[8px] xl:mb-[6px]"
+          >
+            <div class="relative w-8 h-8 flex">
+              <i
+                class="w-full h-full m-auto"
+                [ngStyle]="{
+                  'mask-image': 'url(/assets/icons/log-in-outline.svg)',
+                  '-webkit-mask-image': 'url(/assets/icons/log-in-outline.svg)',
+                  'background-color': 'var(--sh-color-primary-contrast)',
+                  'background-position': 'center',
+                  'mask-repeat': 'no-repeat',
+                }"
+              ></i>
+            </div>
+          </div>
+          <span class="text-[16px] leading-[26px] text-center">Anmelden</span>
+        </div>
+      </li>
+      <li
+        (click)="logoutClick.emit()"
+        *ngIf="hasLogin"
+        data-testid="logout-btn"
+        class="hidden xl:grid bg-primary cursor-pointer transition-all w-[116px] h-[120px] relative hover:bg-primary-shade"
+      >
+        <div class="h-2"></div>
+        <div class="pt-[24px] pb-1 text-center relative h-[108px]">
+          <div
+            class="flex justify-center items-center bg-center bg-no-repeat mx-auto mb-[8px] xl:mb-[6px]"
+          >
+            <div class="relative w-8 h-8 flex">
+              <i
+                class="w-full h-full m-auto"
+                [ngStyle]="{
+                  'mask-image': 'url(/assets/icons/thin/arrow-left-from-bracket-sharp-thin.svg)',
+                  '-webkit-mask-image': 'url(/assets/icons/thin/arrow-left-from-bracket-sharp-thin.svg)',
+                  'background-color': 'var(--sh-color-primary-contrast)',
+                  'background-position': 'center',
+                  'mask-repeat': 'no-repeat',
+                }"
+              ></i>
+            </div>
+          </div>
+          <span class="text-[16px] leading-[26px] text-center">Abmelden</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+</header>

@@ -1,0 +1,119 @@
+{
+  "control": {
+    "transactionId": "310114c5-b08a-4b97-9889-0b698585a321",
+    "zustaendigeStelle": "197008",
+    "leikaIds": ["99050012104000"],
+    "formId": "Gewerbeanmeldung",
+    "name": "Antrag auf Gewerbeanmeldung",
+    "serviceKonto": {
+      "type": "OSI",
+      "trustLevel": "STORK-QAA-Level-1",
+      "postfachAddress": {
+        "identifier": "d047d29f-5f2b-466d-a552-3a12f6623187",
+        "type": "unternehmen"
+      }
+    }
+  },
+  "formData": [
+    {
+      "name": "Antragstellende Person",
+      "label": "Antragstellende Person",
+      "formItems": [
+        {
+          "name": "person_oder_firma",
+          "label": "Angabe zur Person/Firma",
+          "stringValue": "firma"
+        },
+        {
+          "name": "Nachname",
+          "label": "Nachname",
+          "stringValue": "Simpson"
+        },
+        {
+          "name": "Vorname",
+          "label": "Vorname",
+          "stringValue": "Maggie"
+        },
+        {
+          "name": "Geburtsdatum",
+          "label": "Geburtsdatum",
+          "dateValue": "1900-01-01"
+        },
+        {
+          "name": "Adresse",
+          "label": "Adresse",
+          "formItems": [
+            {
+              "name": "Straße",
+              "label": "Straße",
+              "stringValue": "Evergreen Terrac"
+            },
+            {
+              "name": "Hausnummer",
+              "label": "Hausnummer",
+              "stringValue": "742"
+            },
+            {
+              "name": "PLZ",
+              "label": "PLZ",
+              "stringValue": "25832"
+            },
+            {
+              "name": "Ort",
+              "label": "Ort",
+              "stringValue": "TÖNNING"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Betriebsdaten",
+      "label": "Betriebsdaten",
+      "formItems": [
+        {
+          "name": "Geschäftsbezeichnung",
+          "label": "Geschäftsbezeichnung",
+          "stringValue": "The Simpsons Company"
+        },
+        {
+          "name": "Rechtsform",
+          "label": "Rechtsform",
+          "stringValue": "nicht eingetragenes Einzelunternehmen"
+        }
+      ]
+    },
+    {
+      "name": "Kontaktinformationen",
+      "label": "Kontaktinformationen",
+      "formItems": [
+        {
+          "name": "Telefonnummer",
+          "label": "Telefonnummer",
+          "stringValue": "+49 7021 9508585"
+        },
+        {
+          "name": "E-Mail",
+          "label": "E-Mail",
+          "stringValue": "silke.homann-vorderbrueck@amt-eiderstedt.de"
+        }
+      ]
+    },
+    {
+      "name": "Erklärungen",
+      "label": "Erklärungen",
+      "formItems": [
+        {
+          "name": "check_richtigkeit",
+          "label": "Richtigkeit bestätigt",
+          "booleanValue": true
+        },
+        {
+          "name": "check_datenschutz",
+          "label": "Datenschutz akzeptiert",
+          "booleanValue": true
+        }
+      ]
+    }
+  ]
+}

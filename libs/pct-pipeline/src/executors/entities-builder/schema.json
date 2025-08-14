@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "version": 2,
+  "title": "EntitiesBuilder executor",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "The name of the app for which to generate the entities files from the database"
+    }
+  },
+  "required": ["app"]
+}

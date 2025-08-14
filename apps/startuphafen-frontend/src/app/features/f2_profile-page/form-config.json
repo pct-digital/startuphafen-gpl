@@ -1,0 +1,59 @@
+{
+  "fields": [
+    {
+      "key": "firstName",
+      "type": "input",
+      "props": {
+        "label": "Vorname",
+        "placeholder": "Geben Sie Ihren Vornamen ein *",
+        "required": true,
+        "class": "w-full mb-4"
+      }
+    },
+    {
+      "key": "lastName",
+      "type": "input",
+      "props": {
+        "label": "Nachname",
+        "placeholder": "Geben Sie Ihren Nachnamen ein *",
+        "required": true,
+        "class": "w-full mt-4"
+      }
+    },
+    {
+      "key": "email",
+      "type": "email",
+      "props": {
+        "label": "Email",
+        "placeholder": "Geben Sie Ihre E-Mail-Adresse ein *",
+        "required": true,
+        "class": "w-full mt-4"
+      }
+    },
+    {
+      "key": "age",
+      "type": "number",
+      "props": {
+        "label": "Alter",
+        "placeholder": "Geben Sie Ihr Alter an",
+        "required": false,
+        "class": "w-full mt-4"
+      }
+    },
+    {
+      "key": "gender",
+      "type": "multi-single",
+      "props": {
+        "label": "Geschlecht",
+        "placeholder": "Wählen Sie Ihr Geschlecht aus",
+        "required": false,
+        "class": "w-full bg-primary text-primary-contrast mt-4 p-2 border rounded-md",
+        "options": [
+          { "label": "Männlich", "value": "Male" },
+          { "label": "Weiblich", "value": "Female" },
+          { "label": "Divers", "value": "Other" }
+        ]
+      }
+    }
+  ]
+}

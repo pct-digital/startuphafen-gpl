@@ -1,0 +1,71 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "declaration": false,
+    "strict": true,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2022",
+    "module": "es2022",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@spartan-ng/ui-button-helm": ["libs/ui/ui-button-helm/src/index.ts"],
+      "@spartan-ng/ui-card-helm": ["libs/ui/ui-card-helm/src/index.ts"],
+      "@spartan-ng/ui-formfield-helm": [
+        "libs/ui/ui-formfield-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-icon-helm": ["libs/ui/ui-icon-helm/src/index.ts"],
+      "@spartan-ng/ui-input-helm": ["libs/ui/ui-input-helm/src/index.ts"],
+      "@spartan-ng/ui-pagination-helm": [
+        "libs/ui/ui-pagination-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-separator-helm": [
+        "libs/ui/ui-separator-helm/ui-separator-helm/src/index.ts"
+      ],
+      "@startuphafen/angular-common": ["libs/angular-common/src/index.ts"],
+      "@startuphafen/base64": ["libs/base64/src/index.ts"],
+      "@startuphafen/cypress-help": ["libs/cypress-help/src/index.ts"],
+      "@startuphafen/db-migration": ["libs/db-migration/src/index.ts"],
+      "@startuphafen/dockerized-node-libs": [
+        "libs/dockerized-node-libs/src/index.ts"
+      ],
+      "@startuphafen/enitity-engine/server-entity-engine": [
+        "libs/entity-engine/server/src/index.ts"
+      ],
+      "@startuphafen/entity-engine/common": [
+        "libs/entity-engine/common/src/index.ts"
+      ],
+      "@startuphafen/eric-connector": ["libs/eric-connector/src/index.ts"],
+      "@startuphafen/pct-pipeline": ["libs/pct-pipeline/src/index.ts"],
+      "@startuphafen/serialized-transaction": [
+        "libs/serialized-transaction/src/index.ts"
+      ],
+      "@startuphafen/server": ["libs/watermark/server/src/index.ts"],
+      "@startuphafen/spectator-help": ["libs/spectator-help/src/index.ts"],
+      "@startuphafen/startuphafen-common": [
+        "libs/startuphafen-common/src/index.ts"
+      ],
+      "@startuphafen/trpc-root": ["libs/trpc-root/src/index.ts"],
+      "@startuphafen/utility": ["libs/utility/src/index.ts"],
+      "@startuphafen/utility-server": ["libs/utility-server/src/index.ts"],
+      "@startuphafen/watermark/angular": [
+        "libs/watermark/angular/src/index.ts"
+      ],
+      "@startuphafen/watermark/server": ["libs/watermark/server/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

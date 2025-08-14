@@ -1,0 +1,88 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+  "name": "Startuphafen Dev Environment",
+  "dockerComposeFile": [
+    "../apps/startuphafen-backend/src/assets/docker-compose.yml",
+    "dev-compose.yml"
+  ],
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached,readonly"
+  ],
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+  },
+  "containerEnv": {
+    "TZ": "Europe/Berlin"
+  },
+  "forwardPorts": [6080, 5901, 3000, 4200, 4201, 5001, 1080],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "npm install && ./node_modules/.bin/cypress install",
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "angular.ng-template",
+        "cyrilletuzi.angular-schematics",
+        "alexkrechik.cucumberautocomplete",
+        "andrejunges.Handlebars",
+        "usernamehw.errorlens",
+        "nrwl.angular-console",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "firsttris.vscode-jest-runner",
+        "ms-vsliveshare.vsliveshare",
+        "ms-azuretools.vscode-docker",
+        "mihelcic.colored-regions",
+        "YoavBls.pretty-ts-errors",
+        "bradlc.vscode-tailwindcss",
+        "eamodio.gitlens",
+        "github.vscode-github-actions",
+        "Prisma.prisma"
+      ],
+      "settings": {
+        "eslint.validate": ["json"],
+        "[handlebars]": {
+          "editor.formatOnSave": false
+        },
+        "[feature]": {
+          "editor.defaultFormatter": "alexkrechik.cucumberautocomplete"
+        },
+        "cucumberautocomplete.formatConfOverride": {
+          "Funktionalität": 0,
+          "Regel": 0,
+          "Szenario": 1,
+          "Angenommen": 2,
+          "Wenn": 2,
+          "Dann": 2,
+          "Und": 2,
+          "Aber": 2
+        },
+        "files.associations": {
+          ".feature": "feature",
+          "*.xfeature": "feature"
+        },
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "files.exclude": {
+          "**/node_modules": true
+        },
+        "angular.enable-strict-mode-prompt": false,
+        "typescript": {
+          "tsserver": {
+            "maxTsServerMemory": 8192,
+            "nodePath": "node"
+          }
+        }
+      }
+    }
+  }
+}

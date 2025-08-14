@@ -1,0 +1,9 @@
+.login-pf body {
+  background: #004c69 none;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

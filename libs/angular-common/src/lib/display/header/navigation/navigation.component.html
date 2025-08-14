@@ -1,0 +1,122 @@
+<ul class="flex">
+  @for (item of items; track $index) { @if (item.isActive) {
+  <li
+    [ngClass]="{
+          'bg-primary cursor-pointer transition-all w-[116px] relative group hover:bg-primary-shade': true,
+          'bg-primary-contrast border-t-[8px] border-header text-primary hover:bg-primary hover:text-primary-contrast': isActive(item),
+        }"
+    [attr.data-index]="$index"
+  >
+    <div class="h-[1.25rem]"></div>
+    <div
+      class="pt-[24px] pb-1 text-center relative h-[90%]"
+      [attr.data-testid]="
+        item.type === 'HEADER_GROUP_ITEM'
+          ? 'header-group-' + item.groupId
+          : 'header-link' + item.path
+      "
+      (click)="onItemClick(item)"
+    >
+      <div
+        class="flex justify-center items-center bg-center bg-no-repeat mx-auto mb-[6px]"
+      >
+        <div class="relative w-8 h-8 flex">
+          <i
+            *ngIf="!isActive(item)"
+            class="w-full h-full m-auto"
+            [ngStyle]="{
+                  'mask-image': 'url(' + item.icon + ')',
+                  '-webkit-mask-image': 'url(' + item.icon + ')',
+                  'background-color': 'var(--sh-color-primary-contrast)',
+                  'background-position': 'center',
+                  'mask-repeat': 'no-repeat',
+                }"
+          >
+          </i>
+          <i
+            *ngIf="isActive(item)"
+            class="w-full h-full m-auto bg-primary hover:bg-primary-contrast"
+            [ngStyle]="{
+                  'mask-image': 'url(' + item.activeIcon + ')',
+                  '-webkit-mask-image': 'url(' + item.activeIcon + ')',
+                  color: 'inherit',
+                  'background-color': 'currentColor',
+                  'background-position': 'center',
+                  'mask-repeat': 'no-repeat',
+                }"
+          >
+          </i>
+          <span
+            *ngIf="item.type === 'HEADER_LINK_ITEM' && item.notificationCount"
+            class="absolute -top-4 -right-6 px-[6px] py-[1px] text-xs font-bold text-primary-shade bg-warning rounded-full"
+          >
+            {{ item.notificationCount }}
+          </span>
+        </div>
+      </div>
+      <span class="text-[16px] leading-[26px] text-center">{{
+        item.label
+      }}</span>
+      <div
+        *ngIf="item.type === 'HEADER_GROUP_ITEM'"
+        class="flex transform -translate-x-1"
+      >
+        <i
+          *ngIf="!isActive(item)"
+          class="w-5 h-5 m-auto"
+          [ngStyle]="{
+                'mask-image': 'url(/assets/icons/solid/triangle-down.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/solid/triangle-down.svg)',
+                'background-color': 'var(--sh-color-primary-contrast)',
+                'mask-repeat': 'no-repeat',
+              }"
+        >
+        </i>
+        <i
+          *ngIf="isActive(item)"
+          class="w-5 h-5 m-auto bg-primary hover:bg-primary-contrast"
+          [ngStyle]="{
+                'mask-image': 'url(/assets/icons/solid/triangle-down.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/solid/triangle-down.svg)',
+                'mask-repeat': 'no-repeat',
+                color: 'inherit',
+                'background-color': 'currentColor',
+              }"
+        >
+        </i>
+      </div>
+    </div>
+    <div
+      *ngIf="item.type === 'HEADER_GROUP_ITEM'"
+      class="absolute top-full bg-primary ring-primary-shade ring-1 z-10 min-w-[310px] hidden group-hover:block"
+    >
+      @for (collapsable_item of item.children || []; track collapsable_item.id)
+      {
+      <div
+        *ngIf="collapsable_item.isActive"
+        [attr.data-collapsable-index]="collapsable_item.id"
+        class="pl-[41px] pr-[10px] py-[23px] w-full flex items-center gap-[16px] hover:bg-primary-shade text-primary-contrast"
+        (click)="onSubitemClick(collapsable_item)"
+        [attr.data-testid]="'header-link' + collapsable_item.path"
+      >
+        <div class="flex justify-center items-center bg-center bg-no-repeat">
+          <i
+            class="w-10 h-10 m-auto"
+            [ngStyle]="{
+                    'mask-image': 'url(' + collapsable_item.icon + ')',
+                    '-webkit-mask-image': 'url(' + collapsable_item.icon + ')',
+                    'background-color': 'var(--sh-color-primary-contrast)',
+                    'mask-repeat': 'no-repeat',
+                  }"
+          >
+          </i>
+        </div>
+        <p class="text-[15px]">
+          {{ collapsable_item.label }}
+        </p>
+      </div>
+      }
+    </div>
+  </li>
+  } }
+</ul>

@@ -1,0 +1,4 @@
+This file contains the lists of apps that actually get build if they are affected by changes
+Each line defines an app, lines that do not match any apps names are ignored
+
+startuphafen

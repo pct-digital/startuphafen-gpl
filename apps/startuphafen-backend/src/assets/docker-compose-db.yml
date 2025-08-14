@@ -1,0 +1,62 @@
+services:
+  database:
+    container_name: startuphafen-database
+    restart: unless-stopped
+    init: true
+    image: postgres:15.10-bookworm
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: app
+      TZ: 'Europe/Berlin'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/backend_hba.conf:/var/lib/postgresql/docker_hba.conf:ro
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin -c hba_file=/var/lib/postgresql/docker_hba.conf
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U app']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      local:
+        ipv4_address: '172.42.0.6'
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: database
+    depends_on:
+      - serverfluent
+
+  keycloak-database:
+    container_name: startuphafen-keycloak-database
+    restart: unless-stopped
+    init: true
+    image: postgres:15.10-bookworm
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+      TZ: 'Europe/Berlin'
+    command: postgres -c timezone=Europe/Berlin -c log_timezone=Europe/Berlin -c hba_file=/var/lib/postgresql/docker_hba.conf
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U keycloak']
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 2s
+      retries: 5
+    volumes:
+      - kcpgdata:/var/lib/postgresql/data
+      - ./postgres/keycloak_hba.conf:/var/lib/postgresql/docker_hba.conf:ro
+    networks:
+      local:
+        ipv4_address: '172.42.0.11'
+    logging:
+      driver: 'fluentd'
+      options:
+        fluentd-async: 'true'
+        tag: keycloak-database
+    depends_on:
+      - serverfluent

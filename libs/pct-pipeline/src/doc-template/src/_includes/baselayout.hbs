@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href='{{ relativeLocation }}tw.css' rel='stylesheet' />
+  <link href='{{ relativeLocation }}style.css' rel='stylesheet' />
+
+  <link href="{{relativeLocation}}prismjs/prism.css" rel="stylesheet" />
+
+  <link rel="shortcut icon" href="{{relativeLocation}}img/favicon.webp" sizes="32x32" />
+
+  <meta name="google" content="notranslate" />
+  <meta name="color-scheme" content="light only" />
+
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <style>
+    @font-face {
+      font-family: Montserrat;
+      src: url('{{relativeLocation}}fonts/Montserrat/Montserrat-VariableFont_wght.ttf');
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: Montserrat;
+      src: url('{{relativeLocation}}fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf');
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100">
+
+    <div class="w-full" style="padding-left: calc(100vw - 100%);">
+
+        <div class="flex justify-center p-1 md:p-4">
+
+            <div class="w-full lg:w-[1000px] xl:w-[1250px] 2xl:w-[1500px] flex flex-col lg:flex-row">
+
+                <div class="w-full bg-slate-200 lg:bg-slate-100 lg:w-[300px] p-2 lg:p-0 lg:block flex justify-between">
+
+                    <div class="noselect w-12 lg:w-full h-12 lg:h-44 flex justify-center items-center">
+
+                        <a href="{{relativeLocation}}">
+                            <img class="w-10 h-10 lg:w-40 lg:h-40" src="{{relativeLocation}}img/pct_digital_gmbh_logo.svg" width="224" height="224" />
+                        </a>
+
+                    </div>
+                    <div id="mobile-menu-btt" class="noselect lg:hidden w-12 h-12 flex cursor-pointer justify-center items-center">
+                        <div class="flex justify-center items-center bg-slate-100 rounded p-1">
+                            <img src="{{relativeLocation}}img/menu-icon.svg" width="40" height="40" class="w-10 h-10" />
+                        </div>
+                    </div>
+
+
+                    <div id="nav-menu" class="hidden fixed z-50 top-0 left-0 w-full bg-slate-300 lg:bg-slate-100 lg:relative lg:block lg:mt-4">
+
+                        <div class="flex justify-center w-full">
+                            <div class="p-2 max-h-[400px] lg:max-h-max overflow-y-auto overflow-hidden lg:overflow-auto">
+                                <div class="font-bold text-sm lg:text-2xl ml-1">
+                                    Funktionalitäten
+                                </div>
+                                
+                                <div class="mt-1 ml-2 lg:ml-4 flex flex-col lg:gap-4">
+                                    {{#each features}}
+                                        <a href="{{@root.relativeLocation}}feature/{{slugify this.file}}/" class="pt-3 lg:pt-0">
+                                            <div class="italic text-sm lg:text-base {{#if this.isIncomplete}} text-red-900 {{/if}}">
+                                                {{this.name}}
+                                            </div>
+                                        </a>
+                                    {{/each}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="scroll-content" class="lg:ml-8 w-full lg:w-[750px] xl:w-[950px] 2xl:w-[1200px]">
+                    {{{ content }}}
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+    <script src="{{relativeLocation}}prismjs/prism.js"></script>
+
+    <script>
+        document.getElementById("mobile-menu-btt").addEventListener("click", () => {
+            document.getElementById("nav-menu").style.display = "block";
+        });
+    </script>
+
+</body>

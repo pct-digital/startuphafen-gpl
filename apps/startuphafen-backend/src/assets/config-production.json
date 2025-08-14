@@ -1,0 +1,8 @@
+{
+  "watermarkConfig": {
+    "text": "PROD-WIP"
+  },
+  "eric": {
+    "devMode": false
+  }
+}

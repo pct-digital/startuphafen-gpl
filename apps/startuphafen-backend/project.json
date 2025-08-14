@@ -1,0 +1,65 @@
+{
+  "name": "startuphafen-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/startuphafen-backend/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/startuphafen-backend",
+        "main": "apps/startuphafen-backend/src/main.ts",
+        "tsConfig": "apps/startuphafen-backend/tsconfig.app.json",
+        "webpackConfig": "apps/startuphafen-backend/webpack.config.js",
+        "sourceMap": true
+      },
+      "configurations": {
+        "production": {
+          "assets": ["apps/startuphafen-backend/src/assets"],
+          "generatePackageJson": true
+        },
+        "development": {
+          "assets": ["apps/startuphafen-backend/src/assets"],
+          "generatePackageJson": true
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "startuphafen-backend:build",
+        "runBuildTargetDependencies": false,
+        "watch": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "startuphafen-backend:build:development"
+        },
+        "production": {
+          "buildTarget": "startuphafen-backend:build:production"
+        }
+      }
+    },
+    "entities": {
+      "executor": "@startuphafen/pct-pipeline:entities-builder",
+      "options": {
+        "app": "startuphafen-backend"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/startuphafen-backend",
+        "commands": [
+          "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit"
+        ]
+      }
+    }
+  }
+}

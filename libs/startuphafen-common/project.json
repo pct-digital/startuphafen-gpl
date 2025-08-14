@@ -1,0 +1,9 @@
+{
+  "name": "startuphafen-common",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/startuphafen-common/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project startuphafen-common --web",
+  "targets": {}
+}

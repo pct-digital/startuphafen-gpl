@@ -1,0 +1,42 @@
+.carousel-container {
+  perspective: 1000px;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    transform: scale(0.85);
+  }
+}
+
+.carousel-card {
+  // Use will-change to optimize for animations
+  will-change: transform, opacity;
+  // Use transform3d to enable hardware acceleration
+  transform: translate3d(0, 0, 0);
+  // Prevent visual artifacts during animation
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.nav-button {
+  // Use transform instead of scale for better performance
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: translate3d(0, 0, 0) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: translate3d(0, 0, 0) scale(0.95);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translate3d(0, 0, 0) scale(1);
+}
