@@ -236,11 +236,11 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ env.TAG_NAME }}.zip
 
-  auto-deploy-staging:
-    needs: accept-and-release
-    if: github.ref == 'refs/heads/dev'
-    uses: './.github/workflows/lib_deploy.yml'
-    with:
-      release: ${{ needs.accept-and-release.outputs.tag_name }}
-      target: startuphafen-staging
-    secrets: inherit
+  # auto-deploy-staging:
+  #   needs: accept-and-release
+  #   if: github.ref == 'refs/heads/dev'
+  #   uses: './.github/workflows/lib_deploy.yml'
+  #   with:
+  #     release: ${{ needs.accept-and-release.outputs.tag_name }}
+  #     target: startuphafen-staging
+  #   secrets: inherit
