@@ -1,0 +1,46 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+name: Startuphafen
+url: 'https://github.com/pct-digital/startuphafen-gpl.git'
+releaseDate: '2025-03-25'
+developmentStatus: beta
+platforms:
+  - web
+softwareType: standalone/web
+categories:
+  - application-development
+  - taxes-management
+  - digital-citizenship
+maintenance:
+  type: contract
+legal:
+  license: GPL-3.0-or-later
+intendedAudience:
+  countries:
+    - de
+localisation:
+  localisationReady: false
+description:
+  de:
+    genericName: Webapplication
+    longDescription: >
+      Startuphafen is a webapplication designed to help users navigate the
+      german company application process. It mainly provides a questionaire, of
+      which it creates a request that is send to ERiC / Elster and the OZG-Cloud
+      provider.
+
+
+      It is able to create XML data for ERiC and request for the OZG-Cloud.
+      Furthermore it has an FAQ-Page and a Contact Page.
+
+
+      User Login to Startuphafen via BundID. User information is retrieved from
+      BundID and then used in the application process automatically. Every Input
+      into a registration form is saved in between and steps that are
+      standardised are done in the background.
+    shortDescription: >-
+      Startuphafen is a webapplication designed to help users navigate the
+      german company application process.
