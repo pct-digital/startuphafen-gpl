@@ -16,6 +16,11 @@ categories:
   - digital-citizenship
 maintenance:
   type: contract
+  contractors:
+    - name: 'PCT digital GmbH'
+      until: '2027-12-31'
+      email: 'moin@pct-digital.de'
+      website: 'https://www.pct-digital.de'
 legal:
   license: GPL-3.0-or-later
 intendedAudience:
@@ -23,6 +28,8 @@ intendedAudience:
     - de
 localisation:
   localisationReady: false
+  availableLanguages:
+    - de
 description:
   de:
     genericName: Webapplication
@@ -44,3 +51,10 @@ description:
     shortDescription: >-
       Startuphafen is a webapplication designed to help users navigate the
       german company application process.
+    features:
+      - Fragebogen-gestützter Unternehmensgründungs-Workflow
+      - XML-Erzeugung für ERiC / Elster
+      - Anbindung an OZG-Cloud-Provider
+      - BundID-Authentifizierung mit automatischer Datenübernahme
+      - Zwischenspeicherung von Formular-Eingaben
+      - FAQ- und Kontakt-Seite
