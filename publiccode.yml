@@ -4,7 +4,7 @@
 
 publiccodeYmlVersion: '0.2'
 name: Startuphafen
-url: 'https://github.com/pct-digital/startuphafen-gpl.git'
+url: 'https://gitlab.opencode.de/sh/digitalhub-sh/landesprogramm-offene-innovationen/startuphafen-sh.git'
 releaseDate: '2025-03-25'
 developmentStatus: beta
 platforms:
