@@ -56,3 +56,7 @@ core
 
 libs/eric-connector/src/lib/ERiC*
 eric.log
+.claude
+.codegraph
+.codex
+devcontainer-lock.json
