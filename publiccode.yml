@@ -2,12 +2,11 @@
 # metadata file that makes public software easily discoverable.
 # More info at https://github.com/publiccodeyml/publiccode.yml
 
-publiccodeYmlVersion: '0.2'
+publiccodeYmlVersion: "0.2"
 name: Startuphafen
-url: >-
-  https://gitlab.opencode.de/sh/digitalhub-sh/landesprogramm-offene-innovationen/startuphafen-sh
+url: https://github.com/pct-digital/startuphafen-gpl
 softwareVersion: "1.0.0"
-releaseDate: '2025-03-25'
+releaseDate: "2025-03-25"
 developmentStatus: beta
 logo: logo.png
 platforms:
@@ -21,9 +20,9 @@ maintenance:
   type: contract
   contractors:
     - name: PCT digital GmbH
-      until: '2027-12-31'
+      until: "2027-12-31"
       email: moin@pct-digital.de
-      website: 'https://www.pct-digital.de'
+      website: "https://www.pct-digital.de"
   contacts:
     - name: PCT digital GmbH
       email: moin@pct-digital.de
