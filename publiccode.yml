@@ -1,11 +1,13 @@
-# This repository adheres to the publiccode.yml standard by including this
+# This repository adheres to the publiccode.yml standard by including this 
 # metadata file that makes public software easily discoverable.
 # More info at https://github.com/publiccodeyml/publiccode.yml
 
-publiccodeYmlVersion: "0.2"
+publiccodeYmlVersion: '0.2'
 name: Startuphafen
-url: "https://gitlab.opencode.de/sh/digitalhub-sh/landesprogramm-offene-innovationen/startuphafen-sh"
-releaseDate: "2025-03-25"
+url: >-
+  https://gitlab.opencode.de/sh/digitalhub-sh/landesprogramm-offene-innovationen/startuphafen-sh
+softwareVersion: "1.0.0"
+releaseDate: '2025-03-25'
 developmentStatus: beta
 logo: logo.png
 platforms:
@@ -18,10 +20,13 @@ categories:
 maintenance:
   type: contract
   contractors:
-    - name: "PCT digital GmbH"
-      until: "2027-12-31"
-      email: "moin@pct-digital.de"
-      website: "https://www.pct-digital.de"
+    - name: PCT digital GmbH
+      until: '2027-12-31'
+      email: moin@pct-digital.de
+      website: 'https://www.pct-digital.de'
+  contacts:
+    - name: PCT digital GmbH
+      email: moin@pct-digital.de
 legal:
   license: GPL-3.0-or-later
 intendedAudience:
