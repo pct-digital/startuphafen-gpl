@@ -1,6 +1,6 @@
 # trpc-root
 
-This library was generated with [Nx](https://nx.dev).
+tRPC foundation: procedure builder with auth/feature-flag/logging middleware, OpenID token verification, request context, error redaction and audit helpers.
 
 ## Running unit tests
 

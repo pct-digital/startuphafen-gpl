@@ -1,0 +1,144 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div
+    class="lg:col-span-3 border rounded-xl p-6 shadow-md"
+    style="background-color: rgba(var(--sh-color-primary-rgb), 0.05)"
+    data-testid="profile-projects"
+  >
+    <h2 class="text-xl font-bold text-primary mb-4">Startups</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (project of projects; track project.id) {
+      <div
+        class="border border-primary rounded-lg p-4 hover:shadow-md transition-shadow"
+      >
+        <h3 class="font-bold text-lg mb-2 break-words">
+          {{ project.name }}
+        </h3>
+        <div class="flex flex-col gap-2">
+          <span
+            class="flex text-xs px-2 py-1 rounded-full justify-between"
+            [ngClass]="{
+            'bg-green-100 text-green-800': project.progress === 100 && project.stSent === true,
+            'bg-blue-100 text-blue-800': project.stSent === false,
+          }"
+          >
+            <div>
+              {{
+                project.stSent
+                  ? 'Steuerliche Erfassung abgesendet'
+                  : 'Steuerliche Erfassung ausstehend'
+              }}
+            </div>
+            @if(project.stEr != null && project.stSent){
+
+            <button
+              data-testid="profile-project-document-button"
+              (click)="requestDocument(project.id, project.stEr.id)"
+            >
+              <img
+                class="h-5 w-5 relative -top-[0.1rem] hover:scale-125"
+                src="/assets/icons/thin/eye-outline.svg"
+                alt="Pdf anzeigen"
+              />
+            </button>
+            }
+          </span>
+
+          @if(gewaProjects != null){ @if(gewaProjects.includes(project.id)){
+          <span
+            class="flex text-xs px-2 py-1 rounded-full justify-between"
+            [ngClass]="{
+                'bg-green-100 text-green-800': project.progress === 100 && project.gwSent === true,
+                'bg-blue-100 text-blue-800': project.gwSent === false,
+              }"
+          >
+            <div>
+              {{
+                project.gwSent
+                  ? 'Gewerbeanmeldung abgesendet'
+                  : 'Gewerbeanmeldung ausstehend'
+              }}
+            </div>
+            @if(project.gewA != null && project.gwSent){
+
+            <button
+              data-testid="profile-project-document-button"
+              (click)="requestDocument(project.id, project.gewA.id)"
+            >
+              <img
+                class="h-5 w-5 relative -top-[0.1rem] hover:scale-125"
+                src="/assets/icons/thin/eye-outline.svg"
+                alt="Pdf anzeigen"
+              />
+            </button>
+            }
+          </span>
+          } } @if(hasHwkApplication(project.id)){
+          <span
+            class="flex text-xs px-2 py-1 rounded-full justify-between items-center gap-3"
+            data-testid="profile-hwk-application"
+            [ngClass]="{
+                'bg-green-100 text-green-800': hwkApplicationSent(project.id),
+                'bg-blue-100 text-blue-800': !hwkApplicationSent(project.id),
+              }"
+          >
+            <div>
+              {{
+                hwkApplicationSent(project.id)
+                  ? 'Handwerkskammer abgesendet'
+                  : 'Handwerkskammer ausstehend'
+              }}
+            </div>
+            <button
+              data-testid="profile-hwk-application-button"
+              (click)="requestHwkApplication(project.id)"
+            >
+              <img
+                class="h-5 w-5 relative -top-[0.1rem] hover:scale-125"
+                src="/assets/icons/thin/eye-outline.svg"
+                alt="HWK-Antrag-PDF anzeigen"
+              />
+            </button>
+          </span>
+          } @if (hasRelevantDocuments(project)) {
+          <div
+            (click)="toggleShowDocuments(project.id)"
+            class="flex"
+            data-testid="profile-documents-section"
+          >
+            @if (showDocuments(project)) {
+            <img
+              class="h-5 w-5 top-[0.1rem] relative mr-1"
+              style="filter: brightness(0)"
+              src="/assets/icons/solid/angle-down-sharp-solid.svg"
+            />
+            } @else {
+            <img
+              class="h-5 w-5 top-[0.1rem] relative mr-1"
+              style="filter: brightness(0)"
+              src="/assets/icons/solid/angle-right-sharp-solid.svg"
+            />
+            }
+            <div>Dokumente</div>
+          </div>
+          @if (showDocuments(project)) { @for (document of
+          getDocuments(project); track document.id) {
+          <div class="flex text-xs">
+            <img
+              class="h-5 w-5 mr-1 relative -top-[0.1rem] hover:scale-125"
+              src="/assets/icons/thin/eye-outline.svg"
+              alt="Pdf anzeigen"
+              (click)="requestDocument(project.id, document.id)"
+            />
+            {{ cleanDocumentName(document) }}
+          </div>
+          } }
+          <div class="text-red-500">
+            {{ documentEditing.error.get(project.id) ?? '' }}
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

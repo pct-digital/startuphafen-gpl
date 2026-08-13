@@ -1,7 +1,6 @@
 # db-migration
 
-This library was generated with [Nx](https://nx.dev).
+Applies the Prisma-generated SQL migrations to a PostgreSQL database at server startup, without requiring the Prisma CLI at runtime.
 
 ## Running unit tests
 
-Run `nx test db-migration` to execute the unit tests via [Jest](https://jestjs.io).

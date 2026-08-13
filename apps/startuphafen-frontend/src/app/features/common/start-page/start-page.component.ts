@@ -19,7 +19,8 @@ import {
   ShInputDirective,
   TrpcService,
 } from '@startuphafen/angular-common';
-import { ShProject, WebsiteText } from '@startuphafen/startuphafen-common';
+import { Project, WebsiteText } from '@startuphafen/startuphafen-common';
+import { marked } from 'marked';
 import { Subject, takeUntil } from 'rxjs';
 import { ProjectListComponent } from '../project-list/project-list.component';
 
@@ -48,12 +49,32 @@ export interface MainStartPageItems {
     FormsModule,
   ],
   templateUrl: './start-page.component.html',
-  styles: ``,
+  styles: `
+    :host ::ng-deep .markdown-content {
+      text-align: left;
+    }
+    :host ::ng-deep .markdown-content p {
+      margin-bottom: 1rem;
+    }
+    :host ::ng-deep .markdown-content ol {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    :host ::ng-deep .markdown-content ul {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    :host ::ng-deep .markdown-content li {
+      margin-bottom: 0.5rem;
+    }
+  `,
 })
 export class StartPageComponent implements OnDestroy, OnInit {
   private destroy$ = new Subject<void>();
   projectName = '';
-  projects: ShProject[] = [];
+  projects: Project[] = [];
   private projectToDeleteId: number | null = null;
 
   websiteText: WebsiteText[] = [];
@@ -66,14 +87,14 @@ export class StartPageComponent implements OnDestroy, OnInit {
     private trpc: TrpcService
   ) {}
 
-  @ViewChild('projectPopupTemplate', { static: true })
-  projectPopUpTemplate?: TemplateRef<any>;
-
   @ViewChild('createProjectPopup', { static: true })
   createProjectPopup?: TemplateRef<any>;
 
   @ViewChild('deleteProjectPopup', { static: true })
   deleteProjectPopup?: TemplateRef<any>;
+
+  @ViewChild('errorPopup', { static: true })
+  errorPopup?: TemplateRef<any>;
 
   async ngOnInit() {
     this.projects = await this.getProjects();
@@ -92,22 +113,49 @@ export class StartPageComponent implements OnDestroy, OnInit {
       this.popupService
         .open(popupTemplate)
         .pipe(takeUntil(this.destroy$))
-        .subscribe((action) => {
-          console.log('popupAction', action);
-        });
+        .subscribe();
     }
   }
 
   async editProject(id: number) {
-    await this.router.navigateByUrl(this.nav.applicationPage(id));
+    const projectPicks = (
+      await this.trpc.client.Project.pickFiltered.query({
+        pick: ['catalogueId', 'progress'],
+        filters: { id: id },
+      })
+    )[0];
+
+    if (projectPicks.catalogueId === 'none') {
+      await this.router.navigateByUrl(this.nav.corporateFormPage(id));
+      return;
+    }
+    if (
+      projectPicks != null &&
+      projectPicks.catalogueId != null &&
+      projectPicks.progress != null
+    ) {
+      if (projectPicks.progress < 1 && projectPicks.catalogueId === 'kapg') {
+        await this.router.navigateByUrl(this.nav.checkListPage(id));
+      } else {
+        await this.router.navigateByUrl(
+          this.nav.questionnaire(projectPicks.catalogueId, id)
+        );
+      }
+    } else {
+      this.openPopup(this.errorPopup);
+    }
   }
 
   async deleteProject(id: number) {
     const project = this.projects.find((project) => project.id === id);
-    if (!project?.gewASent && !project?.steErSent) {
+    if (!project?.gwSent && !project?.stSent) {
       this.projectToDeleteId = id;
       this.openPopup(this.deleteProjectPopup);
     }
+  }
+
+  async editProjectName(id: number, newName: string) {
+    await this.trpc.client.Project.updateName.mutate({ id, name: newName });
   }
 
   async confirmDeleteProject() {
@@ -115,7 +163,7 @@ export class StartPageComponent implements OnDestroy, OnInit {
     this.projects = this.projects.filter(
       (project) => project.id !== this.projectToDeleteId
     );
-    await this.trpc.client.ShProject.delete.mutate(this.projectToDeleteId);
+    await this.trpc.client.Project.delete.mutate(this.projectToDeleteId);
     this.projectToDeleteId = null;
     this.popupService.closePopup();
   }
@@ -207,25 +255,22 @@ export class StartPageComponent implements OnDestroy, OnInit {
   }
 
   async saveProject() {
-    const versionId = await this.trpc.client.CMS.questionVersionLoader.query(
-      'EuN'
-    );
-
-    const id = await this.trpc.client.ShProject.create.mutate({
+    const id = await this.trpc.client.Project.create.mutate({
       name: this.projectName,
       progress: 0,
-      gewASent: false,
-      steErSent: false,
-      versionId: versionId,
+      gwSent: false,
+      catalogueId: 'none',
+      lastPosition: 0,
+      stSent: false,
     });
 
     this.popupService.closePopup();
 
-    await this.router.navigateByUrl(this.nav.applicationPage(id));
+    await this.router.navigateByUrl(this.nav.corporateFormPage(id));
   }
 
   async getProjects() {
-    return await this.trpc.client.ShProject.read.query();
+    return await this.trpc.client.Project.read.query();
   }
 
   closePopup() {
@@ -233,7 +278,7 @@ export class StartPageComponent implements OnDestroy, OnInit {
   }
 
   async getWebsiteText(placeToPutList: string[]) {
-    const websiteText = await this.trpc.client.CMS.getWebsiteText.query(
+    const websiteText = await this.trpc.client.CMS['getWebsiteText'].query(
       placeToPutList
     );
     return websiteText;
@@ -244,7 +289,7 @@ export class StartPageComponent implements OnDestroy, OnInit {
 
     for (const wt of wText) {
       if (wt.icon == null) continue;
-      rec[wt.placeToPut] = await this.trpc.client.CMS.getFileUrl.query(
+      rec[wt.placeToPut] = await this.trpc.client.CMS['getFileUrl'].query(
         wt.icon.url
       );
     }
@@ -252,7 +297,14 @@ export class StartPageComponent implements OnDestroy, OnInit {
   }
 
   getStartPageText() {
-    return this.websiteText.find((text) => text.placeToPut === 'startseite');
+    const startText = this.websiteText.find(
+      (text) => text.placeToPut === 'startseite'
+    );
+    const parsedHtml = marked.parse(startText?.text ?? '') as string;
+    return {
+      title: startText?.title,
+      text: parsedHtml,
+    };
   }
 
   ngOnDestroy(): void {

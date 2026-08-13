@@ -14,7 +14,7 @@
     "acceptance-test-executor": {
       "implementation": "./src/executors/acceptance-test-executor/executor",
       "schema": "./src/executors/acceptance-test-executor/schema.json",
-      "description": "Version 2 of the PCT e2e testrunner, based on the production-ready docker-compose build of the apps with all legacy issues removed."
+      "description": "Runs the Cypress acceptance test suite against the production-ready docker-compose build of the apps."
     }
   }
 }

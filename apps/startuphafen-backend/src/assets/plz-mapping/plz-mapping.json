@@ -1,0 +1,20 @@
+{
+  "12345": [
+    {
+      "kreis": "Musterkreis",
+      "gemeinde": "Musterstadt",
+      "amt": "Amt Musterstadt",
+      "amtCode": "0000",
+      "domain": "https://example-amt.invalid/"
+    }
+  ],
+  "54321": [
+    {
+      "kreis": "Beispielkreis",
+      "gemeinde": "Beispielgemeinde",
+      "amt": "Amt Beispiel",
+      "amtCode": "0001",
+      "domain": "https://example-amt-2.invalid/"
+    }
+  ]
+}

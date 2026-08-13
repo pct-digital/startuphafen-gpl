@@ -5,7 +5,10 @@
 'use strict';
 
 const { TextEncoder, TextDecoder } = require('util');
-const { default: $JSDOMEnvironment, TestEnvironment } = require('jest-environment-jsdom');
+const {
+  default: $JSDOMEnvironment,
+  TestEnvironment,
+} = require('jest-environment-jsdom');
 
 Object.defineProperty(exports, '__esModule', {
   value: true,
@@ -25,4 +28,5 @@ class JSDOMEnvironment extends $JSDOMEnvironment {
 }
 
 exports.default = JSDOMEnvironment;
-exports.TestEnvironment = TestEnvironment === $JSDOMEnvironment ? JSDOMEnvironment : TestEnvironment;
+exports.TestEnvironment =
+  TestEnvironment === $JSDOMEnvironment ? JSDOMEnvironment : TestEnvironment;

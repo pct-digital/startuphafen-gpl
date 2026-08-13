@@ -12,25 +12,26 @@ import {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './popup.component.html',
-  styles: ``,
+  styles: `
+    .popup-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .popup-container {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+  `,
 })
 export class PopupComponent {
-  @Input() title? = '';
   @Input() width?: number;
   @Input() height?: number;
   @Input() content?: TemplateRef<any>;
   @Input() context?: any;
 
   @Output() closeEvent = new EventEmitter();
-  @Output() createEvent = new EventEmitter();
-
-  constructor() {}
 
   close() {
     this.closeEvent.emit();
-  }
-
-  create() {
-    this.createEvent.emit();
   }
 }

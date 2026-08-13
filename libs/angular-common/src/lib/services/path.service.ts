@@ -24,6 +24,10 @@ export class PathService {
     root: 'login',
   };
 
+  loginPw = {
+    root: 'login-pw',
+  };
+
   faq = {
     root: 'faqPage',
   };
@@ -40,13 +44,30 @@ export class PathService {
     root: 'createProfile',
   };
 
-  application = {
-    root: 'applicationPage/:projectId',
+  corporateForm = {
+    root: 'corporateForm/:projectId',
+  };
+
+  checklist = {
+    root: 'checklist/:projectId',
   };
 
   profile = {
     root: 'profilePage',
   };
+
+  admin = {
+    root: 'adminPage',
+  };
+
+  questionnaire = {
+    root: 'questionnaire/:catalogueId/:projectId',
+  };
+
+  featureFlags = {
+    root: 'admin/feature-flags',
+  };
+
 }
 
 /**
@@ -90,10 +111,31 @@ export class NavService {
     return this.resolvePath([this.path.createProfile.root]);
   }
 
-  applicationPage(projectId: string | number) {
-    return this.resolvePath([this.path.application.root], { projectId });
+  corporateFormPage(projectId: string | number) {
+    return this.resolvePath([this.path.corporateForm.root], { projectId });
   }
+
+  checkListPage(projectId: string | number) {
+    return this.resolvePath([this.path.checklist.root], { projectId });
+  }
+
   profilePage() {
     return this.resolvePath([this.path.profile.root]);
   }
+
+  adminPage() {
+    return this.resolvePath([this.path.admin.root]);
+  }
+
+  questionnaire(catalogueId: string, projectId: string | number) {
+    return this.resolvePath([this.path.questionnaire.root], {
+      catalogueId: catalogueId,
+      projectId: projectId,
+    });
+  }
+
+  featureFlagsAdminPage() {
+    return this.resolvePath([this.path.featureFlags.root]);
+  }
+
 }

@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { AdminLoginService } from '../../services/admin-login.service';
 
 @Component({
   selector: 'sh-portal-footer',
@@ -69,19 +71,61 @@ import { Component } from '@angular/core';
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
   }
+
+  nav[data-testid='footer-links'] {
+    position: relative;
+  }
   `,
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
 })
-export class PortalFooterComponent {
-  constructor() {}
+export class PortalFooterComponent implements OnDestroy {
+  adminLoginVisible = false;
+
+  private adminLoginHideTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly adminLoginVisibleDurationMs = 15000;
+
+  constructor(private adminLogin: AdminLoginService) {}
+
+  ngOnDestroy(): void {
+    if (this.adminLoginHideTimeout) {
+      clearTimeout(this.adminLoginHideTimeout);
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleSecretKey(event: KeyboardEvent) {
+    if (event.altKey && event.shiftKey && event.code === 'KeyA') {
+      event.preventDefault();
+      this.revealAdminLoginButton();
+    }
+  }
+
+  private revealAdminLoginButton() {
+    this.adminLoginVisible = true;
+    if (this.adminLoginHideTimeout) {
+      clearTimeout(this.adminLoginHideTimeout);
+    }
+
+    this.adminLoginHideTimeout = setTimeout(() => {
+      this.adminLoginVisible = false;
+    }, this.adminLoginVisibleDurationMs);
+  }
+
+  async onAdminLoginClick() {
+    try {
+      await this.adminLogin.loginThroughKeycloak();
+    } catch (error) {
+      console.error('Admin login failed', error);
+    }
+  }
 
   readonly impressumExternalLink: string =
-    'https://www.startuphafen.sh/Service/Impressum/';
+    'https://www.startuphafen.sh/impressum';
   readonly datenschutzExternalLink: string =
-    'https://www.startuphafen.sh/Service/Datenschutz/';
+    'https://www.startuphafen.sh/datenschutz';
   readonly barrierefreiheitExternalLink: string =
-    'https://www.startuphafen.sh/Service/Barrierefreiheit/';
+    'https://www.startuphafen.sh/barrierefreiheit';
   readonly startSeiteExternalLink: string = 'https://www.startuphafen.sh/';
   readonly kontaktExternalLink: string = 'https://www.startuphafen.sh/Kontakt/';
 }

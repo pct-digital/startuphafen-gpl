@@ -7,7 +7,9 @@ const NX_BASE = process.argv[2];
 const NX_HEAD = process.argv[3];
 
 function printAffectedList(target) {
-  const COMMAND = `npx nx show projects --affected ${target != null ? '--with-target=' + target + ' ' : ''}--base=${NX_BASE} --head=${NX_HEAD}`;
+  const COMMAND = `npx nx show projects --affected ${
+    target != null ? '--with-target=' + target + ' ' : ''
+  }--base=${NX_BASE} --head=${NX_HEAD}`;
   console.log(COMMAND);
   const raw = execSync(COMMAND).toString();
   const projects = raw
@@ -15,7 +17,7 @@ function printAffectedList(target) {
     .map((x) => x.trim())
     .filter((x) => x !== '');
   projects.sort();
-  return projects;
+  return projects.filter((x) => !x.includes('deploy3')); // somehow nx picks up deploy3...;
 }
 const affectedProjects = printAffectedList();
 

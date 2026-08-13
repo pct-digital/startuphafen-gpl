@@ -3,21 +3,17 @@ import {
   EricToolInterface,
 } from '@startuphafen/startuphafen-common';
 import axios, { AxiosInstance } from 'axios';
-import { LocalSecrets, ServerConfig } from '../../config';
+import { ServerConfig } from '../../config';
 
 export class EricTool implements EricToolInterface {
-  token = {};
   axi: AxiosInstance;
 
-  constructor(
-    private serverConfig: ServerConfig,
-    private localSecrets: LocalSecrets
-  ) {
+  constructor(private serverConfig: ServerConfig) {
     this.axi = axios.create({
-      baseURL: this.localSecrets.eric.host,
+      baseURL: this.serverConfig.eric.host,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: this.localSecrets.eric.token,
+        Authorization: this.serverConfig.eric.token,
       },
     });
   }
@@ -35,6 +31,12 @@ export class EricTool implements EricToolInterface {
 
         if (!input.xmlData.includes('Testmerker'))
           throw new Error('Testmerker was not set while in dev mode!');
+
+        console.log('Eric is making a call with test flag set!');
+      } else {
+        console.log(
+          'Eric is making a call WITHOUT test flag set, REAL company will be created!'
+        );
       }
 
       const res = (
@@ -42,9 +44,19 @@ export class EricTool implements EricToolInterface {
           responseType: 'json',
         })
       ).data;
+
       return res;
     } catch (e: any) {
-      console.error(e);
+      // Extract only essential error info to avoid logging megabytes of circular references
+      const errorLog = {
+        message: e.message,
+        code: e.code,
+        status: e.response?.status,
+        statusText: e.response?.statusText,
+        url: e.config?.url,
+      };
+
+      console.error('[EricTool] Error:', errorLog);
     }
   }
 }

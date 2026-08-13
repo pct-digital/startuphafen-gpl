@@ -33,7 +33,7 @@
     "doc": {
       "executor": "@startuphafen/pct-pipeline:doc-builder",
       "options": {
-        "app": "startuphafen"
+        "app": "startuphafen-frontend"
       }
     },
     "typecheck": {

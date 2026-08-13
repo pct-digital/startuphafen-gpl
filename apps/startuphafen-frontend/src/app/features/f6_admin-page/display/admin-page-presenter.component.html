@@ -1,0 +1,143 @@
+<div
+  class="min-h-screen p-6"
+  style="background-color: var(--sh-background-color)"
+>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Stats Cards -->
+    @for (item of topCards; track $index) {
+    <div
+      class="p-6 bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p
+            class="text-sm font-medium mb-1"
+            style="color: var(--sh-color-medium)"
+          >
+            {{ item.title }}
+          </p>
+          <p class="text-2xl font-bold" style="color: var(--sh-color-primary)">
+            {{ item.value }}
+          </p>
+        </div>
+        <div
+          class="w-12 h-12 rounded-lg flex items-center justify-center"
+          style="background-color: rgba(26, 123, 171, 0.1)"
+        >
+          <span
+            [ngStyle]="{
+              'mask-image': 'url(' + item.iconUrl + ')',
+              '-webkit-mask-image': 'url(' + item.iconUrl + ')',
+              'mask-position': 'center',
+              'mask-repeat': 'no-repeat',
+              'mask-size': 'contain',
+              'background-color': 'var(--sh-color-primary)'
+            }"
+            class="w-6 h-6"
+            aria-hidden="true"
+          ></span>
+        </div>
+      </div>
+    </div>
+
+    }
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    @if(errorMessage){
+    <div class="w-full flex justify-center pt-20">
+      <div class="bg-white p-2 rounded-lg shadow-md flex gap-4">
+        <img
+          src="/assets/icons/solid/warning-solid.svg"
+          alt=""
+          class="w-6 h-6 [filter:invert(27%)_sepia(98%)_saturate(7498%)_hue-rotate(359deg)_brightness(95%)_contrast(118%)]"
+        />
+        <p class="font-extrabold text-red-600">{{ errorMessage }}</p>
+      </div>
+    </div>
+    } @else {
+    <!-- Graph Section -->
+    <div class="lg:col-span-2">
+      <div class="p-6 bg-white shadow-sm rounded-xl">
+        <div class="mb-4">User Registrierung</div>
+        <div
+          class="h-96 rounded-lg border-2 border-dashed flex items-center justify-center"
+          style="
+            background-color: rgba(26, 123, 171, 0.05);
+            border-color: rgba(26, 123, 171, 0.2);
+          "
+        >
+          @if(userChartOptions !== null){
+
+          <ag-charts
+            style="height: 100%; width: 100%"
+            [options]="userChartOptions"
+          ></ag-charts>
+          }@else {
+
+          <div class="text-center">
+            <svg
+              class="w-16 h-16 mx-auto mb-4"
+              style="color: var(--sh-color-primary); opacity: 0.6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 4 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+            <h3
+              class="text-lg font-medium mb-2"
+              style="color: var(--sh-color-primary)"
+            >
+              Graph Placeholder
+            </h3>
+            <p style="color: var(--sh-color-medium)">
+              Graph konnte nicht geladen werden
+            </p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Side Panel -->
+    <div class="space-y-6">
+      <!-- Quick Actions -->
+      <div class="p-6 bg-white shadow-sm rounded-xl">
+        <div class="space-y-3">
+          <button
+            class="w-full px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium"
+            style="background-color: var(--sh-color-primary)"
+            (click)="featureFlagRouteClicked.emit()"
+          >
+            Feature Flags
+          </button>
+        </div>
+        <div class="mb-4 mt-8">Externe Services</div>
+        <div class="space-y-3">
+          <button
+            class="w-full px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium"
+            style="background-color: var(--sh-color-primary)"
+            (click)="kcRouteClicked.emit()"
+          >
+            KC-Admin
+          </button>
+          <button
+            class="w-full px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all font-medium"
+            style="background-color: var(--sh-color-primary)"
+            (click)="strapiRouteClicked.emit()"
+          >
+            Strapi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

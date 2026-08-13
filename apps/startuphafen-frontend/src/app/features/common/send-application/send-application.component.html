@@ -1,87 +1,136 @@
-<div shCard data-testid="send-application-card" class="px-8 w-full">
-  <div shCardTitle data-testid="send-application-card-title">{{ title }}</div>
-  <div class="flex flex-row gap-4">
-    <div shCardSubtitle data-testid="send-application-card-subtitle">
-      {{ subtitle
-      }}{{
-        subtitle == null
-          ? ''
-          : applicationType === 'elster'
-          ? ': Finanzamt'
-          : applicationType === 'gewerbeamt'
-          ? ': Gewerbeamt'
-          : ''
-      }}
-    </div>
-    <div>
-      <img
-        src="/assets/icons/solid/check-solid.svg"
-        alt="icon"
-        *ngIf="sendDisabled"
-        class="size-12 filter-green relative -top-4"
-      />
-    </div>
+<div
+  shCard
+  data-testid="send-application-card"
+  class="relative px-4 sm:px-8 w-full max-w-[calc(100vw-2rem)] sm:w-[30rem] h-[28rem] min-h-[24rem] sm:h-[30rem] acrylic"
+>
+  <div
+    data-testid="send-application-card-title"
+    [style]="sent ? 'background-color: #3cc135' : 'background-color: #1d89c4'"
+    class="font-sans font-bold text-2xl sm:text-3xl text-white rounded-full px-3 py-2 absolute -top-4 min-w-[2.8rem] sm:min-w-[3.2rem] min-h-[2.8rem] sm:min-h-[3rem] flex items-center justify-center text-center"
+  >
+    {{ title }}
   </div>
-  <span shCardContent data-testid="send-application-card-content">
-    {{ content }}
-  </span>
-  <div class="mt-8">
-    <button
-      shButton
-      [disabled]="downloadDisabled"
-      [outline]="true"
-      (click)="clickDownloadData()"
-      data-testid="send-application-donwload-data-btn"
-      tabindex="0"
-      [style]="downloadVisible ? 'display: ' : 'display: none'"
-    >
-      <img
-        src="/assets/icons/solid/file-pdf-sharp-solid.svg"
-        alt="icon"
-        class="size-6"
-      />
-      Angaben herunterladen
-    </button>
+  <div
+    class="text-xl sm:text-2xl font-sans font-semibold text-tertiary-shade absolute top-12 sm:top-14 max-w-[80%] truncate"
+    data-testid="send-application-card-subtitle"
+  >
+    {{ subtitle
+    }}{{
+      subtitle == null
+        ? ''
+        : applicationType === 'elster'
+        ? ': Finanzamt'
+        : applicationType === 'gewerbeamt'
+        ? ': Gewerbeamt'
+        : applicationType === 'hwk'
+        ? ': Handwerkskammer'
+        : ''
+    }}
   </div>
-  <div class="mt-2">
-    <button
-      shButton
-      [disabled]="sendDisabled || lockSend"
-      (click)="clickSend()"
-      data-testid="send-application-send-data-btn"
-      tabindex="1"
+  <img
+    src="/assets/icons/solid/check-solid.svg"
+    alt="icon"
+    *ngIf="sent"
+    class="size-20 sm:size-28 filter-green absolute -top-6 sm:-top-8 -right-6 sm:-right-10"
+  />
+  <div class="mt-auto w-full flex flex-col items-center gap-3">
+    <span
+      shCardContent
+      class="z-10"
+      data-testid="send-application-card-content"
     >
-      <img
-        src="/assets/icons/solid/envelope-sharp-solid-white.svg"
-        alt="icon"
-        class="size-6"
-      />
-      <div>
-        An das
-        {{
-          applicationType === 'elster'
-            ? 'Finanzamt'
-            : applicationType === 'gewerbeamt'
-            ? 'Gewerbeamt'
-            : ''
-        }}
-        senden
-      </div>
-    </button>
+      {{ content }}
+    </span>
+    @if(applicationType === 'elster'){
+
+    <div class="text-center font-sans text-tertiary font-semibold z-10">
+      <p>
+        Überprüfe welches Finanzamt für Dich zuständig ist
+        <a
+          href="https://www.schleswig-holstein.de/DE/landesregierung/ministerien-behoerden/FinanzaemterSH/FA_Kiel/ueber_FA_Kiel/Zustaendigkeiten/Steuerliche_zustaendigkeit_NEU"
+          target="_blank"
+          class="text-blue-500 underline"
+          >hier.</a
+        >
+      </p>
+    </div>
+    <div class="mt-4 relative w-full sm:w-5/6 mx-auto">
+      <select
+        name="finanzämter"
+        [(ngModel)]="bufaNrSelected"
+        class="w-full h-10 md:h-12 text-primary text-base md:text-lg bg-[rgba(var(--sh-color-primary-rgb),0.09)] border border-gray-200 rounded-xl pl-4 pr-10 py-2 transition duration-200 ease focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary appearance-none cursor-pointer hover:border-primary"
+      >
+        <option [value]="null" disabled hidden>Bitte auswählen</option>
+        @for (item of finanzaemter; track $index) {
+        <option [ngValue]="item.bufaNr">
+          {{ item.name }}: {{ item.bufaNr }}
+        </option>
+        }
+      </select>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        style="pointer-events: none"
+        class="size-5 md:size-6 absolute top-1/2 -translate-y-1/2 right-3 text-primary"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+        />
+      </svg>
+    </div>
+    }
+
+    <ng-content></ng-content>
+
+    <div class="mt-4 sm:mt-8 z-10">
+      <button
+        shButton
+        [disabled]="downloadDisabled"
+        [outline]="true"
+        (click)="clickDownloadData()"
+        data-testid="send-application-donwload-data-btn"
+        tabindex="0"
+        [style]="downloadVisible ? 'display: ' : 'display: none'"
+      >
+        <img
+          src="/assets/icons/solid/file-pdf-sharp-solid.svg"
+          alt="icon"
+          class="size-6"
+        />
+        Angaben herunterladen
+      </button>
+    </div>
+    <div class="mt-2 z-10 flex items-center justify-center gap-3">
+      <button
+        shButton
+        [disabled]="
+          sendDisabled ||
+          lockSend ||
+          (applicationType === 'elster' && bufaNrSelected == null)
+        "
+        (click)="clickSend()"
+        data-testid="send-application-send-data-btn"
+        tabindex="1"
+      >
+        <img
+          src="/assets/icons/solid/envelope-sharp-solid-white.svg"
+          alt="icon"
+          class="size-6"
+        />
+        <div>{{ sendButtonText ?? 'Senden' }}</div>
+      </button>
+    </div>
   </div>
 </div>
 @if(errorMessage != null) {
 <div shCard class="mt-4 mx-auto max-w-[calc(100vw-2rem)] sm:max-w-lg w-full">
   <div shCardTitle class="text-red-500">{{ errorCardTitle }}</div>
   <div shCardContent class="px-4 sm:px-6">
-    <div class="flex flex-col space-y-3">
-      <span class="text-red-500 font-semibold">Hinweis</span>
-      <span class="text-sm sm:text-base break-words"
-        >Bitte leg Dein Startup neu an. Aufgrund von gesetzlich festgelegten
-        Abhängigkeiten innerhalb des Fragenflows kannst Du abgeschlossene
-        Eingaben nicht mehr ändern.</span
-      >
-    </div>
     @for( error of errorMessage; track $index){
     <div class="flex flex-col space-y-1 mt-4">
       <span class="text-red-500 font-semibold text-sm sm:text-base"

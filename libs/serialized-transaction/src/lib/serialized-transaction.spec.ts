@@ -1,5 +1,10 @@
 import { Knex } from 'knex';
-import { TransactionFactory, checkError, createDelay, createRepeatedSerializedKnexTransaction } from './serialized-transaction';
+import {
+  TransactionFactory,
+  checkError,
+  createDelay,
+  createRepeatedSerializedKnexTransaction,
+} from './serialized-transaction';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { DockerizedPostgres } from '../../../dockerized-node-libs/src';
 
@@ -19,7 +24,11 @@ const dummyData: Accounts[] = [
   { id: 4, balance: 400 },
 ];
 
-async function setupDb(transaction: <E>(cb: (trx: Knex.Transaction<any, any[]>) => Promise<E>) => Promise<E>) {
+async function setupDb(
+  transaction: <E>(
+    cb: (trx: Knex.Transaction<any, any[]>) => Promise<E>
+  ) => Promise<E>
+) {
   return await transaction(async (trx) => {
     await trx.schema.createTable('accounts', (table) => {
       table.integer('id');
@@ -41,7 +50,8 @@ function makeBlocker() {
   };
 }
 
-const randomIntFromInterval = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
+const randomIntFromInterval = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
 
 describe('serialized transaction', () => {
   beforeAll(async () => {
@@ -57,14 +67,20 @@ describe('serialized transaction', () => {
   });
 
   it('expect transaction to work', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 3);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      3
+    );
     const returnData = await setupDb(transaction);
 
     expect(returnData).toEqual(dummyData);
   });
 
   it('does not allow dirty reads', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 3);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      3
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -78,7 +94,10 @@ describe('serialized transaction', () => {
     });
     const x2 = transaction(async (_trx2) => {
       await step2.promise;
-      const result = await _trx2<Accounts>('accounts').select().where({ id: 1 }).first();
+      const result = await _trx2<Accounts>('accounts')
+        .select()
+        .where({ id: 1 })
+        .first();
       step1.resolver();
       return result;
     });
@@ -90,7 +109,10 @@ describe('serialized transaction', () => {
   });
 
   it('could not serialize access due to concurrent update', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 0);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      0
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -98,7 +120,9 @@ describe('serialized transaction', () => {
     const step2 = makeBlocker();
 
     const x1 = transaction(async (trx1) => {
-      await trx1<Accounts>('accounts').where({ id: 1 }).update({ id: 1, balance: 200 });
+      await trx1<Accounts>('accounts')
+        .where({ id: 1 })
+        .update({ id: 1, balance: 200 });
       const result = await trx1<Accounts>('accounts').where({ id: 1 }).first();
       step2.resolver();
       await step1.promise;
@@ -106,7 +130,9 @@ describe('serialized transaction', () => {
     });
     const x2 = transaction(async (trx2) => {
       await step2.promise;
-      const u1 = trx2<Accounts>('accounts').where({ id: 1 }).update({ id: 1, balance: 0 });
+      const u1 = trx2<Accounts>('accounts')
+        .where({ id: 1 })
+        .update({ id: 1, balance: 0 });
       // instant start the query
       let e = null;
       const u2Blocker = makeBlocker();
@@ -121,11 +147,16 @@ describe('serialized transaction', () => {
     });
 
     await expect(x1).resolves.toEqual({ balance: 200, id: 1 });
-    await expect(x2).rejects.toThrow('could not serialize access due to concurrent update');
+    await expect(x2).rejects.toThrow(
+      'could not serialize access due to concurrent update'
+    );
   });
 
   it('could not serialize access due to read/write dependencies among transactions', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 0);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      0
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -133,23 +164,38 @@ describe('serialized transaction', () => {
     const step2 = makeBlocker();
 
     const x1 = transaction(async (trx1) => {
-      const result = await trx1<Accounts>('accounts').sum('balance').whereIn('id', [1, 2]).first();
-      await trx1<Accounts>('accounts').update('balance', Number(result!['sum'])).whereIn('id', [3, 4]);
+      const result = await trx1<Accounts>('accounts')
+        .sum('balance')
+        .whereIn('id', [1, 2])
+        .first();
+      await trx1<Accounts>('accounts')
+        .update('balance', Number(result!['sum']))
+        .whereIn('id', [3, 4]);
       step2.resolver();
       await step1.promise;
     });
     const x2 = transaction(async (trx2) => {
-      const result = await trx2<Accounts>('accounts').sum('balance').whereIn('id', [3, 4]).first();
-      await trx2<Accounts>('accounts').update('balance', Number(result!['sum'])).whereIn('id', [1, 2]);
+      const result = await trx2<Accounts>('accounts')
+        .sum('balance')
+        .whereIn('id', [3, 4])
+        .first();
+      await trx2<Accounts>('accounts')
+        .update('balance', Number(result!['sum']))
+        .whereIn('id', [1, 2]);
       step1.resolver();
       await step2.promise;
     });
 
-    await expect(Promise.all([x1, x2])).rejects.toThrow('could not serialize access due to read/write dependencies among transactions');
+    await expect(Promise.all([x1, x2])).rejects.toThrow(
+      'could not serialize access due to read/write dependencies among transactions'
+    );
   });
 
   it('check for uncommitted transaction', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 0);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      0
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -163,7 +209,10 @@ describe('serialized transaction', () => {
   });
 
   it('should not retry on no serialization error', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 10);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      10
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -172,7 +221,9 @@ describe('serialized transaction', () => {
       await trx('accounts').insert({ id: 1, balance: faultyData });
     });
 
-    await expect(toThrow).rejects.toThrow(`invalid input syntax for type integer: "${faultyData}"`);
+    await expect(toThrow).rejects.toThrow(
+      `invalid input syntax for type integer: "${faultyData}"`
+    );
   });
 
   it('time delay should be random', async () => {
@@ -188,7 +239,10 @@ describe('serialized transaction', () => {
   });
 
   it('should handle massive load', async () => {
-    const transaction = createRepeatedSerializedKnexTransaction(postgres.knex, 100);
+    const transaction = createRepeatedSerializedKnexTransaction(
+      postgres.knex,
+      100
+    );
     const successful = await setupDb(transaction);
     expect(successful).toEqual(dummyData);
 
@@ -255,7 +309,9 @@ describe('serialized transaction', () => {
     try {
       await tryToInsert(trx, true);
     } catch (error) {
-      expect((error as Error).message).toContain('cannot execute INSERT in a read-only transaction');
+      expect((error as Error).message).toContain(
+        'cannot execute INSERT in a read-only transaction'
+      );
     }
     const r = await tryToInsert(trx, false);
     expect(r.length).toBe(1);

@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { provideIcons } from '@ng-icons/core';
-import { lucideDownload } from '@ng-icons/lucide';
 import { NavService, ShButtonDirective } from '@startuphafen/angular-common';
 import { Artikel } from '@startuphafen/startuphafen-common';
 
@@ -10,7 +8,6 @@ import { Artikel } from '@startuphafen/startuphafen-common';
   standalone: true,
   imports: [ShButtonDirective],
   templateUrl: './faq-article-page-presenter.component.html',
-  providers: [provideIcons({ lucideDownload })],
   styles: `
     ::ng-deep .article-content a {
       @apply text-primary;
@@ -29,7 +26,6 @@ export class FaqArticlePagePresenterComponent {
   @Input() artilceId = '';
   @Input() articleData: Artikel | null = null;
   @Output() backButtonClicked = new EventEmitter();
-  @Output() downLoadButtonClicked = new EventEmitter();
 
   constructor(private router: Router, private nav: NavService) {}
 

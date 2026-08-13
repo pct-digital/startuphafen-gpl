@@ -1,0 +1,227 @@
+[
+  {
+    "name": "antragsteller",
+    "label": "antragsteller",
+    "formItems": [
+      {
+        "name": "pers_anrede",
+        "label": "pers_anrede",
+        "type": "string"
+      },
+      {
+        "name": "pers_nachname",
+        "label": "pers_nachname",
+        "type": "string"
+      },
+      {
+        "name": "pers_vorname",
+        "label": "pers_vorname",
+        "type": "string"
+      },
+      {
+        "name": "pers_geburtsname",
+        "label": "pers_geburtsname",
+        "type": "string"
+      },
+      {
+        "name": "pers_geburtsdatum",
+        "label": "pers_geburtsdatum",
+        "type": "date"
+      },
+      {
+        "name": "pers_geburtsort",
+        "label": "pers_geburtsort",
+        "type": "string"
+      },
+      {
+        "name": "pers_geburtsland",
+        "label": "pers_geburtsland",
+        "type": "string"
+      },
+      {
+        "name": "pers_staatsangehoerigkeit",
+        "label": "pers_staatsangehoerigkeit",
+        "type": "string"
+      },
+      {
+        "name": "sh_strasse",
+        "label": "sh_strasse",
+        "type": "string"
+      },
+      {
+        "name": "sh_hausnummer",
+        "label": "sh_hausnummer",
+        "type": "string"
+      },
+      {
+        "name": "sh_plz",
+        "label": "sh_plz",
+        "type": "string"
+      },
+      {
+        "name": "ort",
+        "label": "ort",
+        "type": "string"
+      },
+      {
+        "name": "kont_telefonnummer",
+        "label": "kont_telefonnummer",
+        "type": "string"
+      },
+      {
+        "name": "kont_mobilnummer",
+        "label": "kont_mobilnummer",
+        "type": "string"
+      },
+      {
+        "name": "kont_telefaxnummer",
+        "label": "kont_telefaxnummer",
+        "type": "string"
+      },
+      {
+        "name": "kont_email",
+        "label": "kont_email",
+        "type": "string"
+      },
+      {
+        "name": "kont_demail",
+        "label": "kont_demail",
+        "type": "string"
+      },
+      {
+        "name": "zeichen",
+        "label": "zeichen",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "name": "Angaben zum Betriebsinhaber",
+    "label": "Angaben zum Betriebsinhaber",
+    "formItems": [
+      {
+        "name": "Projektname",
+        "label": "Projektname",
+        "type": "string"
+      }
+    ]
+  },
+  {
+    "name": "Betriebsdaten",
+    "label": "Betriebsdaten",
+    "formItems": [
+      {
+        "name": "Betriebsstätte",
+        "label": "Betriebsstätte",
+        "formItems": [
+          {
+            "name": "Straße",
+            "label": "Straße",
+            "type": "string"
+          },
+          {
+            "name": "Hausnummer",
+            "label": "Hausnummer",
+            "type": "string"
+          },
+          {
+            "name": "PLZ",
+            "label": "PLZ",
+            "type": "string"
+          },
+          {
+            "name": "Ort",
+            "label": "Ort",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Angemeldete Tätigkeit",
+        "label": "Angemeldete Tätigkeit",
+        "formItems": [
+          {
+            "name": "Nebenerwerb",
+            "label": "Nebenerwerb",
+            "type": "string"
+          },
+          {
+            "name": "Beginn",
+            "label": "Beginn",
+            "type": "date"
+          },
+          {
+            "name": "Beschreibung",
+            "label": "Beschreibung",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Vorliegende Erlaubnis",
+        "label": "Vorliegende Erlaubnis",
+        "formItems": [
+          {
+            "name": "Unterliegt das Gewerbe einer Erlaubnispflicht",
+            "label": "Unterliegt das Gewerbe einer Erlaubnispflicht",
+            "type": "string"
+          },
+          {
+            "name": "Liegt bereits eine Erlaubnis vor",
+            "label": "Liegt bereits eine Erlaubnis vor",
+            "type": "string"
+          },
+          {
+            "name": "Ausstellende Behörde",
+            "label": "Ausstellende Behörde",
+            "type": "string"
+          },
+          {
+            "name": "Ausstellungsdatum",
+            "label": "Ausstellungsdatum",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Vorliegende Handwerkskarte",
+        "label": "Vorliegende Handwerkskarte",
+        "formItems": [
+          {
+            "name": "Handwerkskarte liegt vor",
+            "label": "Handwerkskarte liegt vor",
+            "type": "string"
+          },
+          {
+            "name": "Name der Handwerkskammer",
+            "label": "Name der Handwerkskammer",
+            "type": "string"
+          },
+          {
+            "name": "Ausstellungsdatum",
+            "label": "Ausstellungsdatum",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "Art des Betriebes",
+        "label": "Art des Betriebes",
+        "type": "string"
+      },
+      {
+        "name": "Rechtsform",
+        "label": "Rechtsform",
+        "type": "string"
+      }
+    ]
+  },
+  { "name": "source", "label": "source", "type": "string" },
+  { "name": "Auth-Kommentar", "label": "Auth-Kommentar", "type": "string" },
+  {
+    "name": "OrganisationseinheitenID",
+    "label": "OrganisationseinheitenID",
+    "type": "string"
+  },
+  { "name": "inbox_reference", "label": "inbox_reference", "type": "string" }
+]

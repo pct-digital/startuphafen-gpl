@@ -1,0 +1,23 @@
+name: 4 - Create New Testing Environment
+run-name: 'Create env ${{ inputs.domain }} from ${{ inputs.source }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Fully qualified domain for the new ephemeral / testing environment'
+        required: true
+        type: string
+      source:
+        description: 'Source environment to copy baseline vars from (e.g. dev)'
+        required: true
+        type: string
+
+jobs:
+  create-environment:
+    name: Create ${{ inputs.domain }}
+    uses: ./.github/workflows/lib_create_environment.yml
+    with:
+      domain: ${{ inputs.domain }}
+      source: ${{ inputs.source }}
+    secrets: inherit

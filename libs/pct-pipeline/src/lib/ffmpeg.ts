@@ -28,8 +28,8 @@ function extendFrame(rect?: VideoRect) {
   if (!rect) {
     return;
   }
-  // hacky fix for an annoying white border on the left side
-  // dunno why...
+  // Shrink the crop rectangle by one pixel on each side to avoid a
+  // white border artifact at the edges of the recording.
   rect.x += 1;
   rect.width -= 2;
   rect.y += 1;
@@ -137,7 +137,6 @@ export async function cutSlowVideo(
     duration * timeFactor
   )} -preset fast -crf 24 -hide_banner -loglevel error -y ${filtersParam} ${tempName}`;
 
-  //   console.log('dcmd', dcmd);
 
   // make sure the file exists already, such that it is only overwritten by ffmpeg, not created. This way it won't be owned by root in the end (docker issue)
   exec('touch "' + tempPath + '"');

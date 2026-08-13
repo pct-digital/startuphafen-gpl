@@ -1,6 +1,10 @@
 import slugify from 'slugify';
 
-export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor = 1) {
+export function patchCypressForVideoRecording(
+  cy: any,
+  Cypress: any,
+  speedFactor = 1
+) {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   // add terminal printing of video timestamps and frame rectangle for further processing by the e2e executor
 
@@ -8,7 +12,9 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
     console.log('No videos will be recorded');
     return false;
   } else {
-    console.log('Will slow down and add highlights for tutorial video recording');
+    console.log(
+      'Will slow down and add highlights for tutorial video recording'
+    );
   }
 
   let printedFrameRegion = false;
@@ -19,14 +25,20 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
   // cy.task cannot be run from the Cypress.on handlers...
   const flushPendingPrints = () => {
     if (!printedFrameRegion) {
-      const frameRegion = window.top?.document.querySelector('.screenshot-height-container')?.getBoundingClientRect() ?? null;
+      const frameRegion =
+        window.top?.document
+          .querySelector('.screenshot-height-container')
+          ?.getBoundingClientRect() ?? null;
 
       if (frameRegion != null) {
         printedFrameRegion = true;
 
         if (Cypress.env('SLOWMOTION')) {
           const specName = (Cypress.config() as any).spec.fileName;
-          cy.task('log', 'frame:cut:' + specName + ':' + JSON.stringify(frameRegion));
+          cy.task(
+            'log',
+            'frame:cut:' + specName + ':' + JSON.stringify(frameRegion)
+          );
         } else {
           cy.task('log', 'frame:cut:' + JSON.stringify(frameRegion));
         }
@@ -42,7 +54,11 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
     }
   };
 
-  function buildLogStatement(state: 'after' | 'before', scenarioName: string, runOffset: number) {
+  function buildLogStatement(
+    state: 'after' | 'before',
+    scenarioName: string,
+    runOffset: number
+  ) {
     let result = 'test:' + state + ':run:' + scenarioName + ':';
     if (Cypress.env('SLOWMOTION')) {
       const specName = (Cypress.config() as any).spec.fileName;
@@ -228,8 +244,17 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
       `);
   };
 
-  const highlightInteractedElements = (firstParam: any, clr: string, scale: boolean) => {
-    if (firstParam != null && firstParam.length != null && firstParam.length > 0 && typeof firstParam !== 'string') {
+  const highlightInteractedElements = (
+    firstParam: any,
+    clr: string,
+    scale: boolean
+  ) => {
+    if (
+      firstParam != null &&
+      firstParam.length != null &&
+      firstParam.length > 0 &&
+      typeof firstParam !== 'string'
+    ) {
       for (let i = 0; i < firstParam.length; i++) {
         const elem = firstParam[i];
         if (
@@ -239,7 +264,11 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
           typeof elem['getBoundingClientRect'] === 'function'
         ) {
           const scrollLocked = (cy as any).state('window').docVideoScrollLock;
-          if ('scrollIntoView' in elem && typeof elem['scrollIntoView'] === 'function' && !scrollLocked) {
+          if (
+            'scrollIntoView' in elem &&
+            typeof elem['scrollIntoView'] === 'function' &&
+            !scrollLocked
+          ) {
             elem.scrollIntoView();
           }
 
@@ -272,7 +301,11 @@ export function patchCypressForVideoRecording(cy: any, Cypress: any, speedFactor
           waitAndDisplay(x, clr);
         }, 15);
       } else {
-        highlightInteractedElements(x.attributes.prev.attributes.subject, clr, true);
+        highlightInteractedElements(
+          x.attributes.prev.attributes.subject,
+          clr,
+          true
+        );
       }
     }
   };

@@ -11,7 +11,7 @@ const isExpectedExtension = (file, extension, extensionLength) => {
 };
 
 const getByExtension = (basePath, extension, extensionLength, result) => {
-  filesInCurrentDir = fs.readdirSync(basePath);
+  const filesInCurrentDir = fs.readdirSync(basePath);
   filesInCurrentDir.forEach((file) => {
     const updatedBasePath = path.join(basePath, file);
     if (!fs.statSync(updatedBasePath).isDirectory()) {

@@ -40,13 +40,6 @@ import {
   
   opacity: 0;
   transition: opacity 0.3s;
-
-  //mobile styles
-  @media only screen and (max-width: 768px) {
-    min-width: 120px; 
-    max-width: 300px;
-    transform: translateX(-47%);
-  }
 }
 
 .tooltip .tooltiptext::after {
@@ -59,11 +52,6 @@ import {
   border-width: 5px;
   border-style: solid;
   border-color: var(--sh-color-tertiary) transparent transparent transparent;
-
-  //mobile styles
-  @media only screen and (max-width: 768px) {
-   left: 47%;
-  }
 }
 
 @media only screen and (min-width: 769px) {
@@ -74,6 +62,16 @@ import {
 }
 
 @media only screen and (max-width: 768px) {
+  .tooltip .tooltiptext {
+    min-width: 120px; 
+    max-width: 300px;
+    transform: translateX(-47%);
+  }
+
+  .tooltip .tooltiptext::after {
+    left: 47%;
+  }
+
   .tooltip .tooltiptext.mobile-visible {
     visibility: visible;
     opacity: 1;
@@ -83,6 +81,7 @@ import {
 })
 export class ShTooltipComponent implements OnInit, OnDestroy {
   @Input() content = '';
+  @Input() size = 6;
 
   isTooltipVisible = false;
   isMobile = false;

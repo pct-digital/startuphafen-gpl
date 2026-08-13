@@ -1,0 +1,79 @@
+name: 95 - Cleanup Expired Environments
+run-name: 'Cleanup expired temporary environments'
+
+on:
+  schedule:
+    # Run every hour at minute 0
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger for testing
+
+jobs:
+  find-expired:
+    runs-on: ubuntu-latest
+    outputs:
+      expired_json: ${{ steps.check.outputs.expired_json }}
+      domains_json: ${{ steps.check.outputs.domains_json }}
+      has_expired: ${{ steps.check.outputs.has_expired }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for expired environments
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          # Get expired environments as JSON array of objects: [{domain, pr_number}, ...]
+          EXPIRED_JSON=$(node tools/deploy3/bin/check-expired.cjs --repo "$GITHUB_REPOSITORY")
+          echo "expired_json=$EXPIRED_JSON" >> "$GITHUB_OUTPUT"
+
+          # Extract just domains for the destroy matrix (use -c for compact single-line output)
+          DOMAINS_JSON=$(echo "$EXPIRED_JSON" | jq -c '[.[].domain]')
+          echo "domains_json=$DOMAINS_JSON" >> "$GITHUB_OUTPUT"
+
+          # Check if array is non-empty
+          LENGTH=$(echo "$EXPIRED_JSON" | jq 'length')
+          if [ "$LENGTH" -gt 0 ]; then
+            echo "has_expired=true" >> "$GITHUB_OUTPUT"
+            echo "Found $LENGTH expired environment(s): $EXPIRED_JSON"
+          else
+            echo "has_expired=false" >> "$GITHUB_OUTPUT"
+            echo "No expired environments found"
+          fi
+
+  destroy-each:
+    needs: find-expired
+    if: needs.find-expired.outputs.has_expired == 'true'
+    strategy:
+      matrix:
+        domain: ${{ fromJson(needs.find-expired.outputs.domains_json) }}
+      fail-fast: false
+    uses: ./.github/workflows/lib_destroy_environment.yml
+    with:
+      domain: ${{ matrix.domain }}
+    secrets: inherit
+
+  notify-pr:
+    runs-on: ubuntu-latest
+    needs: [find-expired, destroy-each]
+    if: always() && needs.find-expired.outputs.has_expired == 'true'
+    strategy:
+      matrix:
+        env: ${{ fromJson(needs.find-expired.outputs.expired_json) }}
+      fail-fast: false
+    steps:
+      - name: Checkout repository
+        if: matrix.env.pr_number != ''
+        uses: actions/checkout@v4
+
+      - name: Post expiration comment to PR
+        if: matrix.env.pr_number != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node tools/deploy3/bin/post-pr-comment.cjs \
+            --repo "$GITHUB_REPOSITORY" \
+            --pr "${{ matrix.env.pr_number }}" \
+            --type temp-expired \
+            --domain "${{ matrix.env.domain }}"

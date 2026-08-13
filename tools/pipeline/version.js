@@ -2,6 +2,7 @@
 
 const { execSync } = require('child_process');
 const { writeFileSync, mkdirSync, existsSync, readFileSync } = require('fs');
+const crypto = require('crypto');
 
 function getSha() {
   return execSync('git rev-parse HEAD').toString().trim();
@@ -72,16 +73,65 @@ function getTimeVersion() {
   return result;
 }
 
+function getBranch() {
+  // Get current branch name
+  return execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+}
+
+/**
+ * Extracts and normalizes the task ID from the branch name.
+ * Handles formats like:
+ * - some-word/PCTI-12344_bla_blup → PCTI-12344
+ * - PCT-121 → PCT-121
+ * - PCTI_1211 → PCTI-1211
+ * - PCT_121 → PCT-121
+ * - pcti_232 → PCTI-232
+ * - pct_121 → PCT-121
+ *
+ */
+function extractTaskId(branchName) {
+  // Pattern to match task IDs: PCT(I)?[-_]?\d+
+  // This matches: PCTI-123, PCT_123, pcti_123, pct-123, etc.
+  const taskIdPattern = /(pcti?)([-_]?)(\d+)/i;
+  const match = branchName.match(taskIdPattern);
+
+  if (match) {
+    const prefix = match[1].toUpperCase(); // PCTI or PCT
+    const number = match[3];
+    return `${prefix}-${number}`;
+  }
+
+  return null;
+}
+
+function createShortHash(branchName) {
+  const hash = crypto.createHash('md5').update(branchName).digest('hex');
+  const hexStr = hash.substring(0, 3);
+  // Convert hex characters to letters only (0-9,a-f → a-p)
+  return hexStr
+    .split('')
+    .map((char) => String.fromCharCode('a'.charCodeAt(0) + parseInt(char, 16)))
+    .join('');
+}
+
+// the branch part of the release name must be limited in length
+function createBranchShortId(branchName) {
+  const task = extractTaskId(branchName);
+  return (
+    (task ?? branchName.substring(0, 5)) + '_' + createShortHash(branchName)
+  );
+}
+
 if (!existsSync('version.json')) {
   const versionInfo = {
     time: getTimeVersion(),
     sha: getSha(),
+    branchId: createBranchShortId(getBranch()),
   };
   console.log(
     'version.json is written for this build with content',
     versionInfo
   );
-
   writeFileSync(`version.json`, JSON.stringify(versionInfo));
 } else {
   console.log('version.json exists already!');
@@ -104,4 +154,9 @@ execSync(
 execSync(
   `node tools/pipeline/replace.js libs/startuphafen-common/src/buildinfo.ts CI_BUILD_VERSION ` +
     versionInfo.sha
+);
+execSync(
+  `node tools/pipeline/replace.js libs/startuphafen-common/src/buildinfo.ts CI_BUILD_BRANCH_ID "` +
+    versionInfo.branchId +
+    `"`
 );

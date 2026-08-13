@@ -1,0 +1,14 @@
+<sh-loader></sh-loader>
+<sh-feature-flag-admin-presenter
+  [flags]="flags"
+  [isLoading]="isLoading"
+  [isSaving]="isSaving"
+  [hasChanges]="hasChanges"
+  [dirtyFlags]="dirtyFlags"
+  [loadError]="loadError"
+  [saveError]="saveError"
+  [successMessage]="successMessage"
+  (toggleFlag)="onToggleFlag($event)"
+  (saveClicked)="onSaveChanges()"
+  (retryClicked)="onRetryLoad()"
+></sh-feature-flag-admin-presenter>

@@ -38,6 +38,12 @@ describe('FaqArticlePageContainerComponent', () => {
     mocks: [FaqPageService],
   });
 
+  window.scrollTo = jest.fn();
+
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   it('should create', () => {
     spectator = createComponent();
 

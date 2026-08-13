@@ -1,0 +1,174 @@
+name: 96 - Reusable Copy Database Workflow, ignore me
+
+on:
+  workflow_call:
+    inputs:
+      source:
+        description: 'Source environment (e.g., production)'
+        type: string
+        required: true
+      target:
+        description: 'Target environment (production requires allow_production)'
+        type: string
+        required: true
+      allow_production:
+        description: 'Allow copying to a production environment (requires explicit confirmation in the calling workflow)'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  prepare_source:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.source }}
+    outputs:
+      deploy_ssh_key: ${{ steps.capture-key.outputs.deploy_ssh_key }}
+    steps:
+      - name: Capture source SSH key
+        id: capture-key
+        env:
+          SOURCE_DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SOURCE_DEPLOY_KEY" ]; then
+            echo "Source DEPLOY_SSH_PRIVATE_KEY is not configured" >&2
+            exit 1
+          fi
+          ENCODED=$(printf '%s' "$SOURCE_DEPLOY_KEY" | base64 | tr -d '\n' | base64 | tr -d '\n')
+          if [ -z "$ENCODED" ]; then
+            echo "Failed to encode source deploy key" >&2
+            exit 1
+          fi
+          echo "deploy_ssh_key=$ENCODED" >> "$GITHUB_OUTPUT"
+
+  prepare_target:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target }}
+    outputs:
+      deploy_ssh_key: ${{ steps.capture-key.outputs.deploy_ssh_key }}
+    steps:
+      - name: Capture target SSH key
+        id: capture-key
+        env:
+          TARGET_DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$TARGET_DEPLOY_KEY" ]; then
+            echo "Target DEPLOY_SSH_PRIVATE_KEY is not configured" >&2
+            exit 1
+          fi
+          ENCODED=$(printf '%s' "$TARGET_DEPLOY_KEY" | base64 | tr -d '\n' | base64 | tr -d '\n')
+          if [ -z "$ENCODED" ]; then
+            echo "Failed to encode target deploy key" >&2
+            exit 1
+          fi
+          echo "deploy_ssh_key=$ENCODED" >> "$GITHUB_OUTPUT"
+
+  # Using environments creates unwanted deployment records
+  # See: https://github.com/actions/runner/issues/2120
+  cleanup_deployments:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare_source
+      - prepare_target
+    if: ${{ always() }}
+    steps:
+      - name: Delete deployment records
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const deployments = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha
+            });
+            await Promise.all(
+              deployments.data.map(async (deployment) => {
+                await github.rest.repos.createDeploymentStatus({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  deployment_id: deployment.id,
+                  state: 'inactive'
+                });
+                return github.rest.repos.deleteDeployment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  deployment_id: deployment.id
+                });
+              })
+            );
+
+  copy-databases:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare_source
+      - prepare_target
+      - cleanup_deployments
+    steps:
+      - name: Echo invocation
+        run: echo "Copy '${{ inputs.source }}' -> '${{ inputs.target }}'"
+
+      - uses: actions/checkout@v4
+
+      - name: Write source SSH key
+        env:
+          SOURCE_DEPLOY_KEY_B64: ${{ needs.prepare_source.outputs.deploy_ssh_key }}
+        run: |
+          if [ -z "${SOURCE_DEPLOY_KEY_B64}" ]; then
+            echo "needs.prepare_source.outputs.deploy_ssh_key is empty - check prepare_source job" >&2
+            exit 1
+          fi
+          FIRST_DECODE=$(printf '%s' "$SOURCE_DEPLOY_KEY_B64" | base64 -d)
+          DECODED=$(printf '%s' "$FIRST_DECODE" | base64 -d)
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$DECODED" > ~/.ssh/deploy_source_key
+          chmod 600 ~/.ssh/deploy_source_key
+
+      - name: Write target SSH key
+        env:
+          TARGET_DEPLOY_KEY_B64: ${{ needs.prepare_target.outputs.deploy_ssh_key }}
+        run: |
+          if [ -z "${TARGET_DEPLOY_KEY_B64}" ]; then
+            echo "needs.prepare_target.outputs.deploy_ssh_key is empty - check prepare_target job" >&2
+            exit 1
+          fi
+          FIRST_DECODE=$(printf '%s' "$TARGET_DEPLOY_KEY_B64" | base64 -d)
+          DECODED=$(printf '%s' "$FIRST_DECODE" | base64 -d)
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$DECODED" > ~/.ssh/deploy_target_key
+          chmod 600 ~/.ssh/deploy_target_key
+
+      - name: Fetch source environment JSON
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node ./tools/deploy3/bin/gh-envs.cjs list '${{ inputs.source }}' --repo ${{ github.repository }} > source-env.json
+
+      - name: Fetch target environment JSON
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node ./tools/deploy3/bin/gh-envs.cjs list '${{ inputs.target }}' --repo ${{ github.repository }} > target-env.json
+
+      - name: Install deploy3 dependencies
+        run: cd ./tools/deploy3 && npm install
+
+      - name: Run prep-copy
+        run: |
+          EXTRA_FLAGS=""
+          if [ "${{ inputs.allow_production }}" = "true" ]; then
+            EXTRA_FLAGS="--allow-production"
+          fi
+          npx tsx ./tools/deploy3/bin/prep-copy.ts \
+            --app-name startuphafen \
+            --source-env source-env.json \
+            --source-ssh-key-file ~/.ssh/deploy_source_key \
+            --target-env target-env.json \
+            --target-ssh-key-file ~/.ssh/deploy_target_key \
+            --db "postgres:knex:APP_BACKEND_SECRETS" \
+            --db "postgres:keycloak:DEPLOY_DOCKER_ENV" \
+            --output copy-config.json \
+            $EXTRA_FLAGS
+
+      - name: Run copy
+        run: npx tsx ./tools/deploy3/bin/copy.ts --config copy-config.json

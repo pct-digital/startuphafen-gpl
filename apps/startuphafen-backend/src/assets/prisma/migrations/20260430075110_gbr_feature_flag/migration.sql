@@ -1,0 +1,2 @@
+-- This migration is intentionally empty in the open source release.
+-- The GbR question flow is not part of the published code base.

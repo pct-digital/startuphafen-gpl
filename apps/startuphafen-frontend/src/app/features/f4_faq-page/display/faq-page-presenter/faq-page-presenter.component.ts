@@ -31,7 +31,6 @@ import { FaqAccordionComponent } from '../faq-accordion/faq-accordion.component'
   styles: ``,
 })
 export class FaqPagePresenterComponent {
-  @Input() isPopup = false;
   @Input() faqList: FAQItem[] = [];
 
   @Input() articleSearchResults: Artikel[] = [];

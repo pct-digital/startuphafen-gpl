@@ -1,0 +1,44 @@
+<div shCard class="max-w-[778px] z-10 relative">
+  <div shCardTitle>Übersicht</div>
+  <div class="font-normal text-left text-tertiary font-sans">
+    <table>
+      @for (element of formatAnswers(); track $index) { @if (element.headerText)
+      {
+      <tr>
+        <td>{{ element.headerText }}</td>
+        <td></td>
+      </tr>
+      }
+      <tr>
+        <td [class.pl-3]="element.hasHeader" [class.pb-4]="element.makeSpace">
+          {{ element.questionText }}
+        </td>
+        <td class="font-semibold" [class.pb-4]="element.makeSpace">
+          @if (element.type === 'date') {
+          {{ formatDate(element.answerText) }} } @else {
+          {{ element.answerText }}
+          }
+        </td>
+      </tr>
+      }
+    </table>
+  </div>
+  <div class="flex justify-between gap-6">
+    @if(!stSent && !gwSent && !hwkSent){
+    <button
+      type="button"
+      class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-shade"
+      (click)="back.emit()"
+    >
+      Zurück
+    </button>
+    }
+    <button
+      type="button"
+      class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-shade"
+      (click)="continue.emit()"
+    >
+      Weiter zum Absenden
+    </button>
+  </div>
+</div>

@@ -1,9 +1,138 @@
 {
   "tables": {
+    "_prisma_migrations": {
+      "columns": [
+        {
+          "name": "applied_steps_count",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "0",
+          "propertyName": "applied_steps_count",
+          "propertyType": "number"
+        },
+        {
+          "name": "checksum",
+          "type": "varchar",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "checksum",
+          "propertyType": "string"
+        },
+        {
+          "name": "finished_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "finished_at",
+          "propertyType": "Date"
+        },
+        {
+          "name": "id",
+          "type": "varchar",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "id",
+          "propertyType": "string"
+        },
+        {
+          "name": "logs",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "logs",
+          "propertyType": "string"
+        },
+        {
+          "name": "migration_name",
+          "type": "varchar",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "migration_name",
+          "propertyType": "string"
+        },
+        {
+          "name": "rolled_back_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "rolled_back_at",
+          "propertyType": "Date"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "now()",
+          "propertyName": "started_at",
+          "propertyType": "Date"
+        }
+      ],
+      "interfaceName": "PrismaMigrations",
+      "name": "_prisma_migrations",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [],
+      "uniqueConstrains": []
+    },
     "Answers": {
       "columns": [
         {
-          "name": "flowId",
+          "name": "answerText",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "''::text",
+          "propertyName": "answerText",
+          "propertyType": "string"
+        },
+        {
+          "name": "componentId",
           "type": "text",
           "nullable": false,
           "optional": false,
@@ -12,7 +141,20 @@
           "enumSchema": "pg_catalog",
           "comment": "",
           "defaultValue": null,
-          "propertyName": "flowId",
+          "propertyName": "componentId",
+          "propertyType": "string"
+        },
+        {
+          "name": "headerText",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "headerText",
           "propertyType": "string"
         },
         {
@@ -55,17 +197,30 @@
           "propertyType": "number"
         },
         {
-          "name": "strapiAnswerId",
-          "type": "int4",
+          "name": "questionText",
+          "type": "text",
           "nullable": false,
           "optional": false,
           "isEnum": false,
           "isPrimaryKey": false,
           "enumSchema": "pg_catalog",
           "comment": "",
+          "defaultValue": "''::text",
+          "propertyName": "questionText",
+          "propertyType": "string"
+        },
+        {
+          "name": "stringValue",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
           "defaultValue": null,
-          "propertyName": "strapiAnswerId",
-          "propertyType": "number"
+          "propertyName": "stringValue",
+          "propertyType": "string"
         },
         {
           "name": "type",
@@ -76,7 +231,7 @@
           "isPrimaryKey": false,
           "enumSchema": "pg_catalog",
           "comment": "",
-          "defaultValue": "'string'::text",
+          "defaultValue": null,
           "propertyName": "type",
           "propertyType": "string"
         },
@@ -126,10 +281,23 @@
       ],
       "uniqueConstrains": []
     },
-    "FlagTracking": {
+    "ChatMessage": {
       "columns": [
         {
-          "name": "flag",
+          "name": "author",
+          "type": "ChatAuthor",
+          "nullable": false,
+          "optional": false,
+          "isEnum": true,
+          "isPrimaryKey": false,
+          "enumSchema": "public",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "author",
+          "propertyType": "ChatAuthor"
+        },
+        {
+          "name": "content",
           "type": "text",
           "nullable": false,
           "optional": false,
@@ -138,8 +306,21 @@
           "enumSchema": "pg_catalog",
           "comment": "",
           "defaultValue": null,
-          "propertyName": "flag",
+          "propertyName": "content",
           "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
         },
         {
           "name": "id",
@@ -150,9 +331,364 @@
           "isPrimaryKey": true,
           "enumSchema": "pg_catalog",
           "comment": "",
-          "defaultValue": "nextval('\"FlagTracking_id_seq\"'::regclass)",
+          "defaultValue": "nextval('\"ChatMessage_id_seq\"'::regclass)",
           "propertyName": "id",
           "propertyType": "number"
+        },
+        {
+          "name": "sessionId",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "sessionId",
+          "propertyType": "number"
+        }
+      ],
+      "interfaceName": "ChatMessage",
+      "name": "ChatMessage",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "ChatMessage_sessionId_fkey",
+          "column": "sessionId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "ChatSession",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
+    "ChatSession": {
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "deletedAt",
+          "type": "timestamp",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "deletedAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"ChatSession_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "'Neuer Chat'::text",
+          "propertyName": "title",
+          "propertyType": "string"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "updatedAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "userId",
+          "propertyType": "string"
+        }
+      ],
+      "interfaceName": "ChatSession",
+      "name": "ChatSession",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "ChatSession_userId_fkey",
+          "column": "userId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "ShUser",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
+    "FeatureFlag": {
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "description",
+          "propertyType": "string"
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "false",
+          "propertyName": "enabled",
+          "propertyType": "boolean"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "name",
+          "propertyType": "string"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "updatedAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "updatedBy",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "updatedBy",
+          "propertyType": "string"
+        }
+      ],
+      "interfaceName": "FeatureFlag",
+      "name": "FeatureFlag",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [],
+      "uniqueConstrains": []
+    },
+    "HwkMailLog": {
+      "columns": [
+        {
+          "name": "attemptCount",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "0",
+          "propertyName": "attemptCount",
+          "propertyType": "number"
+        },
+        {
+          "name": "cc",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "cc",
+          "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"HwkMailLog_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "lastAttemptAt",
+          "type": "timestamp",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "lastAttemptAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "lastError",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "lastError",
+          "propertyType": "string"
+        },
+        {
+          "name": "mailBody",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "mailBody",
+          "propertyType": "string"
+        },
+        {
+          "name": "mailContentType",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "mailContentType",
+          "propertyType": "string"
+        },
+        {
+          "name": "mailFrom",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "mailFrom",
+          "propertyType": "string"
+        },
+        {
+          "name": "nextAttemptAt",
+          "type": "timestamp",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "nextAttemptAt",
+          "propertyType": "Date"
         },
         {
           "name": "projectId",
@@ -168,7 +704,7 @@
           "propertyType": "number"
         },
         {
-          "name": "qId",
+          "name": "recipient",
           "type": "text",
           "nullable": false,
           "optional": false,
@@ -177,19 +713,97 @@
           "enumSchema": "pg_catalog",
           "comment": "",
           "defaultValue": null,
-          "propertyName": "qId",
+          "propertyName": "recipient",
+          "propertyType": "string"
+        },
+        {
+          "name": "replyTo",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "replyTo",
+          "propertyType": "string"
+        },
+        {
+          "name": "sentAt",
+          "type": "timestamp",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "sentAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "status",
+          "propertyType": "string"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "subject",
+          "propertyType": "string"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "updatedAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "userId",
           "propertyType": "string"
         }
       ],
-      "interfaceName": "FlagTracking",
-      "name": "FlagTracking",
+      "interfaceName": "HwkMailLog",
+      "name": "HwkMailLog",
       "schema": "public",
       "additionalProperties": [],
       "extends": "",
       "comment": "",
       "foreignKeys": [
         {
-          "constraint_name": "FlagTracking_projectId_fkey",
+          "constraint_name": "HwkMailLog_projectId_fkey",
           "column": "projectId",
           "foreign_key_schema": "public",
           "foreign_key_table": "Project",
@@ -200,10 +814,462 @@
       ],
       "uniqueConstrains": []
     },
+    "IdentificationDocument": {
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "data",
+          "type": "bytea",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "data",
+          "propertyType": "Uint8Array"
+        },
+        {
+          "name": "fileName",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "'Personalausweis'::text",
+          "propertyName": "fileName",
+          "propertyType": "string"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"IdentificationDocument_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "mimeType",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "mimeType",
+          "propertyType": "string"
+        },
+        {
+          "name": "projectId",
+          "type": "int4",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "projectId",
+          "propertyType": "number"
+        },
+        {
+          "name": "taxId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "taxId",
+          "propertyType": "string"
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "userId",
+          "propertyType": "string"
+        }
+      ],
+      "interfaceName": "IdentificationDocument",
+      "name": "IdentificationDocument",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "IdentificationDocument_userId_fkey",
+          "column": "userId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "ShUser",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        },
+        {
+          "constraint_name": "IdentificationDocument_projectId_fkey",
+          "column": "projectId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "Project",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
+    "OzgInfo": {
+      "columns": [
+        {
+          "name": "amt",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "amt",
+          "propertyType": "string"
+        },
+        {
+          "name": "amtCode",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "amtCode",
+          "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "domain",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "domain",
+          "propertyType": "string"
+        },
+        {
+          "name": "gemeinde",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "gemeinde",
+          "propertyType": "string"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"OzgInfo_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "kreis",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "kreis",
+          "propertyType": "string"
+        },
+        {
+          "name": "oeid",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "oeid",
+          "propertyType": "string"
+        },
+        {
+          "name": "plz",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "plz",
+          "propertyType": "string"
+        },
+        {
+          "name": "projectId",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "projectId",
+          "propertyType": "number"
+        }
+      ],
+      "interfaceName": "OzgInfo",
+      "name": "OzgInfo",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "OzgInfo_projectId_fkey",
+          "column": "projectId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "Project",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
+    "ProfileInfo": {
+      "columns": [
+        {
+          "name": "birthCountry",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "birthCountry",
+          "propertyType": "string"
+        },
+        {
+          "name": "birthPlace",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "birthPlace",
+          "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"ProfileInfo_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "phoneInternational",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "phoneInternational",
+          "propertyType": "string"
+        },
+        {
+          "name": "phoneNational",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "phoneNational",
+          "propertyType": "string"
+        },
+        {
+          "name": "phoneNumber",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "phoneNumber",
+          "propertyType": "string"
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "userId",
+          "propertyType": "string"
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "website",
+          "propertyType": "string"
+        }
+      ],
+      "interfaceName": "ProfileInfo",
+      "name": "ProfileInfo",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "ProfileInfo_userId_fkey",
+          "column": "userId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "ShUser",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
     "Project": {
       "columns": [
         {
-          "name": "gewASent",
+          "name": "catalogueId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "'none'::text",
+          "propertyName": "catalogueId",
+          "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "gwSent",
           "type": "bool",
           "nullable": false,
           "optional": false,
@@ -212,7 +1278,7 @@
           "enumSchema": "pg_catalog",
           "comment": "",
           "defaultValue": "false",
-          "propertyName": "gewASent",
+          "propertyName": "gwSent",
           "propertyType": "boolean"
         },
         {
@@ -226,6 +1292,19 @@
           "comment": "",
           "defaultValue": "nextval('\"Project_id_seq\"'::regclass)",
           "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "lastPosition",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "lastPosition",
           "propertyType": "number"
         },
         {
@@ -255,7 +1334,7 @@
           "propertyType": "number"
         },
         {
-          "name": "steErSent",
+          "name": "stSent",
           "type": "bool",
           "nullable": false,
           "optional": false,
@@ -264,7 +1343,7 @@
           "enumSchema": "pg_catalog",
           "comment": "",
           "defaultValue": "false",
-          "propertyName": "steErSent",
+          "propertyName": "stSent",
           "propertyType": "boolean"
         },
         {
@@ -303,6 +1382,19 @@
     "QuestionTracking": {
       "columns": [
         {
+          "name": "answeredQuestions",
+          "type": "_text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "answeredQuestions",
+          "propertyType": "string[]"
+        },
+        {
           "name": "id",
           "type": "int4",
           "nullable": false,
@@ -313,19 +1405,6 @@
           "comment": "",
           "defaultValue": "nextval('\"QuestionTracking_id_seq\"'::regclass)",
           "propertyName": "id",
-          "propertyType": "number"
-        },
-        {
-          "name": "posIndex",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "posIndex",
           "propertyType": "number"
         },
         {
@@ -340,32 +1419,6 @@
           "defaultValue": null,
           "propertyName": "projectId",
           "propertyType": "number"
-        },
-        {
-          "name": "strapiQDictPosIndex",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "strapiQDictPosIndex",
-          "propertyType": "number"
-        },
-        {
-          "name": "strapiQuestionFlowId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "strapiQuestionFlowId",
-          "propertyType": "string"
         }
       ],
       "interfaceName": "QuestionTracking",
@@ -380,392 +1433,6 @@
           "column": "projectId",
           "foreign_key_schema": "public",
           "foreign_key_table": "Project",
-          "foreign_key_column": "id",
-          "on_update": "CASCADE",
-          "on_delete": "CASCADE"
-        }
-      ],
-      "uniqueConstrains": []
-    },
-    "ShAnswers": {
-      "columns": [
-        {
-          "name": "catalogueId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "catalogueId",
-          "propertyType": "string"
-        },
-        {
-          "name": "id",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": true,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "nextval('\"ShAnswers_id_seq\"'::regclass)",
-          "propertyName": "id",
-          "propertyType": "number"
-        },
-        {
-          "name": "key",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "key",
-          "propertyType": "string"
-        },
-        {
-          "name": "projectId",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "projectId",
-          "propertyType": "number"
-        },
-        {
-          "name": "strapiAnswerId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "strapiAnswerId",
-          "propertyType": "string"
-        },
-        {
-          "name": "type",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "'string'::text",
-          "propertyName": "type",
-          "propertyType": "string"
-        },
-        {
-          "name": "value",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "value",
-          "propertyType": "string"
-        },
-        {
-          "name": "xmlKey",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "xmlKey",
-          "propertyType": "string"
-        }
-      ],
-      "interfaceName": "ShAnswers",
-      "name": "ShAnswers",
-      "schema": "public",
-      "additionalProperties": [],
-      "extends": "",
-      "comment": "",
-      "foreignKeys": [
-        {
-          "constraint_name": "ShAnswers_projectId_fkey",
-          "column": "projectId",
-          "foreign_key_schema": "public",
-          "foreign_key_table": "ShProject",
-          "foreign_key_column": "id",
-          "on_update": "CASCADE",
-          "on_delete": "CASCADE"
-        }
-      ],
-      "uniqueConstrains": []
-    },
-    "ShCatalogueVersions": {
-      "columns": [
-        {
-          "name": "catalogueId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "catalogueId",
-          "propertyType": "string"
-        },
-        {
-          "name": "catalogueJSON",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "catalogueJSON",
-          "propertyType": "string"
-        },
-        {
-          "name": "createdAt",
-          "type": "timestamp",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "createdAt",
-          "propertyType": "Date"
-        },
-        {
-          "name": "id",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": true,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "nextval('\"ShCatalogueVersions_id_seq\"'::regclass)",
-          "propertyName": "id",
-          "propertyType": "number"
-        }
-      ],
-      "interfaceName": "ShCatalogueVersions",
-      "name": "ShCatalogueVersions",
-      "schema": "public",
-      "additionalProperties": [],
-      "extends": "",
-      "comment": "",
-      "foreignKeys": [],
-      "uniqueConstrains": []
-    },
-    "ShProject": {
-      "columns": [
-        {
-          "name": "gewASent",
-          "type": "bool",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "false",
-          "propertyName": "gewASent",
-          "propertyType": "boolean"
-        },
-        {
-          "name": "id",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": true,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "nextval('\"ShProject_id_seq\"'::regclass)",
-          "propertyName": "id",
-          "propertyType": "number"
-        },
-        {
-          "name": "name",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "name",
-          "propertyType": "string"
-        },
-        {
-          "name": "progress",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "0",
-          "propertyName": "progress",
-          "propertyType": "number"
-        },
-        {
-          "name": "steErSent",
-          "type": "bool",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "false",
-          "propertyName": "steErSent",
-          "propertyType": "boolean"
-        },
-        {
-          "name": "userId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "userId",
-          "propertyType": "string"
-        },
-        {
-          "name": "versionId",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "versionId",
-          "propertyType": "number"
-        }
-      ],
-      "interfaceName": "ShProject",
-      "name": "ShProject",
-      "schema": "public",
-      "additionalProperties": [],
-      "extends": "",
-      "comment": "",
-      "foreignKeys": [
-        {
-          "constraint_name": "ShProject_userId_fkey",
-          "column": "userId",
-          "foreign_key_schema": "public",
-          "foreign_key_table": "ShUser",
-          "foreign_key_column": "id",
-          "on_update": "CASCADE",
-          "on_delete": "RESTRICT"
-        },
-        {
-          "constraint_name": "ShProject_versionId_fkey",
-          "column": "versionId",
-          "foreign_key_schema": "public",
-          "foreign_key_table": "ShCatalogueVersions",
-          "foreign_key_column": "id",
-          "on_update": "CASCADE",
-          "on_delete": "RESTRICT"
-        }
-      ],
-      "uniqueConstrains": []
-    },
-    "ShQuestionTracking": {
-      "columns": [
-        {
-          "name": "id",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": true,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": "nextval('\"ShQuestionTracking_id_seq\"'::regclass)",
-          "propertyName": "id",
-          "propertyType": "number"
-        },
-        {
-          "name": "posIndex",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "posIndex",
-          "propertyType": "number"
-        },
-        {
-          "name": "projectId",
-          "type": "int4",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "projectId",
-          "propertyType": "number"
-        },
-        {
-          "name": "strapiQuestionId",
-          "type": "text",
-          "nullable": false,
-          "optional": false,
-          "isEnum": false,
-          "isPrimaryKey": false,
-          "enumSchema": "pg_catalog",
-          "comment": "",
-          "defaultValue": null,
-          "propertyName": "strapiQuestionId",
-          "propertyType": "string"
-        }
-      ],
-      "interfaceName": "ShQuestionTracking",
-      "name": "ShQuestionTracking",
-      "schema": "public",
-      "additionalProperties": [],
-      "extends": "",
-      "comment": "",
-      "foreignKeys": [
-        {
-          "constraint_name": "ShQuestionTracking_projectId_fkey",
-          "column": "projectId",
-          "foreign_key_schema": "public",
-          "foreign_key_table": "ShProject",
           "foreign_key_column": "id",
           "on_update": "CASCADE",
           "on_delete": "CASCADE"
@@ -828,6 +1495,19 @@
           "propertyType": "string"
         },
         {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
           "name": "dateOfBirth",
           "type": "text",
           "nullable": false,
@@ -877,6 +1557,19 @@
           "comment": "",
           "defaultValue": null,
           "propertyName": "id",
+          "propertyType": "string"
+        },
+        {
+          "name": "inboxReference",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "inboxReference",
           "propertyType": "string"
         },
         {
@@ -979,7 +1672,255 @@
       "comment": "",
       "foreignKeys": [],
       "uniqueConstrains": []
+    },
+    "UserDocument": {
+      "columns": [
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "data",
+          "type": "bytea",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "data",
+          "propertyType": "Uint8Array"
+        },
+        {
+          "name": "documentCase",
+          "type": "text",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "documentCase",
+          "propertyType": "string"
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "filename",
+          "propertyType": "string"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"UserDocument_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "mimeType",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "mimeType",
+          "propertyType": "string"
+        },
+        {
+          "name": "projectId",
+          "type": "int4",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "projectId",
+          "propertyType": "number"
+        },
+        {
+          "name": "userId",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "userId",
+          "propertyType": "string"
+        }
+      ],
+      "interfaceName": "UserDocument",
+      "name": "UserDocument",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [
+        {
+          "constraint_name": "UserDocument_userId_fkey",
+          "column": "userId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "ShUser",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        },
+        {
+          "constraint_name": "UserDocument_projectId_fkey",
+          "column": "projectId",
+          "foreign_key_schema": "public",
+          "foreign_key_table": "Project",
+          "foreign_key_column": "id",
+          "on_update": "CASCADE",
+          "on_delete": "CASCADE"
+        }
+      ],
+      "uniqueConstrains": []
+    },
+    "VectorEmbedding": {
+      "columns": [
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "content",
+          "propertyType": "string"
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "CURRENT_TIMESTAMP",
+          "propertyName": "createdAt",
+          "propertyType": "Date"
+        },
+        {
+          "name": "embedding",
+          "type": "vector",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "public",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "embedding",
+          "propertyType": "any"
+        },
+        {
+          "name": "id",
+          "type": "int4",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": true,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": "nextval('\"VectorEmbedding_id_seq\"'::regclass)",
+          "propertyName": "id",
+          "propertyType": "number"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": true,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "metadata",
+          "propertyType": "any"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "nullable": false,
+          "optional": false,
+          "isEnum": false,
+          "isPrimaryKey": false,
+          "enumSchema": "pg_catalog",
+          "comment": "",
+          "defaultValue": null,
+          "propertyName": "updatedAt",
+          "propertyType": "Date"
+        }
+      ],
+      "interfaceName": "VectorEmbedding",
+      "name": "VectorEmbedding",
+      "schema": "public",
+      "additionalProperties": [],
+      "extends": "",
+      "comment": "",
+      "foreignKeys": [],
+      "uniqueConstrains": []
     }
   },
-  "enums": {}
+  "enums": {
+    "ChatAuthor": {
+      "name": "ChatAuthor",
+      "schema": "public",
+      "convertedName": "ChatAuthor",
+      "values": [
+        {
+          "originalKey": "human",
+          "convertedKey": "human",
+          "value": "human"
+        },
+        {
+          "originalKey": "agent",
+          "convertedKey": "agent",
+          "value": "agent"
+        },
+        {
+          "originalKey": "system",
+          "convertedKey": "system",
+          "value": "system"
+        }
+      ]
+    }
+  }
 }

@@ -4,17 +4,25 @@
       data-testid="contact-page-title"
       class="text-4xl md:text-5xl text-secondary text-center font-bold"
     >
-      {{ websiteText[0].title ?? 'Placeholder Title' }}
+      {{ websiteText[0] ? websiteText[0].title : 'Placeholder Title' }}
     </h1>
   </div>
 
   <section class="py-6 md:py-12">
     <div class="w-full mx-auto flex justify-center">
       <p class="text-lg md:text-xl text-tertiary text-center max-w-4xl">
-        {{ websiteText[0].text ?? 'Placeholder Text' }}
+        {{ websiteText[0] ? websiteText[0].text : 'Placeholder Text' }}
       </p>
     </div>
   </section>
+
+  @if(contactListGrouped.length === 0){
+  <div class="w-full mx-auto flex justify-center">
+    <p class="text-xl md:text-2xl text-primary text-center max-w-4xl">
+      {{ 'Zurzeit gibt es keine Beratungsangebote in Deiner Nähe.' }}
+    </p>
+  </div>
+  }
 
   <section class="py-8 md:py-16 lg:py-20 mb-12">
     <div class="w-full mx-auto">
@@ -45,7 +53,7 @@
                   <img
                     class="rounded-full w-28 h-28 md:w-36 md:h-36 object-cover"
                     [src]="contact.foto.url"
-                    alt="Contact image"
+                    [alt]="'Bild von Kontakperson ' + contact.name"
                   />
                 </div>
                 <div

@@ -105,11 +105,86 @@ export class MailClient {
     return result;
   }
 
+  private splitRecipients(value: string | undefined): string[] {
+    if (!value) return [];
+    return value
+      .split(/[;,]/)
+      .map((recipient) => recipient.trim().toLowerCase())
+      .filter((recipient) => recipient.length > 0);
+  }
+
+  private normalizeAddress(value: string): string {
+    return value.trim().toLowerCase();
+  }
+
+  private extractRecipientAddress(value: unknown): string | null {
+    if (typeof value === 'string') {
+      return this.normalizeAddress(value);
+    }
+
+    if (typeof value !== 'object' || value === null || !('address' in value)) {
+      return null;
+    }
+
+    const address = value.address;
+    if (typeof address !== 'string') {
+      return null;
+    }
+
+    return this.normalizeAddress(address);
+  }
+
+  private getRejectedRecipients(info: unknown): string[] {
+    if (typeof info !== 'object' || info === null || !('rejected' in info)) {
+      return [];
+    }
+
+    const rejectedValue = info.rejected;
+    if (!Array.isArray(rejectedValue)) {
+      return [];
+    }
+
+    const rejectedRecipients: string[] = [];
+    for (const entry of rejectedValue) {
+      const address = this.extractRecipientAddress(entry);
+      if (address) {
+        rejectedRecipients.push(address);
+      }
+    }
+
+    return rejectedRecipients;
+  }
+
+  private getIntendedRecipients(request: MailDescription): Set<string> {
+    return new Set([
+      ...this.splitRecipients(request.to),
+      ...this.splitRecipients(request.cc),
+      ...this.splitRecipients(request.bcc),
+    ]);
+  }
+
   async sendMail(request: MailDescription): Promise<SendMailResponse> {
     const mt = this.mailTransport;
     const msg = this.createMessage(request);
     try {
-      await mt.sendMail(msg);
+      const info = await mt.sendMail(msg);
+      const rejectedRecipients = this.getRejectedRecipients(info);
+      if (rejectedRecipients.length > 0) {
+        const intendedRecipients = this.getIntendedRecipients(request);
+        const relevantRejectedRecipients = rejectedRecipients.filter((recipient) =>
+          intendedRecipients.has(recipient)
+        );
+        const rejectionList =
+          relevantRejectedRecipients.length > 0
+            ? relevantRejectedRecipients
+            : rejectedRecipients;
+
+        return {
+          success: false,
+          message: `Rejected recipients: ${rejectionList.join(', ')}`,
+        };
+      }
+
       // Always send a copy to our own postbox so we have a record of everything we sent out
       await mt.sendMail({
         ...msg,

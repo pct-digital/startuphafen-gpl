@@ -1,15 +1,15 @@
-import { DBMigrationSchema } from '@startuphafen/db-migration';
+import { FinanzaemterSchema } from '@startuphafen/startuphafen-common';
 import { KeycloakAccessConfigSchema } from '@startuphafen/trpc-root';
 import {
   CONFIG_TYPE,
+  CONFIG_TYPE_SCHEMA,
   ConfigLoader,
-  FileAccess,
 } from '@startuphafen/utility-server';
 import { WatermarkSchema } from '@startuphafen/watermark/server';
-import path from 'path';
 import { z } from 'zod';
 
 export const ConfigSchema = z.object({
+  configType: CONFIG_TYPE_SCHEMA.nullable().default(null),
   express: z.object({
     host: z.string().ip(),
     port: z.number().gte(0).lte(65_535),
@@ -31,116 +31,112 @@ export const ConfigSchema = z.object({
     user: z.string(),
     password: z.string(),
     from: z.string().optional(),
+    hwkRecipient: z.string().min(1),
+    disableHwkDelivery: z.boolean().default(false),
     noSSL: z.boolean().optional(),
+    supportRecipient: z.string().min(1),
+    feedbackRecipient: z.string().min(1),
+    supportCC: z.string(),
   }),
   allowedOrigins: z.array(z.string()),
   keycloak: KeycloakAccessConfigSchema,
+  matchingStrapi: z.object({ url: z.string() }),
   watermarkConfig: WatermarkSchema,
-  dbMigration: DBMigrationSchema,
   eric: z.object({
+    placeholder: z.string().nullable().default(null),
     devMode: z.boolean().default(true),
+    host: z.string().default(''),
+    token: z.string().default(''),
+    finanzaemter: FinanzaemterSchema.default([]),
   }),
-});
-
-export const LocalSecretsSchema = z.object({
-  strapi: z.object({
-    host: z.string(),
-    token: z.string(),
-  }),
-  eric: z.object({
-    host: z.string(),
-    token: z.string(),
-    finanzAmtId: z.string(),
-  }),
+  strapi: z
+    .object({
+      host: z.string().default(''),
+      token: z.string().default(''),
+    })
+    .default({}),
   ozg: z.object({
-    host: z.string(),
-    control: z.object({
-      zustaendigeStelle: z.string(),
-      leikaIds: z.array(z.string()),
-      formId: z.string(),
-      name: z.string(),
-      serviceKonto: z.object({
-        type: z.string(),
-        trustLevel: z.string(),
-        postfachAddress: z.object({
-          identifier: z.string(),
-          type: z.string(),
+    placeholder: z.string().nullable().default(null),
+    host: z.string().default(''),
+    useStagingDomain: z.boolean().default(true),
+    enableAmtSelection: z.boolean().default(false),
+    globalOverride: z
+      .object({
+        domain: z.string().trim().min(1),
+        oeid: z.string().trim().min(1),
+      })
+      .nullable()
+      .default(null),
+    control: z
+      .object({
+        zustaendigeStelle: z.string().default(''),
+        organisationsEinheitenId: z.string().default(''),
+        leikaIds: z.array(z.string()).default([]),
+        formId: z.string().default(''),
+        name: z.string().default(''),
+        serviceKonto: z.object({
+          type: z.string().default(''),
+          trustLevel: z.string().default(''),
+          postfachAddress: z.object({
+            identifier: z.string().default(''),
+            type: z.string().default(''),
+          }),
         }),
-      }),
-    }),
+      })
+      .optional(),
   }),
+  mistral: z
+    .object({
+      apiKey: z.string(),
+    })
+    .optional(),
+  bntk: z
+    .object({
+      private_jwk: z.object({
+        crv: z.string(),
+        d: z.string(),
+        key_ops: z.array(z.string()),
+        kty: z.string(),
+        x: z.string(),
+        y: z.string(),
+        alg: z.string(),
+        use: z.string(),
+        kid: z.string(),
+      }),
+      domain: z.string(),
+    })
+    .optional(),
+  rateLimit: z
+    .object({
+      upload: z
+        .object({
+          enabled: z.boolean().default(true),
+          max: z.number().int().positive().default(5),
+          windowMs: z.number().int().positive().default(30000),
+        })
+        .default({}),
+      chatbot: z
+        .object({
+          enabled: z.boolean().default(true),
+          max: z.number().int().positive().default(5),
+          windowMs: z.number().int().positive().default(30000),
+        })
+        .default({}),
+    })
+    .default({}),
 });
 
 export type ServerConfig = z.infer<typeof ConfigSchema>;
-export type LocalSecrets = z.infer<typeof LocalSecretsSchema>;
 
 export async function loadServerConfiguration(env: CONFIG_TYPE) {
-  return await ConfigLoader.loadServerConfiguration(
+  const config = await ConfigLoader.loadServerConfiguration(
     __dirname,
     env,
     ConfigSchema
   );
-}
 
-export async function loadLocalSecrets(e2e: boolean) {
-  try {
-    const faccess = new FileAccess();
-    let fileContent;
-
-    if (e2e) {
-      const dummy: LocalSecrets = {
-        strapi: { host: '', token: '' },
-        eric: { host: '', token: '', finanzAmtId: '' },
-        ozg: {
-          host: '',
-          control: {
-            zustaendigeStelle: '',
-            leikaIds: [],
-            formId: '',
-            name: '',
-            serviceKonto: {
-              type: '',
-              trustLevel: '',
-              postfachAddress: {
-                identifier: '',
-                type: '',
-              },
-            },
-          },
-        },
-      };
-      fileContent = JSON.stringify(dummy);
-    } else {
-      fileContent = await faccess.readTextFile(
-        path.join(__dirname, 'assets', 'config-secrets.json')
-      );
-    }
-
-    return JSON.parse(fileContent);
-  } catch (e: any) {
-    console.log(
-      '### WARNING: NO local config file was found. Please consult the README.'
-    );
-    return {
-      strapi: { host: '', token: '' },
-      eric: { host: '', token: '', finanzAmtId: '' },
-      ozg: {
-        host: '',
-        control: {
-          zustaendigeStelle: '',
-          leikaIds: [],
-          formId: '',
-          name: '',
-          serviceKonto: {
-            type: '',
-            trustLevel: '',
-            postfachAddress: {
-              identifier: '',
-              type: '',
-            },
-          },
-        },
-      },
-    } as LocalSecrets;
-  }
+  return {
+    ...config,
+    configType: CONFIG_TYPE_SCHEMA.parse(env),
+  };
 }

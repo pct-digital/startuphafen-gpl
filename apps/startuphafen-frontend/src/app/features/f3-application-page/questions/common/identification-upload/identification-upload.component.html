@@ -1,0 +1,35 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
+</form>
+
+@for (person of people; track person.index) {
+<div class="flex items-center justify-between gap-4 p-4 border rounded-lg">
+  <div class="flex flex-col">
+    @if(files.has(person.taxId)){
+    <div>{{ getFileName(person.taxId) }}</div>
+    }
+    <div>{{ person.name }}, geboren am {{ formatDate(person.birthDate) }}</div>
+    @if (!files.has(person.taxId)) {
+    <div class="text-red-500">Ein Ausweis muss vorliegen</div>
+    }
+  </div>
+  <button shButton (click)="selectFile(person)">
+    Ausweis {{ files.has(person.taxId) ? 'Ändern' : 'Hochladen' }}
+  </button>
+</div>
+} @empty {
+<div class="p-4 border rounded-lg text-gray-600">
+  Für Anteilseigner, die keine natürlichen Personen sind (z. B. Firmen) und den
+  Antragstellenden selber, müssen keine Ausweisdokumente hochgeladen werden.
+</div>
+} @if (error !== null) {
+<div class="text-red-500 mt-2">{{ error }}</div>
+}
+
+<input
+  #identificationInput
+  type="file"
+  class="hidden"
+  accept=".png, .jpg, .jpeg, .pdf"
+  (change)="onFileSelected($event)"
+/>

@@ -18,25 +18,18 @@ services:
       - /opt/startuphafen/logs/:/opt/startuphafen/logs/:rw
       - ./fluentd/server_fluentd.conf:/fluentd/etc/fluent.conf:ro
 
-  nginx:
+  caddy:
+    command: ['caddy', 'run', '--config', '/etc/caddy/Caddyfile.staging', '--adapter', 'caddyfile']
     volumes:
-      - ./nginx/maintenance/maintenance.html:/etc/maintenance/maintenance.html:ro
-      - ../../startuphafen-frontend:/usr/share/nginx/html:ro
-      - ./nginx/ssl:/etc/ssl-conf:ro
-      - ../../../../certbot/conf:/etc/letsencrypt:ro
-      - ../../../../certbot/www:/var/www/certbot:ro
-      - ./nginx/99-autoreload.sh:/docker-entrypoint.d/99-autoreload.sh
+      - ../../startuphafen-frontend:/srv:ro
+      - /opt/${APP_NAME:-startuphafen}/caddy/data:/data
+      - /opt/${APP_NAME:-startuphafen}/caddy/config:/config
     environment:
-      NGINX_HOST: '${APP_HOST}'
-      MAIN_PORT: 8443 ssl http2
-      REDIRECT_PORT: 8080
-      SSL_LINE1: 'ssl_certificate /etc/letsencrypt/live/${APP_HOST}/fullchain.pem;'
-      SSL_LINE2: 'ssl_certificate_key /etc/letsencrypt/live/${APP_HOST}/privkey.pem;'
-      SSL_LINE3: include /etc/ssl-conf/options-ssl-nginx.conf;
-      WEB_APP_CONFIG_FILE: '/config-parts/staging.conf'
+      APP_HOST: '${APP_HOST}'
     ports:
-      - '80:8080'
-      - '443:8443'
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
     networks:
       local:
         ipv4_address: '172.42.0.8'
@@ -44,7 +37,7 @@ services:
       driver: 'fluentd'
       options:
         fluentd-async: 'true'
-        tag: nginx
+        tag: caddy
     depends_on:
       - serverfluent
 
@@ -54,9 +47,7 @@ services:
         ipv4_address: '172.42.0.42'
     container_name: startuphafen-maildev
     restart: unless-stopped
-    image: maildev-custom
-    build:
-      context: ./maildev
+    image: maildev/maildev:2.2.1
     environment:
       MAILDEV_BASE_PATHNAME: '/maildev'
       MAILDEV_MAIL_DIRECTORY: /tmp/maildev
@@ -79,9 +70,13 @@ services:
     container_name: startuphafen-backend
     restart: unless-stopped
     init: true
-    image: node:22.12.0-bookworm
+    image: node:22.18.0-bookworm
     user: node
     working_dir: /home/node
+    # extra_hosts:
+    #   Add host pins here if your OZG staging endpoints are not publicly
+    #   resolvable, e.g.:
+    #   - 'your-ozg-staging-host.example.invalid:203.0.113.1'
     volumes:
       - ../:/home/node/app:ro
     environment:
@@ -108,7 +103,7 @@ services:
       local:
         ipv4_address: '172.42.0.12'
     environment:
-      # these are overwritten by an .env file at deployment time, which is placed on the server via gitlab CI
+      # these are overwritten by an .env file at deployment time, which is placed on the server by the deploy pipeline
       KC_HOSTNAME_STRICT: false
       KC_HTTP_ENABLED: true
       KC_PROXY_HEADERS: xforwarded
@@ -120,9 +115,9 @@ services:
       KC_HOSTNAME_ADMIN: 'https://${APP_HOST}/kc-admin'
     volumes:
       # Relative to the location of the docker-compose.yml of the startuphafen-backend
-      - ./keycloak/entrypoint.sh:/entrypoint.sh
+      - ./keycloak/entrypoint-staging.sh:/entrypoint-staging.sh
       - ./keycloak/themes:/opt/keycloak/themes
-    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    entrypoint: ['/bin/bash', '/entrypoint-staging.sh']
     logging:
       driver: 'fluentd'
       options:
@@ -130,20 +125,6 @@ services:
         tag: keycloak
     depends_on:
       - serverfluent
-
-  certbot:
-    image: certbot/certbot:v1.32.2
-    restart: unless-stopped
-    init: true
-    container_name: startuphafen-certbot
-    user: root
-    volumes:
-      - ../../../certbot/conf:/etc/letsencrypt
-      - ../../../certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot --webroot-path /var/www/certbot/; sleep 12h & wait $${!}; done;'"
-    networks:
-      local:
-        ipv4_address: '172.42.0.9'
 
 networks:
   local:

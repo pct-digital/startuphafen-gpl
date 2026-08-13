@@ -1,0 +1,151 @@
+name: 98 - Reusable Create Environment Workflow, ignore me
+
+on:
+  workflow_call:
+    inputs:
+      domain:
+        type: string
+        required: true
+      source:
+        description: 'Source environment'
+        type: string
+        required: true
+
+jobs:
+  create-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print workflow invocation context
+        run: |
+          echo "[debug] Repository: $GITHUB_REPOSITORY"
+          echo "[debug] Run ID: $GITHUB_RUN_ID"
+          echo "[debug] Actor: $GITHUB_ACTOR"
+          echo "[debug] Ref: $GITHUB_REF"
+          echo "[debug] Inputs.domain='${{ inputs.domain }}' Inputs.source='${{ inputs.source }}'"
+
+      - name: Add Multihost SSH key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan "${{ vars.MULTI_HOST_DOMAIN }}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.MULTI_HOST_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add ~/.ssh/deploy_key
+
+      - name: Check if GitHub Environment already exists
+        id: check-env
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          set -euo pipefail
+          echo "[debug] Starting environment existence check"
+          DOMAIN="${{ inputs.domain }}"
+          REPO="$GITHUB_REPOSITORY"
+          EXISTS=$(node tools/deploy3/bin/gh-envs.cjs exists "$DOMAIN" --repo "$REPO")
+          echo "[debug] gh-envs.cjs exists returned: '$EXISTS' (1=exists,0=absent)"
+          echo "exists=$EXISTS" >> "$GITHUB_OUTPUT"
+          if [ "$EXISTS" = "1" ]; then
+            echo "Environment '$DOMAIN' already exists in $REPO. Failing." >&2
+            exit 1
+          fi
+          echo "Environment '$DOMAIN' does not exist yet. Proceeding."
+
+      - name: Spawn multi-host container
+        if: steps.check-env.outputs.exists == '0'
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          set -euo pipefail
+          DOMAIN="${{ inputs.domain }}"
+          echo "Spawning container for domain $DOMAIN on ${{ vars.MULTI_HOST_DOMAIN }}"
+          START_TS=$(date +%s)
+          ssh ${{ vars.MULTI_HOST_USER }}@${{ vars.MULTI_HOST_DOMAIN }} "sudo /opt/multi-host-traefik/spawn.sh $DOMAIN"
+          RC=$?
+          END_TS=$(date +%s)
+            if [ $RC -ne 0 ]; then
+              echo "[error] spawn.sh failed with exit code $RC (duration $((END_TS-START_TS))s)" >&2
+              exit $RC
+            fi
+          echo "[debug] spawn.sh completed successfully in $((END_TS-START_TS))s"
+
+      - name: Collect SSH port and private key
+        if: steps.check-env.outputs.exists == '0'
+        id: collect-ssh
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          set -euo pipefail
+          echo "[debug] Collecting SSH connection data from multi-host"
+          DOMAIN="${{ inputs.domain }}"
+          # Container directory names on the multi-host replace dots with dashes
+          SAFE_DOMAIN="${DOMAIN//./-}"
+          INFO_FILE="/opt/container/${SAFE_DOMAIN}/info"
+          KEY_FILE="/opt/container/${SAFE_DOMAIN}/keys/id_ed25519"
+          # Fetch info file and parse ssh_port
+          INFO_CONTENT=$(ssh ${{ vars.MULTI_HOST_USER }}@${{ vars.MULTI_HOST_DOMAIN }} "sudo cat $INFO_FILE")
+          echo "[debug] Retrieved info file size: ${#INFO_CONTENT} bytes"
+          echo "$INFO_CONTENT" | grep -E '^ssh_port=' >/dev/null || { echo "ssh_port not found in info file" >&2; exit 1; }
+          SSH_PORT=$(echo "$INFO_CONTENT" | awk -F= '/^ssh_port=/{print $2}')
+          # Fetch private key
+          SSH_KEY=$(ssh ${{ vars.MULTI_HOST_USER }}@${{ vars.MULTI_HOST_DOMAIN }} "sudo cat $KEY_FILE")
+          # Persist outputs
+          echo "ssh_port=$SSH_PORT" >> "$GITHUB_OUTPUT"
+          echo "ssh_key<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$SSH_KEY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "Collected SSH port $SSH_PORT"
+          echo "[debug] SSH key length: ${#SSH_KEY} chars"
+
+      - name: Prepare temporary environment directories
+        if: steps.check-env.outputs.exists == '0'
+        id: prep
+        env:
+          SSH_PORT: ${{ steps.collect-ssh.outputs.ssh_port }}
+        run: |
+          set -euo pipefail
+          echo "[debug] Preparing temporary environment directories"
+          DOMAIN="${{ inputs.domain }}"
+          SSH_PORT="${SSH_PORT}"
+          # Write key to file for sanity (not strictly needed)
+          echo "Invoking prep-temp-env.cjs for domain=$DOMAIN port=$SSH_PORT"
+          JSON_FILE=$(mktemp)
+          node tools/deploy3/bin/prep-temp-env.cjs \
+            --domain "$DOMAIN" \
+            --ssh-port "$SSH_PORT" \
+            --ssh-key "${{ steps.collect-ssh.outputs.ssh_key }}" > "$JSON_FILE"
+          echo "prep output:" && cat "$JSON_FILE"
+          # Export each path as output
+          JSON_FILE="$JSON_FILE" node -e 'const fs=require("fs");const f=process.env.JSON_FILE; if(!f){console.error("[error] JSON_FILE env var not set");process.exit(1);} const raw=fs.readFileSync(f,"utf8"); let j; try{ j=JSON.parse(raw);}catch(e){console.error("[error] Failed to parse JSON file", e); process.exit(1);} for (const [k,v] of Object.entries(j)){ if(v!==undefined && v!==null){ console.log(`${k}=${v}`);} }' >> "$GITHUB_OUTPUT"
+
+      - name: Copy GitHub Environment with secrets and vars
+        if: steps.check-env.outputs.exists == '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          set -euo pipefail
+          echo "[debug] Creating GitHub Environment with collected artifacts"
+          DOMAIN="${{ inputs.domain }}"
+          REPO="$GITHUB_REPOSITORY"
+          echo "Creating environment $DOMAIN in $REPO"
+          node tools/deploy3/bin/gh-envs.cjs list '${{ inputs.source }}' --repo "$REPO" \
+            | node tools/deploy3/bin/gh-envs.cjs create "$DOMAIN" --repo "$REPO" \
+                --vars-from-stdin \
+                --exclude-var PREVENT_COPY_TARGET \
+                --exclude-var PREVENT_DELETION \
+                --secrets-dir "${{ steps.prep.outputs.secretDir }}" \
+                --env-dir "${{ steps.prep.outputs.envDir }}" \
+                --overwrite-env-dir "${{ steps.prep.outputs.envOverwriteDir }}" \
+                --overwrite-json-dir "${{ steps.prep.outputs.jsonOverwriteDir }}"
+          RC=$?
+          if [ "$RC" -ne 0 ]; then
+            echo "[error] Environment creation failed with exit code $RC" >&2
+            exit "$RC"
+          fi
+          echo "[debug] Environment creation command completed successfully"
+
+# temporary files do not need to be deleted here, as the runner is a self-replacing docker throw-away container that deletes itself right after the workflow

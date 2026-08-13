@@ -10,6 +10,8 @@
     <div class="h-[1.25rem]"></div>
     <div
       class="pt-[24px] pb-1 text-center relative h-[90%]"
+      tabindex="0"
+      (keydown.enter)="onItemClick(item)"
       [attr.data-testid]="
         item.type === 'HEADER_GROUP_ITEM'
           ? 'header-group-' + item.groupId

@@ -9,7 +9,6 @@ export type TransactionFactory = <T>(
   readOnly?: boolean
 ) => Promise<T>;
 
-//#region [Color1] transaction
 /**
  * A factory function which returns a function with transaction in a serializable isolation level.
  * Be warned that this function will repeat itself n-times. Therefore **don't** put any logic with any **side effects** in the transaction.
@@ -49,9 +48,7 @@ export function createRepeatedSerializedKnexTransaction(
     return await tryTransaction();
   };
 }
-//#endregion
 
-//#region [Color3] error
 async function handleError<E>(
   err: unknown, // sadly knex hasn't any proper interfaces for an pg error
   retriesObj: { retries: number },
@@ -93,4 +90,3 @@ export function checkError(
     retries < _transactionRetries
   );
 }
-//#endregion

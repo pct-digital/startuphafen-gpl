@@ -1,0 +1,258 @@
+---
+# Ansible playbook to set up a server for docker-compose based deploys
+# Usage: ansible-playbook server-setup-playbook.yaml -e "domain=subd.mydomain.com"
+#
+# This playbook will:
+# - Install Docker and Docker Compose
+# - Configure timezone
+# - Set up useful shell aliases
+# - Prepare persistent Caddy storage for application TLS state
+
+- name: Server Setup for Docker-Compose Deployment
+  hosts: all
+  become: yes
+  gather_facts: no
+  vars:
+    ansible_ssh_pipelining: true
+    timezone: 'Europe/Berlin'
+    app_name: 'startuphafen'
+    caddy_dir: '/opt/{{ app_name }}/caddy'
+    required_packages: # some of these are necessary for docker, some are necessary for deploy3. Feel free to add extra stuff you need.
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - dnsutils
+      - gnupg-agent
+      - iproute2
+      - rename
+      - software-properties-common
+      - unzip
+
+  pre_tasks:
+    - name: Validate that domain variable is provided
+      assert:
+        that:
+          - domain is defined
+          - domain | length > 0
+        fail_msg: "domain variable is required. Use: -e 'domain=subd.example.com'"
+
+  tasks:
+    # ============================================================================
+    # 1. Set Hostname
+    # ============================================================================
+    - name: Check if systemd is actually running
+      stat:
+        path: /run/systemd/system
+      register: systemctl_check
+      changed_when: false
+
+    - name: Set hostname using hostnamectl (if systemd is available)
+      command: hostnamectl set-hostname {{ domain }}
+      register: hostnamectl_result
+      changed_when: hostnamectl_result.rc == 0
+      when: systemctl_check.stat.exists
+
+    - name: Set hostname via /etc/hostname (fallback)
+      copy:
+        content: "{{ domain }}\n"
+        dest: /etc/hostname
+        unsafe_writes: yes
+      when: not systemctl_check.stat.exists
+
+    - name: Check current running hostname
+      command: hostname
+      register: current_hostname
+      changed_when: false
+      when: not systemctl_check.stat.exists
+
+    - name: Set running hostname (fallback)
+      command: hostname {{ domain }}
+      when: not systemctl_check.stat.exists and current_hostname.stdout != domain
+
+    - name: Update /etc/hosts with new hostname
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127.0.0.1'
+        line: '127.0.0.1 localhost {{ domain }}'
+        state: present
+        unsafe_writes: yes
+
+    # ============================================================================
+    # 2. Install Prerequisites & Docker
+    # ============================================================================
+    - name: Check if Docker is already installed
+      command: docker --version
+      register: docker_check
+      failed_when: false
+      changed_when: false
+
+    - name: Check if required packages are already installed (local check)
+      shell: |
+        count=$(dpkg-query -W -f='${Status}\n' {{ required_packages | join(' ') }} 2>/dev/null | \
+        grep -c "install ok installed" || echo "0")
+        if [ "$count" = "{{ required_packages | length }}" ]; then
+          echo "all_installed"
+        else
+          echo "missing"
+        fi
+      register: packages_check
+      changed_when: false
+      failed_when: false
+
+    - name: Install required packages
+      apt:
+        name: '{{ required_packages }}'
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+      when: "'missing' in packages_check.stdout"
+
+    - name: Create directory for Docker GPG key
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+      when: docker_check.rc != 0
+
+    - name: Add Docker GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+        unsafe_writes: yes
+      when: docker_check.rc != 0
+
+    - name: Get Ubuntu distribution codename
+      shell: |
+        grep VERSION_CODENAME /etc/os-release | cut -d= -f2
+      register: codename_result
+      changed_when: false
+      when: docker_check.rc != 0
+
+    - name: Set distribution_codename variable
+      set_fact:
+        distribution_codename: '{{ codename_result.stdout }}'
+      when: docker_check.rc != 0
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ distribution_codename }} stable'
+        state: present
+      when: docker_check.rc != 0
+
+    - name: Update apt cache again
+      apt:
+        update_cache: yes
+      when: docker_check.rc != 0
+
+    - name: Install Docker and Docker Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+      when: docker_check.rc != 0
+
+    # ============================================================================
+    # 3. Configure SSH for Port Forwarding (Tunneling)
+    # ============================================================================
+    - name: Allow TCP forwarding in SSH daemon configuration
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?AllowTcpForwarding'
+        line: 'AllowTcpForwarding yes'
+        state: present
+        unsafe_writes: yes
+
+    - name: Reload SSH daemon to apply port forwarding configuration
+      service:
+        name: ssh
+        state: reloaded
+      register: ssh_reload
+      failed_when: false
+
+    # ============================================================================
+    # 4. Configure Timezone
+    # ============================================================================
+    - name: Set timezone using timedatectl (if systemd is available)
+      command: timedatectl set-timezone {{ timezone }}
+      register: timedatectl_result
+      changed_when: timedatectl_result.rc == 0
+      when: systemctl_check.stat.exists
+
+    - name: Set timezone via symlink (fallback)
+      file:
+        src: '/usr/share/zoneinfo/{{ timezone }}'
+        dest: /etc/localtime
+        state: link
+        force: yes
+      when: not systemctl_check.stat.exists
+
+    - name: Set timezone in /etc/timezone (fallback)
+      copy:
+        content: '{{ timezone }}'
+        dest: /etc/timezone
+        unsafe_writes: yes
+      when: not systemctl_check.stat.exists
+
+    # ============================================================================
+    # 5. Add Shell Aliases
+    # ============================================================================
+    - name: Add convenient shell aliases to root's bashrc
+      blockinfile:
+        path: /root/.bashrc
+        block: |
+          alias ..='cd ..'
+          alias ...='cd ../..'
+          alias ....='cd ../../..'
+          alias .....='cd ../../../..'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - useful shell aliases"
+        create: yes
+        unsafe_writes: yes
+
+    # ============================================================================
+    # 6. Prepare persistent Caddy directories
+    # ============================================================================
+    - name: Create application Caddy directory
+      file:
+        path: '{{ caddy_dir }}'
+        state: directory
+        mode: '0755'
+
+    - name: Create persistent Caddy state directories
+      file:
+        path: '{{ caddy_dir }}/{{ item }}'
+        state: directory
+        mode: '0755'
+      loop:
+        - data
+        - config
+
+    # ============================================================================
+    # 7. Final Status Report
+    # ============================================================================
+    - name: Gather Docker version
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Gather Docker Compose version
+      command: docker compose version
+      register: docker_compose_version
+      changed_when: false
+
+    - name: Display setup completion summary
+      debug:
+        msg:
+          - '============================================================'
+          - 'Server Setup Completed Successfully!'
+          - '============================================================'
+          - 'Hostname: {{ domain }}'
+          - 'Timezone: {{ timezone }}'
+          - 'Docker: {{ docker_version.stdout }}'
+          - 'Docker Compose: {{ docker_compose_version.stdout }}'
+          - 'Caddy State Directory: {{ caddy_dir }}/'
+          - 'TLS certificates will be obtained automatically by Caddy on first public start.'
+          - '============================================================'

@@ -1,7 +1,6 @@
 # cypress-help
 
-This library was generated with [Nx](https://nx.dev).
+Helpers for the Cypress e2e suite: scenario environment control (talks to the backend e2e routes), video recording utilities and common test plumbing.
 
 ## Running unit tests
 
-Run `nx test cypress-help` to execute the unit tests via [Jest](https://jestjs.io).

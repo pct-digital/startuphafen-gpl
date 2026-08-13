@@ -1,58 +1,119 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import {
+  PopupService,
+  ShButtonDirective,
+  ShCardDirective,
+  ShCardSubtitleDirective,
+  ShCardTitleDirective,
+} from '@startuphafen/angular-common';
+import { Contact } from '@startuphafen/startuphafen-common';
+import { Subject, takeUntil } from 'rxjs';
+import { ContactCollectionService } from '../contact-collection/contact-collection.service';
+import { FeedbackComponent } from '../feedback/feedback.component';
 
 @Component({
   selector: 'sh-questionflow-top-tracker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    ShCardDirective,
+    ShCardTitleDirective,
+    ShCardSubtitleDirective,
+    ShButtonDirective,
+    FeedbackComponent,
+  ],
   templateUrl: './questionflow-top-tracker.component.html',
   styles: [
     `
-      @keyframes blink {
-        0% {
-          opacity: 0.2;
-        }
-        20% {
-          opacity: 1;
-        }
-        100% {
-          opacity: 0.2;
-        }
+      .acrylic {
+        background-color: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
       }
-      .loading-dot {
-        animation: blink 1.4s infinite both;
+      .progress-bar-fill {
+        transition: width 0.5s ease-in-out;
       }
-      .loading-dot:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .loading-dot:nth-child(3) {
-        animation-delay: 0.4s;
+      .progress-boat {
+        transition: left 0.5s ease-in-out;
       }
     `,
   ],
 })
-export class QuestionflowTopTrackerComponent implements OnInit, OnChanges {
-  @Input() currentStep = 0;
-  @Input() maxLength = 1;
-  @Input() questionIndex = 0;
+export class QuestionflowTopTrackerComponent implements OnInit {
+  @Input() projectName = '';
+  @Input() currentStepIndex = 0;
+  @Input() stepsLength = 0;
+  @Input() stepsLabel = '';
 
-  tracking: number[] = [];
+  //region popup
+  contact: Contact | null = null;
+  //endregion
 
-  ngOnInit() {
-    this.tracking = Array(this.currentStep + 1).fill(0);
+  constructor(
+    private contactService: ContactCollectionService,
+    private router: Router,
+    private popup: PopupService
+  ) {}
+
+  async ngOnInit() {
+    this.contact = await this.loadContact();
   }
 
-  ngOnChanges(): void {
-    this.tracking = Array(this.currentStep + 1).fill(0);
+  get progressPercent(): number {
+    return ((this.currentStepIndex + 1) / this.stepsLength) * 100;
   }
 
-  get boatPosition(): number {
-    const progressWidth = (240 / this.maxLength) * this.questionIndex;
-    // Subtract 20px to center the boat (40px width / 2)
-    return Math.max(0, progressWidth - 20);
+  //region PopUp
+  async routeToFAQ() {
+    await this.router.navigateByUrl('/faqPage');
+    await this.close();
   }
 
-  get progressWidth(): number {
-    return (240 / this.maxLength) * (this.questionIndex + 1);
+  async loadContact() {
+    const contacts: Contact[] = await this.contactService.parseImageUrl(
+      (
+        await this.contactService.getContactsUniversal()
+      ).filter((c) => c.group === 'Gründungslotsen')
+    );
+    if (contacts.length === 0) return null;
+    if (contacts.length === 1) return contacts[0];
+    return contacts[Math.floor(Math.random() * (contacts.length - 1)) + 1];
   }
+
+  @ViewChild('ContactInfo', { static: true })
+  contactInfoTemplate?: TemplateRef<any>;
+
+  @ViewChild('Feedback', { static: true })
+  feedbackTemplate?: TemplateRef<any>;
+
+  private destroy$ = new Subject<void>();
+
+  async close() {
+    this.popup.closePopup();
+  }
+
+  openContactPopup() {
+    this.openPopup(this.contactInfoTemplate);
+  }
+
+  openFeedbackPopup() {
+    this.openPopup(this.feedbackTemplate);
+  }
+
+  openPopup(popupTemplate?: TemplateRef<any>) {
+    if (popupTemplate) {
+      this.popup
+        .open(popupTemplate)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
+    }
+  }
+  //endregion
 }

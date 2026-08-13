@@ -10,11 +10,6 @@ on:
         description: 'Target environment'
         type: string
         required: true
-      # this must be set to DELETE_USERS for the keycloak import to be skipped
-      # just to make it very clear to everybody: This is a very dangerous option
-      skip-keycloak-import:
-        type: string
-        required: false
 
 jobs:
   deploy-app:
@@ -24,18 +19,6 @@ jobs:
       - run: echo "Deploying ${{ inputs.target }} with release ${{ inputs.release }} to server ${{ vars.DEPLOY_SERVER }}"
 
       - uses: actions/checkout@v4
-        with:
-          ref: dev
-      - name: Add SSH key
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan ${{ vars.DEPLOY_SERVER }} >> ~/.ssh/known_hosts
-          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add ~/.ssh/deploy_key
 
       - name: Set env
         run: echo "RELEASE=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
@@ -45,18 +28,21 @@ jobs:
           tag: ${{ inputs.release }}
           fileName: '*.zip'
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Run deploy script v2
-        env:
-          DEPLOY_SERVER: ${{ vars.DEPLOY_SERVER }}
-          DEPLOY_TAG: ${{ inputs.release }}
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
-          DEPLOY_DOCKER_ENV: ${{vars.DEPLOY_DOCKER_ENV}}
-          DEPLOY_BACKEND_SECRETS: ${{vars.DEPLOY_BACKEND_SECRETS}}
-          DEPLOY_KEYCLOAK_SECRETS: ${{vars.DEPLOY_KEYCLOAK_SECRETS}}
-          RESET_KEYCLOAK: ${{inputs.skip-keycloak-import}}
-          DEPLOY_CONFIG_SECRETS: ${{vars.DEPLOY_CONFIG_SECRETS}}
-        run: node ./tools/deploy2/deploy.js
+      - name: Run deploy script v3
+        shell: bash
+        run: |
+          set -e
+
+          eval "$(echo '${{ toJSON(vars) }}' | jq -r 'to_entries | map("export \(.key)=\(.value | @sh)") | .[]')"
+          eval "$(echo '${{ toJSON(secrets) }}' | jq -r 'to_entries | map("export \(.key)=\(.value | @sh)") | .[]')"
+
+          export DEPLOY_TAG="${{ inputs.release }}"
+          echo "Starting deployment with tag: $DEPLOY_TAG"
+          cp $DEPLOY_TAG.zip ./tools/deploy3/$DEPLOY_TAG.zip
+          cd ./tools/deploy3
+          echo "Installing dependencies..."
+          npm install
+          echo "Running deploy script..."
+          npm run deploy
+          echo "Deployment completed successfully"
+

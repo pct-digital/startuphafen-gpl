@@ -26,7 +26,7 @@
   "oauth2DeviceCodeLifespan": 600,
   "oauth2DevicePollingInterval": 5,
   "enabled": true,
-  "sslRequired": "external",
+  "sslRequired": "none",
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "rememberMe": true,
@@ -61,9 +61,13 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": ["user"],
+          "realm": [
+            "user"
+          ],
           "client": {
-            "account": ["manage-account"]
+            "account": [
+              "manage-account"
+            ]
           }
         },
         "clientRole": false,
@@ -92,6 +96,15 @@
         "id": "8718d848-22e0-46b1-9466-8e5ac2024eee",
         "name": "offline_access",
         "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "fb1dab8f-f9f8-4886-9051-4f663f51a6b2",
+        "attributes": {}
+      },
+      {
+        "id": "55f81d67-e3c5-4f6f-82e9-6561cfbe8fc4",
+        "name": "startuphafen-admin",
+        "description": "",
         "composite": false,
         "clientRole": false,
         "containerId": "fb1dab8f-f9f8-4886-9051-4f663f51a6b2",
@@ -135,7 +148,10 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": ["query-groups", "query-users"]
+              "realm-management": [
+                "query-groups",
+                "query-users"
+              ]
             }
           },
           "clientRole": true,
@@ -167,7 +183,9 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": ["query-clients"]
+              "realm-management": [
+                "query-clients"
+              ]
             }
           },
           "clientRole": true,
@@ -360,8 +378,10 @@
     "clientRole": false,
     "containerId": "fb1dab8f-f9f8-4886-9051-4f663f51a6b2"
   },
-  "requiredCredentials": ["password"],
-  "passwordPolicy": "length(8) and maxLength(64) and lowerCase(1) and specialChars(1) and notUsername(undefined) and notEmail(undefined) and upperCase(1) and digits(1)",
+  "requiredCredentials": [
+    "password"
+  ],
+  "passwordPolicy": "length(8) and maxLength(64) and lowerCase(1) and specialChars(1) and notUsername() and notEmail() and upperCase(1) and digits(1)",
   "otpPolicyType": "totp",
   "otpPolicyAlgorithm": "HmacSHA1",
   "otpPolicyInitialCounter": 0,
@@ -390,7 +410,9 @@
     }
   },
   "webAuthnPolicyRpEntityName": "keycloak",
-  "webAuthnPolicySignatureAlgorithms": ["ES256"],
+  "webAuthnPolicySignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyRpId": "",
   "webAuthnPolicyAttestationConveyancePreference": "not specified",
   "webAuthnPolicyAuthenticatorAttachment": "not specified",
@@ -401,7 +423,9 @@
   "webAuthnPolicyAcceptableAaguids": [],
   "webAuthnPolicyExtraOrigins": [],
   "webAuthnPolicyPasswordlessRpEntityName": "keycloak",
-  "webAuthnPolicyPasswordlessSignatureAlgorithms": ["ES256"],
+  "webAuthnPolicyPasswordlessSignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyPasswordlessRpId": "",
   "webAuthnPolicyPasswordlessAttestationConveyancePreference": "not specified",
   "webAuthnPolicyPasswordlessAuthenticatorAttachment": "not specified",
@@ -414,7 +438,9 @@
   "scopeMappings": [
     {
       "clientScope": "offline_access",
-      "roles": ["offline_access"]
+      "roles": [
+        "offline_access"
+      ]
     }
   ],
   "clients": [
@@ -430,8 +456,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["http://localhost*"],
-      "webOrigins": ["*"],
+      "redirectUris": [
+        "http://localhost*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -478,8 +508,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["http://localhost*"],
-      "webOrigins": ["http://localhost*"],
+      "redirectUris": [
+        "http://localhost*"
+      ],
+      "webOrigins": [
+        "http://localhost*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -649,8 +683,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["/admin/startuphafen/console/*"],
-      "webOrigins": ["+"],
+      "redirectUris": [
+        "/admin/startuphafen/console/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -715,8 +753,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["http://localhost*"],
-      "webOrigins": ["*"],
+      "redirectUris": [
+        "http://localhost*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -1435,43 +1477,25 @@
     "auth": "",
     "port": "1025",
     "host": "maildev",
-    "replyTo": "no-reply@aw-startuphafen.com",
-    "from": "reset@aw-startuphafen.com",
+    "replyTo": "no-reply@placeholder.invalid",
+    "from": "reset@placeholder.invalid",
     "fromDisplayName": "AW startuphafen",
-    "envelopeFrom": "reset@aw-startuphafen.com",
+    "envelopeFrom": "reset@placeholder.invalid",
     "ssl": "false"
   },
-  "loginTheme": "startuphafen_base",
+  "loginTheme": "startuphafen",
   "accountTheme": "",
   "adminTheme": "",
-  "emailTheme": "startuphafen_base",
+  "emailTheme": "startuphafen",
   "eventsEnabled": false,
-  "eventsListeners": ["jboss-logging", "email"],
+  "eventsListeners": [
+    "jboss-logging",
+    "email"
+  ],
   "enabledEventTypes": [],
   "adminEventsEnabled": false,
   "adminEventsDetailsEnabled": false,
-  "identityProviders": [
-    {
-      "alias": "bundid",
-      "displayName": "BundID SAML Identity Provider",
-      "internalId": "b321cd37-ba3f-44d6-a8c5-89df6d450fc6",
-      "providerId": "saml",
-      "enabled": true,
-      "updateProfileFirstLoginMode": "on",
-      "trustEmail": false,
-      "storeToken": false,
-      "addReadTokenRoleOnCreate": false,
-      "authenticateByDefault": false,
-      "linkOnly": false,
-      "hideOnLogin": false,
-      "config": {
-        "syncMode": "LEGACY",
-        "entityId": "http://localhost:4000/kc/realms/startuphafen",
-        "singleSignOnServiceUrl": "https://id.bund.de/idp/profile/SAML2/POST/SSO",
-        "idpEntityId": "https://int.id.bund.de/de"
-      }
-    }
-  ],
+  "identityProviders": [],
   "identityProviderMappers": [],
   "components": {
     "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
@@ -1490,7 +1514,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": ["true"]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       },
       {
@@ -1508,7 +1534,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "max-clients": ["200"]
+          "max-clients": [
+            "200"
+          ]
         }
       },
       {
@@ -1518,7 +1546,9 @@
         "subType": "authenticated",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": ["true"]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       },
       {
@@ -1528,8 +1558,12 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "host-sending-registration-request-must-match": ["true"],
-          "client-uris-must-match": ["true"]
+          "host-sending-registration-request-must-match": [
+            "true"
+          ],
+          "client-uris-must-match": [
+            "true"
+          ]
         }
       },
       {
@@ -1590,8 +1624,12 @@
         "providerId": "rsa-enc-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "algorithm": ["RSA-OAEP"]
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "RSA-OAEP"
+          ]
         }
       },
       {
@@ -1600,7 +1638,9 @@
         "providerId": "rsa-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"]
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -1609,7 +1649,9 @@
         "providerId": "aes-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"]
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -1618,14 +1660,20 @@
         "providerId": "hmac-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "algorithm": ["HS512"]
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "HS512"
+          ]
         }
       }
     ]
   },
   "internationalizationEnabled": true,
-  "supportedLocales": ["de"],
+  "supportedLocales": [
+    "de"
+  ],
   "defaultLocale": "de",
   "authenticationFlows": [
     {
@@ -1727,68 +1775,6 @@
           "authenticatorFlow": false,
           "requirement": "REQUIRED",
           "priority": 20,
-          "autheticatorFlow": false,
-          "userSetupAllowed": false
-        }
-      ]
-    },
-    {
-      "id": "5ebec31a-8214-4fbd-9849-85bb94f69671",
-      "alias": "FoxRegistration",
-      "description": "registration flow",
-      "providerId": "basic-flow",
-      "topLevel": true,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "registration-page-form",
-          "authenticatorFlow": true,
-          "requirement": "REQUIRED",
-          "priority": 10,
-          "autheticatorFlow": true,
-          "flowAlias": "FoxRegistration Form",
-          "userSetupAllowed": false
-        }
-      ]
-    },
-    {
-      "id": "6897dff3-616e-4392-af45-98efd270f698",
-      "alias": "FoxRegistration Form",
-      "description": "registration form",
-      "providerId": "form-flow",
-      "topLevel": false,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "registration-user-creation",
-          "authenticatorFlow": false,
-          "requirement": "REQUIRED",
-          "priority": 20,
-          "autheticatorFlow": false,
-          "userSetupAllowed": false
-        },
-        {
-          "authenticator": "registration-password-action",
-          "authenticatorFlow": false,
-          "requirement": "REQUIRED",
-          "priority": 50,
-          "autheticatorFlow": false,
-          "userSetupAllowed": false
-        },
-        {
-          "authenticatorConfig": "captchafox",
-          "authenticator": "registration-captchafox-action",
-          "authenticatorFlow": false,
-          "requirement": "REQUIRED",
-          "priority": 70,
-          "autheticatorFlow": false,
-          "userSetupAllowed": false
-        },
-        {
-          "authenticator": "registration-terms-and-conditions",
-          "authenticatorFlow": false,
-          "requirement": "REQUIRED",
-          "priority": 71,
           "autheticatorFlow": false,
           "userSetupAllowed": false
         }
@@ -2212,15 +2198,6 @@
   ],
   "authenticatorConfig": [
     {
-      "id": "2585de26-b1fb-4c39-9788-00d6e762d102",
-      "alias": "captchafox",
-      "config": {
-        "mode": "inline",
-        "site.key": "sk_11111111000000001111111100000000",
-        "secret": "ok_11111111000000001111111100000000"
-      }
-    },
-    {
       "id": "6b2bbc79-a692-4c7d-a39d-13a9fa7021f9",
       "alias": "create unique user config",
       "config": {
@@ -2377,29 +2354,39 @@
       "username": "admin",
       "firstName": "Admin",
       "lastName": "Test",
-      "email": "test@admin.org",
+      "email": "admin@example.org",
       "emailVerified": true,
       "attributes": {
-        "phone": ["01234566"],
-        "addressBundID": ["{ \"locality\": \"Teststrasse\" }"]
+        "phone": [
+          "01234566"
+        ],
+        "addressBundID": [
+          "{ \"locality\": \"Teststrasse\" }"
+        ]
       },
       "enabled": true,
       "totp": false,
       "credentials": [
         {
-          "id": "f4ed4846-393d-4880-a899-743f72fd1b05",
           "type": "password",
-          "createdDate": 1714123534990,
-          "secretData": "{\"value\":\"OxfD7vcEWeaXkoALN0YnssE42vkMIx0lC8c1JYgMHwaYSz/RhzWyGySKPSTw1sbaQmK5eshjqso7FDU6IPqfUw==\",\"salt\":\"WT1f7/bf4pDu66KCIGo1IQ==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+          "value": "admin",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
       "requiredActions": [],
-      "realmRoles": ["admin", "user"],
+      "realmRoles": [
+        "admin",
+        "user",
+        "startuphafen-admin"
+      ],
       "clientRoles": {
-        "realm-management": ["realm-admin"],
-        "account": ["manage-account"]
+        "realm-management": [
+          "realm-admin"
+        ],
+        "account": [
+          "manage-account"
+        ]
       },
       "notBefore": 0,
       "groups": []
@@ -2412,174 +2399,30 @@
       "email": "alice@keycloak.org",
       "emailVerified": true,
       "attributes": {
-        "phone": ["01254546"]
+        "phone": [
+          "01254546"
+        ]
       },
       "enabled": true,
       "totp": false,
       "credentials": [
         {
-          "id": "f46d665a-92bd-4d30-acf9-b4839e7e819e",
           "type": "password",
-          "createdDate": 1714123534800,
-          "secretData": "{\"value\":\"B9lxJRP/SKXTfc8r07mdC9/yxV0iW6/xHx4oTaxbJlaVypMU+oxtbva/up+UkNPAoYSwNmdXfW3U9J4/9Er6ag==\",\"salt\":\"2KtP6AiJOqEWI0nik+7rVA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+          "value": "alice",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
       "requiredActions": [],
-      "realmRoles": ["user", "activatedUser"],
+      "realmRoles": [
+        "user",
+        "activatedUser"
+      ],
       "clientRoles": {
-        "account": ["manage-account"]
+        "account": [
+          "manage-account"
+        ]
       },
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "95b0c8a4-2ac4-4a97-ad7b-4543de49a79d",
-      "username": "helmt7",
-      "firstName": "Helmut",
-      "lastName": "Seven",
-      "email": "helmt7@keycloak.org",
-      "emailVerified": true,
-      "attributes": {
-        "phone": ["5645646464"]
-      },
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "7b511676-3319-4301-b6bf-c67c8851bb3c",
-          "type": "password",
-          "createdDate": 1714123535171,
-          "secretData": "{\"value\":\"dzxVFnsGJ+EJuASYukgO27XnWH4vEg4iipFuxeXCBIAeot1DbLqXq/RwNIyX7YGi9dVZmiyc9eP1GOCHvSXz9A==\",\"salt\":\"XLoahfP5nB2Xs3u4CHCcJg==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": ["UPDATE_PASSWORD"],
-      "realmRoles": ["user", "activatedUser"],
-      "clientRoles": {
-        "account": ["manage-account"]
-      },
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "51ff7d75-0082-481f-91eb-53e40bea5db0",
-      "username": "f2user",
-      "firstName": "F2",
-      "lastName": "User",
-      "email": "f2user@exmple2.com",
-      "emailVerified": true,
-      "attributes": {
-        "phone": ["015782479921"]
-      },
-      "createdTimestamp": 1717500919790,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "93eba31c-c651-4809-bd43-aba4325580d3",
-          "type": "password",
-          "createdDate": 1717500919965,
-          "secretData": "{\"value\":\"YJZO6GvLoOGjjkbozOJ9OyCluicHU7cCX90sz141sJD7AN5S825ULlBPfIxHXi3RoOgqDKdBwSpQsfgwAUbo3g==\",\"salt\":\"Qj7pZa/jGZkXC0b/63DeCA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["default-roles-startuphafen"],
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "77ff7d75-0082-481f-91eb-53e40bea5db0",
-      "username": "helmut5",
-      "firstName": "Helmut",
-      "lastName": "Karlsen",
-      "email": "helmut@spg.sh",
-      "emailVerified": true,
-      "attributes": {
-        "phone": ["015782479921"]
-      },
-      "createdTimestamp": 1717500919790,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "f77d665a-92bd-4d30-acf9-b4839e7e819e",
-          "type": "password",
-          "createdDate": 1714123534800,
-          "secretData": "{\"value\":\"B9lxJRP/SKXTfc8r07mdC9/yxV0iW6/xHx4oTaxbJlaVypMU+oxtbva/up+UkNPAoYSwNmdXfW3U9J4/9Er6ag==\",\"salt\":\"2KtP6AiJOqEWI0nik+7rVA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["user", "activatedUser"],
-      "clientRoles": {
-        "account": ["manage-account"]
-      },
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "42427d75-0082-481f-91eb-53e40bea5db0",
-      "username": "francisco5",
-      "firstName": "Francisco",
-      "lastName": "Coste Frias",
-      "email": "francisco@spg.sh",
-      "emailVerified": true,
-      "attributes": {
-        "phone": ["015782479921"]
-      },
-      "createdTimestamp": 1717500919791,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "f77d642a-92bd-4d30-acf9-b4839e7e819e",
-          "type": "password",
-          "createdDate": 1714123534800,
-          "secretData": "{\"value\":\"B9lxJRP/SKXTfc8r07mdC9/yxV0iW6/xHx4oTaxbJlaVypMU+oxtbva/up+UkNPAoYSwNmdXfW3U9J4/9Er6ag==\",\"salt\":\"2KtP6AiJOqEWI0nik+7rVA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["user", "activatedUser"],
-      "clientRoles": {
-        "account": ["manage-account"]
-      },
-      "notBefore": 0,
-      "groups": []
-    },
-
-    {
-      "id": "d50c9a7d-e586-4c61-87fb-c703bc5326a3",
-      "username": "helmut",
-      "firstName": "Helmut",
-      "lastName": "Test",
-      "email": "helmut@example.com",
-      "emailVerified": true,
-      "attributes": {
-        "phone": ["015782479921"]
-      },
-      "createdTimestamp": 1717677592318,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "665c21dd-4429-47d9-be5b-3b789bb9401a",
-          "type": "password",
-          "createdDate": 1717677592493,
-          "secretData": "{\"value\":\"4a7VeU26X9lYkgEoqIXjgd+MT4VESmD+AQCyGe/J0waMPDh3jT4zoYxtlYEkisk9BlNdKi/lEvuSoB2YXHWt0A==\",\"salt\":\"KlACilAU1+nruyP9/2TB1g==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["default-roles-startuphafen"],
       "notBefore": 0,
       "groups": []
     },
@@ -2591,86 +2434,28 @@
       "email": "marie@example.com",
       "emailVerified": true,
       "attributes": {
-        "phone": ["333333"],
-        "emailSubscription": ["1"]
+        "phone": [
+          "333333"
+        ],
+        "emailSubscription": [
+          "1"
+        ]
       },
       "createdTimestamp": 1719293028459,
       "enabled": true,
       "totp": false,
       "credentials": [
         {
-          "id": "275a020f-8a9a-4a2e-a3e2-959cd7dcf76b",
           "type": "password",
-          "createdDate": 1719293028492,
-          "secretData": "{\"value\":\"AsZgNY+IDFNTYv28gjlwN9w5z+y0lgaT0rv+5LPiHwY=\",\"salt\":\"h56X6/+jhix/gN2XgjqGLw==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+          "value": "marie",
+          "temporary": false
         }
       ],
       "disableableCredentialTypes": [],
       "requiredActions": [],
-      "realmRoles": ["default-roles-startuphafen"],
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "fa7cc634-dad3-4492-8398-d0d0c73c96c4",
-      "username": "user7",
-      "firstName": "User",
-      "lastName": "Seven",
-      "email": "user7@example.com",
-      "emailVerified": true,
-      "attributes": {
-        "locale": ["de"],
-        "phone": ["121313132132123"],
-        "emailSubscription": ["1"]
-      },
-      "createdTimestamp": 1721663070066,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "1cd4943b-7d29-4367-b604-b06e6303cfc1",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1721663204175,
-          "secretData": "{\"value\":\"Cqwi6LaAAqWxrn6KUHTfpKx8uNxadZ4lTdYrSz5Gy6w=\",\"salt\":\"YO0m4aD3F88WVW4J0K0ECQ==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
-        }
+      "realmRoles": [
+        "default-roles-startuphafen"
       ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["default-roles-startuphafen"],
-      "notBefore": 0,
-      "groups": []
-    },
-    {
-      "id": "6ad2f2cc-296e-42c4-96b4-4a879cee7757",
-      "username": "helmut6",
-      "firstName": "Helmut",
-      "lastName": "Six",
-      "email": "helmut6@spg.sh",
-      "emailVerified": true,
-      "attributes": {
-        "locale": ["de"],
-        "phone": ["333323423"],
-        "emailSubscription": ["1"]
-      },
-      "createdTimestamp": 1722274869759,
-      "enabled": true,
-      "totp": false,
-      "credentials": [
-        {
-          "id": "bf0f99f3-68d6-4586-8f16-ddd3606d7385",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1722274920983,
-          "secretData": "{\"value\":\"IWEY25EDMhkOmgu7/6hTyLoBYuADq2gthrmlL04bZD4=\",\"salt\":\"b4ghKIcqjFa0y2dvJL7chA==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
-        }
-      ],
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": ["default-roles-startuphafen"],
       "notBefore": 0,
       "groups": []
     }

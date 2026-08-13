@@ -1,0 +1,142 @@
+name: 2A - Temporary Deployment
+run-name: 'Temp deploy ${{ inputs.release }} from ${{ inputs.source_env }} for ${{ inputs.lifetime_hours }}h'
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release tag to deploy (e.g. 25.0109.1714.54_PCTI-1234-abc)'
+        required: true
+        type: string
+      source_env:
+        description: 'Source environment to copy data from'
+        required: true
+        type: environment
+        default: startuphafen-staging
+      lifetime_hours:
+        description: 'Lifetime in hours before auto-cleanup'
+        required: false
+        type: string
+        default: '48'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.resolve-pr.outputs.pr_number }}
+      domain: ${{ steps.derive-domain.outputs.domain }}
+      expire_at: ${{ steps.calc-expiry.outputs.expire_at }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve PR from release tag
+        id: resolve-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          PR_NUMBER=$(node tools/deploy3/bin/resolve-pr.cjs --tag "${{ inputs.release }}" --repo "$GITHUB_REPOSITORY")
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Found PR #$PR_NUMBER for release ${{ inputs.release }}"
+          else
+            echo "No PR found for release ${{ inputs.release }}"
+          fi
+
+      - name: Derive domain from release tag
+        id: derive-domain
+        run: |
+          PR_ARG=""
+          if [ -n "${{ steps.resolve-pr.outputs.pr_number }}" ]; then
+            PR_ARG="--pr-number ${{ steps.resolve-pr.outputs.pr_number }}"
+          fi
+          DOMAIN=$(node tools/deploy3/bin/derive-domain.cjs --release-tag "${{ inputs.release }}" --base-domain "${{ vars.TEMP_DEPLOY_BASE_DOMAIN }}" $PR_ARG)
+          echo "domain=$DOMAIN" >> "$GITHUB_OUTPUT"
+          echo "Derived domain: $DOMAIN"
+
+      - name: Calculate expiration time
+        id: calc-expiry
+        run: |
+          EXPIRE_AT=$(date -u -d "+${{ inputs.lifetime_hours }} hours" --iso-8601=seconds)
+          echo "expire_at=$EXPIRE_AT" >> "$GITHUB_OUTPUT"
+          echo "Deployment will expire at: $EXPIRE_AT"
+
+  create-env:
+    needs: prepare
+    uses: ./.github/workflows/lib_create_environment.yml
+    with:
+      domain: ${{ needs.prepare.outputs.domain }}
+      source: ${{ inputs.source_env }}
+    secrets: inherit
+
+  set-expiry:
+    runs-on: ubuntu-latest
+    needs: [prepare, create-env]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set EXPIRE_AT variable on environment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node tools/deploy3/bin/gh-envs.cjs set "${{ needs.prepare.outputs.domain }}" EXPIRE_AT "${{ needs.prepare.outputs.expire_at }}" --repo "$GITHUB_REPOSITORY"
+          echo "Set EXPIRE_AT=${{ needs.prepare.outputs.expire_at }} on environment ${{ needs.prepare.outputs.domain }}"
+
+      - name: Set PR_NUMBER variable on environment
+        if: needs.prepare.outputs.pr_number != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node tools/deploy3/bin/gh-envs.cjs set "${{ needs.prepare.outputs.domain }}" PR_NUMBER "${{ needs.prepare.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY"
+          echo "Set PR_NUMBER=${{ needs.prepare.outputs.pr_number }} on environment ${{ needs.prepare.outputs.domain }}"
+
+  deploy-pre-copy:
+    needs: [prepare, set-expiry]
+    uses: ./.github/workflows/lib_deploy.yml
+    with:
+      release: ${{ inputs.release }}
+      target: ${{ needs.prepare.outputs.domain }}
+    secrets: inherit
+
+  copy-db:
+    needs: [prepare, deploy-pre-copy]
+    uses: ./.github/workflows/lib_copy_database.yml
+    with:
+      source: ${{ inputs.source_env }}
+      target: ${{ needs.prepare.outputs.domain }}
+    secrets: inherit
+
+  # copy pulls the keycloak settings from the source, which may differ from the version that we want deployed
+  # so need to run a 2nd deploy...
+  # we may need to rethink how all this works in the course of using the keycloak-terraform adapter.
+  # I am wondering: maybe the app could run that one on normal app startup to configure keycloak for itself, then this 2nd deploy would not be necessary...
+  # only possible if we actually have a "a few seconds to configure keycloak via terraform"-capability
+  deploy-post-copy:
+    needs: [prepare, set-expiry, copy-db]
+    uses: ./.github/workflows/lib_deploy.yml
+    with:
+      release: ${{ inputs.release }}
+      target: ${{ needs.prepare.outputs.domain }}
+    secrets: inherit
+
+  notify-pr:
+    runs-on: ubuntu-latest
+    needs: [prepare, copy-db, deploy-post-copy]
+    if: needs.prepare.outputs.pr_number != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Post deployment comment to PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node tools/deploy3/bin/post-pr-comment.cjs \
+            --repo "$GITHUB_REPOSITORY" \
+            --pr "${{ needs.prepare.outputs.pr_number }}" \
+            --type temp-deploy \
+            --release "${{ inputs.release }}" \
+            --domain "${{ needs.prepare.outputs.domain }}" \
+            --expires "${{ needs.prepare.outputs.expire_at }}" \
+            --source "${{ inputs.source_env }}"

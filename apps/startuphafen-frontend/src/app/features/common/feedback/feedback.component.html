@@ -1,0 +1,37 @@
+<div shCard class="flex flex-col items-center justify-center max-w-md">
+  <div shCardTitle>Gib uns Deine Rückmeldung</div>
+  <div shCardSubtitle class="text-center">
+    Wir wollen unbedingt wissen, was gut war oder woran Deine Gründung hier
+    gescheitert ist!
+  </div>
+
+  <div
+    class="flex items-center select-none mt-6"
+    style="min-height: 5em; min-width: 5em"
+  >
+    @for (emoji of emojis; track emoji) {
+    <span
+      (click)="selectedEmoji = $index"
+      [ngClass]="selectedEmoji == $index ? 'text-7xl' : 'text-5xl'"
+      [class.grayscale]="selectedEmoji != null && selectedEmoji != $index"
+      title="{{ emoji.text }}"
+      [attr.data-testid]="'emoji-' + $index"
+      >{{ emoji.value }}</span
+    >
+    }
+  </div>
+
+  <textarea
+    shInput
+    placeholder="Deine Rückmeldung..."
+    rows="5"
+    class="resize-none mb-6"
+    [(ngModel)]="message"
+  ></textarea>
+
+  <div class="button-container flex justify-center items-center">
+    <button shButton (click)="submit()" [disabled]="selectedEmoji == null">
+      Absenden
+    </button>
+  </div>
+</div>

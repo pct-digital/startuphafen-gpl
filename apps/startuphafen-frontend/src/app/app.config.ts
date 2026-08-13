@@ -19,10 +19,16 @@ import {
   FormlyFieldCheckboxSmall,
   FormlyFieldCheckComponent,
   FormlyFieldDateComponent,
+  FormlyFieldEmptyComponent,
+  FormlyFieldInfoBoxComponent,
   FormlyFieldInputComponent,
   FormlyFieldNumberComponent,
   FormlyFieldNumberEuroComponent,
+  FormlyFieldPercentComponent,
+  FormlyFieldProfileInputComponent,
   FormlyFieldRadioComponent,
+  FormlyFieldTextareaComponent,
+  FormlyWrapperHeading,
   InitService,
   PathService,
   TrpcService,
@@ -34,7 +40,9 @@ import { buildRoutes } from './app.routes';
 registerLocaleData(localeDe);
 
 export function initializeFactory(init: InitService) {
-  return async () => await init.initApp();
+  return async () => {
+    await init.initApp();
+  };
 }
 
 export function requiredTrueValidator(control: AbstractControl) {
@@ -46,7 +54,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withInterceptorsFromDi()),
     provideRouter(buildRoutes(new PathService())),
-
     {
       provide: APP_INITIALIZER,
       useFactory: initializeFactory,
@@ -74,7 +81,21 @@ export const appConfig: ApplicationConfig = {
             message: 'Sie müssen zustimmen um fortzufahren.',
           },
         ],
+        wrappers: [
+          {
+            name: 'heading',
+            component: FormlyWrapperHeading,
+          },
+        ],
         types: [
+          {
+            name: 'empty',
+            component: FormlyFieldEmptyComponent,
+          },
+          {
+            name: 'info-box',
+            component: FormlyFieldInfoBoxComponent,
+          },
           {
             name: 'bool',
             component: FormlyFieldCheckComponent,
@@ -102,6 +123,18 @@ export const appConfig: ApplicationConfig = {
           {
             name: 'checkbox',
             component: FormlyFieldCheckboxSmall,
+          },
+          {
+            name: 'percent',
+            component: FormlyFieldPercentComponent,
+          },
+          {
+            name: 'profile-input',
+            component: FormlyFieldProfileInputComponent,
+          },
+          {
+            name: 'textarea',
+            component: FormlyFieldTextareaComponent,
           },
         ],
       })

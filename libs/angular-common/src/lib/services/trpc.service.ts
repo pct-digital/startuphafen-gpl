@@ -35,8 +35,4 @@ export class TrpcService implements WatermarkTrpcService {
   getWatermarkApi() {
     return this.client.WaterMark;
   }
-
-  getHello() {
-    return this.client.hello;
-  }
 }

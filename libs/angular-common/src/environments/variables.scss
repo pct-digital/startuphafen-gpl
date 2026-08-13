@@ -1,7 +1,4 @@
-// Ionic Variables and Theming. For more info, please see:
-// http://ionicframework.com/docs/theming/
-
-/** Ionic CSS Variables **/
+// Design tokens (CSS custom properties) for the startuphafen apps.
 :root {
   --sh-color-primary: #1a7bab;
   --sh-color-primary-rgb: 0, 126, 181;
@@ -23,10 +20,6 @@
   --sh-color-tertiary-contrast-rgb: 217, 217, 217;
   --sh-color-tertiary-shade: #363636;
   --sh-color-tertiary-tint: #505050;
-
-  --sh-color-nav-background: #f3f3f3;
-
-  --sh-color-tooltip: #d8eff6;
 
   --sh-color-success: #bccf00;
   --sh-color-success-rgb: 188, 207, 0;
@@ -71,19 +64,10 @@
   --sh-color-dark-tint: #424242;
 
   --sh-background-color: #f3f3f3;
-  //--sh-background-color: var(--sh-color-light);
   --sh-background-color-shade: var(--sh-color-light-shade);
   --sh-background-color-contrast: var(--sh-color-light-contrast);
   --sh-background-color-tint: var(--sh-color-light-tint);
   --sh-text-color: var(--sh-color-dark-tint);
-
-  --sh-color-rest-mull: #cccccc;
-  --sh-color-bio: #b0d89c;
-  --sh-color-wert: #fff799;
-  --sh-color-paper: #77bee0;
-  --sh-color-prim: rgb(238, 127, 1);
-  --sh-color-header: var(--sh-color-primary-shade);
-  --sh-color-others: #333;
 
   --sh-color-step-950: #1e1e1e;
   --sh-color-step-900: #2a2a2a;
@@ -106,14 +90,6 @@
   --sh-color-step-50: #f3f3f3;
 
   @media (prefers-color-scheme: dark) {
-    --sh-background-color: #f3f3f3;
-    --sh-background-color-shade: var(--sh-color-light-shade);
-    --sh-background-color-contrast: var(--sh-color-light-contrast);
-    --sh-background-color-tint: var(--sh-color-light-tint);
-
-    --sh-color-content: var(--sh-color-medium);
-    --sh-color-content-contrast: var(--sh-color-medium-contrast);
-
     --sh-color-light: #2d2d2d;
     --sh-color-light-rgb: 45, 45, 45;
     --sh-color-light-contrast: #c9c9c9;

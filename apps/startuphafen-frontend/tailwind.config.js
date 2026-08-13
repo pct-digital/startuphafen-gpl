@@ -52,8 +52,6 @@ module.exports = {
         'background-tint': 'var(--sh-background-color-tint)',
         'background-contrast': 'var(--sh-background-color-contrast)',
 
-        content: 'var(--sh-color-content)',
-        'content-contrast': 'var(--sh-color-content-contrast)',
         warning: 'var(--sh-color-warning)',
         'warning-contrast': 'var(--sh-color-warning-contrast)',
         'warning-shade': 'var(--sh-color-warning-shade)',

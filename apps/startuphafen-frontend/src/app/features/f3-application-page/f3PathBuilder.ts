@@ -1,17 +1,22 @@
 import { Routes } from '@angular/router';
-import { LoginGuard, PathService } from '@startuphafen/angular-common';
-import { QuestionCatalogueContainerComponent } from './container/question-catalogue-container/question-catalogue-container.component';
+import {
+  EUNGuard,
+  LoginGuard,
+  PathService,
+  UGGuard,
+} from '@startuphafen/angular-common';
+import { QuestionnairePresenterComponent } from './presenter/questionnaire-presenter/questionnaire-presenter.component';
 
 export const buildf3Routes = (paths: PathService): Routes => {
   return [
     {
-      path: paths.application.root,
+      path: paths.questionnaire.root,
       data: {
         requiredRolesAny: ['login'],
       },
-      component: QuestionCatalogueContainerComponent,
+      component: QuestionnairePresenterComponent,
       title: 'Antrag',
-      canActivate: [LoginGuard],
+      canActivate: [LoginGuard, UGGuard, EUNGuard],
     },
   ];
 };

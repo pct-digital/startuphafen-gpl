@@ -3,7 +3,7 @@ export interface AcceptanceTesterSchema {
   noexit: boolean;
   documentationVideos: boolean;
   documentationScreenshots: boolean;
-  size: 'web' | 'android' | 'iphone_65' | 'iphone_55' | 'ipad_129';
+  size: 'android' | 'iphone_65' | 'iphone_55' | 'ipad_129';
   restrict?: string;
   skipBuild?: boolean;
   noDockerLog?: boolean;

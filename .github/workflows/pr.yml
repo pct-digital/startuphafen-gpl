@@ -1,0 +1,56 @@
+name: 7 - PR Events
+run-name: "PR '${{ github.event.action }}' on '${{ github.head_ref || github.ref_name }}'"
+
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+
+jobs:
+  echo-invocation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo PR event
+        run: |
+          echo "PR event: ${{ github.event.action }}"
+          echo "Branch: ${{ github.head_ref || github.ref_name }}"
+          echo "Commit SHA: ${{ github.event.pull_request.head.sha }}"
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "Title: ${{ github.event.pull_request.title }}"
+          echo "User: ${{ github.event.pull_request.user.login }}"
+
+  # When a PR is opened, check if a release already exists for the head commit
+  # and post a comment if so. This handles the case where a branch was pushed
+  # and released before the PR was created.
+  comment-existing-release:
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Find release for commit
+        id: find-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          RELEASE_TAG=$(node tools/deploy3/bin/find-release-for-sha.cjs --sha "${{ github.event.pull_request.head.sha }}" --repo "$GITHUB_REPOSITORY")
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          if [ -n "$RELEASE_TAG" ]; then
+            echo "Found existing release: $RELEASE_TAG"
+          else
+            echo "No existing release found for this commit"
+          fi
+
+      - name: Post release comment to PR
+        if: steps.find-release.outputs.release_tag != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          node tools/deploy3/bin/post-pr-comment.cjs \
+            --repo "$GITHUB_REPOSITORY" \
+            --pr "${{ github.event.pull_request.number }}" \
+            --type release-created \
+            --release "${{ steps.find-release.outputs.release_tag }}"

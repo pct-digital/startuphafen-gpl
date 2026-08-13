@@ -1,7 +1,7 @@
 import {
   ProcessContext,
   waitForProcessExit,
-} from '../../../lib/ProcessContext';
+} from '@startuphafen/utility-server';
 import { getE2eAppPath } from '../helpers';
 import { AcceptanceTesterSchema } from '../schema';
 import { SpecFileProcessor } from './spec-file-processor';
@@ -88,21 +88,17 @@ export class CypressProcess {
 
     if (this.options.documentationVideos) {
       env.VIDEO_RESOLUTION_WIDTH = 2560;
-      env.VIDEO_RESULTION_HEIGHT = 1440;
+      env.VIDEO_RESOLUTION_HEIGHT = 1440;
     }
 
     const IOS_SCALE = 3;
 
     if (this.options.size !== 'android') {
       env.VIDEO_RESOLUTION_WIDTH = 2560;
-      env.VIDEO_RESULTION_HEIGHT = 1440;
+      env.VIDEO_RESOLUTION_HEIGHT = 1440;
     }
 
     switch (this.options.size) {
-      case 'web':
-        env.CYPRESS_VIEWPORT_WIDTH = 2560;
-        env.CYPRESS_VIEWPORT_HEIGHT = 1440;
-        break;
       case 'ipad_129':
         env.CYPRESS_VIEWPORT_WIDTH = 2048 / IOS_SCALE;
         env.CYPRESS_VIEWPORT_HEIGHT = 2732 / IOS_SCALE;

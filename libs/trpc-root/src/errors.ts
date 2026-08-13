@@ -1,5 +1,20 @@
 import { TRPCError } from '@trpc/server';
 
+const REDACTED = '[redacted]';
+
+const SENSITIVE_KEY_RE =
+  /passphrase|password|secret|credential|api[_-]?key|private[_-]?key|token/i;
+
+export function redactSecrets(key: string, value: unknown) {
+  if (key && SENSITIVE_KEY_RE.test(key)) {
+    return REDACTED;
+  }
+  if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
+    return `[binary ${value.byteLength} bytes]`;
+  }
+  return value;
+}
+
 export function logServerSideError(
   err: TRPCError,
   type: string,
@@ -12,7 +27,7 @@ export function logServerSideError(
       err.message
     }\n${err.stack}\nINPUT:\n${JSON.stringify(
       input,
-      undefined,
+      redactSecrets,
       2
     )}\nCAUSE:\n${JSON.stringify(
       err.cause,

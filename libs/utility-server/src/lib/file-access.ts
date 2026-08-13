@@ -26,15 +26,3 @@ export class FileAccess {
     return await fs.writeFile(fpath, data);
   }
 }
-
-export class NoFileAccess extends FileAccess {
-  override async readTextFile(path: string): Promise<string> {
-    throw new Error('no file access to ' + path);
-  }
-
-  override async readdir(path: string): Promise<string[]> {
-    throw new Error('no dir access to ' + path);
-  }
-
-  override async writeFile(_path: string, _data: FileWriteType) {}
-}

@@ -3,7 +3,7 @@ services:
     container_name: startuphafen-database
     restart: unless-stopped
     init: true
-    image: postgres:15.10-bookworm
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

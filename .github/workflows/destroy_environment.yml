@@ -1,0 +1,18 @@
+name: 5 - Destroy Testing Environment
+run-name: 'Destroy env ${{ inputs.domain }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Fully qualified domain of the environment to be deleted'
+        required: true
+        type: string
+
+jobs:
+  destroy-environment:
+    name: Destroy ${{ inputs.domain }}
+    uses: ./.github/workflows/lib_destroy_environment.yml
+    with:
+      domain: ${{ inputs.domain }}
+    secrets: inherit

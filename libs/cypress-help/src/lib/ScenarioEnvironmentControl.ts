@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import type { E2eRoutes } from '../../../../apps/startuphafen-backend/src/e2e-utilites/e2e-routes';
+import type { E2eRoutes } from '../../../../apps/startuphafen-backend/src/e2e-utilities/e2e-routes';
 
 import { createTRPCProxyClient } from '@trpc/client';
 import { waitForKeycloak } from './restarts/keycloak';
@@ -18,15 +18,9 @@ export interface CypressEnvironmentConfiguration {
    */
   useStartuphafen: 'always' | 'conditional' | 'never';
 
-  testserverUrl: string;
-
   startuphafenBackendUrl?: string;
-  syncUrl?: string;
-
-  mailServerUrl?: string;
 
   keycloakUrl?: string;
-  startuphafenFrontendHost?: string;
 }
 
 export interface EnvironmentControls {
@@ -73,10 +67,6 @@ export class ScenarioEnvironmentControl {
     return sIdentifier.toLowerCase().endsWith('p');
   }
 
-  syncAndApplyChangeInCypress() {
-    // warning disabled: Not a real promise in the context of Cypress
-  }
-
   async resetEnvironmentAsync(scenarioName: string) {
     console.log('Begin to reset the environment for scenario ' + scenarioName);
 
@@ -90,8 +80,6 @@ export class ScenarioEnvironmentControl {
     } else {
       console.log('Startuphafen is not used for scenario ' + scenarioName);
     }
-
-    await this.deleteAllTestMails();
   }
 
   private async waitForKeycloakReady() {
@@ -102,12 +90,6 @@ export class ScenarioEnvironmentControl {
       throw new Error(
         'startuphafen is enabled, but no keycloak url is configured?'
       );
-    }
-  }
-
-  private async deleteAllTestMails() {
-    if (this.options.mailServerUrl != null) {
-      return;
     }
   }
 

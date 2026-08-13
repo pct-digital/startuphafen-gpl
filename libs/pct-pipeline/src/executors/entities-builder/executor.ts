@@ -10,8 +10,7 @@ export default async function runExecutor(
   console.log('Executor ran for EntitiesBuilder', options);
 
   const filesRecord = await prepareAllEntitiesOutputs(
-    options.app,
-    options.migrationMode
+    options.app
   );
 
   for (const [fpath, fcontent] of Object.entries(filesRecord)) {

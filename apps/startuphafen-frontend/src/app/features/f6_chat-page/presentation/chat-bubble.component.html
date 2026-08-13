@@ -1,0 +1,148 @@
+<!-- Onboarding speech bubble - shown on first visit, dismissed on interaction -->
+<div
+  *ngIf="showHint && !isOpen"
+  data-testid="chat-bubble-hint"
+  class="fixed bottom-32 right-6 z-[79] w-60 max-w-[calc(100vw-3rem)] animate-hintPop"
+>
+  <div
+    class="relative rounded-2xl border border-[rgba(var(--sh-color-primary-rgb),0.2)] bg-white px-4 py-3 text-sm font-medium leading-snug text-gray-800 shadow-[0_14px_35px_rgba(15,23,42,0.18)]"
+  >
+    <button
+      type="button"
+      (click)="dismissHint()"
+      aria-label="Hinweis schließen"
+      data-testid="chat-bubble-hint-close"
+      class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-contrast shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[rgba(var(--sh-color-primary-rgb),0.25)]"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2.5"
+        stroke="currentColor"
+        class="h-3.5 w-3.5"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18 18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+
+    Dein KI-Hafenlotse - Ich helfe Dir gerne weiter!
+
+    <!-- Tail pointing down toward the button -->
+    <span
+      class="absolute -bottom-1.5 right-12 h-3 w-3 rotate-45 border-b border-r border-[rgba(var(--sh-color-primary-rgb),0.2)] bg-white"
+    ></span>
+  </div>
+</div>
+
+<!-- Chat Bubble Button - Always Visible -->
+<button
+  (click)="toggleChat.emit()"
+  type="button"
+  [attr.aria-label]="isOpen ? 'Chat schließen' : 'Chat öffnen'"
+  data-testid="chat-bubble-button"
+  class="fixed bottom-6 right-6 z-[80] flex h-24 w-24 items-center justify-center rounded-full border border-[rgba(var(--sh-color-primary-rgb),0.35)] bg-primary text-primary-contrast shadow-[0_18px_45px_rgba(var(--sh-color-primary-rgb),0.35)] transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[rgba(var(--sh-color-primary-rgb),0.25)]"
+>
+  <span class="sr-only">{{ isOpen ? 'Chat schließen' : 'Chat öffnen' }}</span>
+
+  <!-- Chat Icon - visible when closed -->
+  <svg
+    *ngIf="!isOpen"
+    width="49"
+    height="49"
+    viewBox="0 0 49 49"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-20 w-20 text-primary-contrast transition-all duration-300"
+  >
+    <circle cx="24.5" cy="24.5" r="24.5" fill="#1A7BAB" />
+    <path
+      d="M32.8571 15.8571H25.7857V14.05C26.2729 13.7828 26.5714 13.2643 26.5714 12.7143C26.5714 11.85 25.8643 11.1428 25 11.1428C24.1357 11.1428 23.4286 11.85 23.4286 12.7143C23.4286 13.2643 23.7271 13.7671 24.2143 14.05V15.8571H17.1429C15.4143 15.8571 14 17.2714 14 19V30C14 31.7285 15.4143 33.1428 17.1429 33.1428H18.7143V37.0714C18.7143 37.5114 19.06 37.8571 19.5 37.8571C19.7043 37.8571 19.9086 37.7785 20.05 37.6214L24.5286 33.1428H32.8414C34.57 33.1428 35.9843 31.7285 35.9843 30V19C35.9843 17.2714 34.57 15.8571 32.8414 15.8571H32.8571ZM20.2857 20.2885C21.15 20.2885 21.8571 20.9957 21.8571 21.86C21.8571 22.7243 21.15 23.4314 20.2857 23.4314C19.4214 23.4314 18.7143 22.7243 18.7143 21.86C18.7143 20.9957 19.4214 20.2885 20.2857 20.2885ZM30.6729 27.4228C27.1843 29.5285 22.8157 29.5285 19.3114 27.4228C18.8243 27.1243 18.6671 26.4957 18.9657 26.0085C19.2643 25.5214 19.8929 25.3643 20.38 25.6628C23.2243 27.3442 26.7757 27.3442 29.62 25.6628C30.1071 25.3643 30.7357 25.5214 31.0343 26.0085C31.3329 26.4957 31.1757 27.1243 30.6886 27.4228H30.6729ZM29.7143 23.4314C28.85 23.4314 28.1429 22.7243 28.1429 21.86C28.1429 20.9957 28.85 20.2885 29.7143 20.2885C30.5786 20.2885 31.2857 20.9957 31.2857 21.86C31.2857 22.7243 30.5786 23.4314 29.7143 23.4314Z"
+      fill="white"
+    />
+  </svg>
+
+  <!-- Chevron Up Icon - visible when open -->
+  <svg
+    *ngIf="isOpen"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="2"
+    stroke="currentColor"
+    class="h-8 w-8 text-primary-contrast transition-all duration-300"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="m4.5 15.75 7.5-7.5 7.5 7.5"
+    />
+  </svg>
+</button>
+
+<!-- Chat-Fenster -->
+<div
+  *ngIf="isOpen"
+  class="fixed bottom-24 left-2 right-2 top-20 z-[70] sm:top-auto sm:left-auto sm:right-10 sm:h-[80vh] sm:w-[38rem] lg:w-[62rem] transition-all duration-300 ease-out"
+  [class.animate-slideUp]="isOpen"
+>
+  <div
+    class="relative mx-auto flex h-full flex-col overflow-hidden rounded-[1.9rem] border shadow-[0_35px_70px_rgba(15,23,42,0.25)] sm:flex-row"
+    data-testid="chat-window"
+    style="
+      background: linear-gradient(
+        180deg,
+        rgba(var(--sh-color-primary-rgb), 0.05) 0%,
+        rgba(var(--sh-color-primary-rgb), 0.015) 100%
+      );
+      border-color: rgba(var(--sh-color-primary-rgb), 0.16);
+      backdrop-filter: blur(14px);
+    "
+  >
+    @if (!isHistoryCollapsed) {
+    <sh-chat-history
+      class="flex-1 sm:basis-1/3 sm:max-w-[33%]"
+      [isSessionLoading]="isSessionLoading"
+      [isSending]="isSending"
+      [sessions]="sessions"
+      [selectedSessionId]="selectedSessionId"
+      [editingSessionId]="editingSessionId"
+      [editedTitle]="editedTitle"
+      [sessionPendingDeletion]="sessionPendingDeletion"
+      [hasReachedSessionLimit]="hasReachedSessionLimit"
+      [sessionLimit]="sessionLimit"
+      (startNewChat)="startNewChat.emit()"
+      (selectSession)="selectSession.emit($event)"
+      (sessionRenameBegin)="sessionRenameBegin.emit($event)"
+      (editedTitleChange)="editedTitleChange.emit($event)"
+      (sessionRenameCommit)="sessionRenameCommit.emit($event)"
+      (sessionRenameCancel)="sessionRenameCancel.emit()"
+      (sessionDeleteRequested)="sessionDeleteRequested.emit($event)"
+      (sessionDeleteConfirmed)="sessionDeleteConfirmed.emit($event)"
+      (sessionDeleteCanceled)="sessionDeleteCanceled.emit()"
+    />
+    }
+
+    <sh-chat-conversation
+      class="flex-1"
+      [ngClass]="{
+        'sm:basis-2/3 sm:max-w-[67%]': !isHistoryCollapsed,
+        'sm:basis-full sm:max-w-full': isHistoryCollapsed
+      }"
+      [isHistoryCollapsed]="isHistoryCollapsed"
+      [conversationHistory]="conversationHistory"
+      [isSending]="isSending"
+      [isHistoryLoading]="isHistoryLoading"
+      [error]="error"
+      [currentMessage]="currentMessage"
+      (toggleHistory)="toggleHistory.emit()"
+      (closeChat)="closeChat.emit()"
+      (currentMessageChange)="currentMessageChange.emit($event)"
+      (messageSend)="messageSend.emit()"
+    />
+  </div>
+</div>

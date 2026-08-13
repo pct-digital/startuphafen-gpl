@@ -1,0 +1,248 @@
+@if(didError){
+<div class="flex w-full justify-center mt-20" data-testid="questionnaire-error">
+  <div class="relative mb-6 z-10 bg-white text-lg rounded-xl p-4">
+    Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut oder
+    wenden Sie sich an die Betreiber von startuphafen.sh.
+  </div>
+</div>
+}
+
+<div class="questionnaire-container max-w-4xl mx-auto p-6">
+  <div
+    class="absolute lg:top-28 left-0 w-full h-[400px]"
+    style="
+      background-color: rgba(var(--sh-color-primary-rgb), 0.2);
+      pointer-events: none;
+    "
+  >
+    <img
+      src="/assets/icons/sh-cutout.svg"
+      alt=""
+      class="absolute right-0 top-2 w-fit"
+    />
+  </div>
+  @if(!finishedQuestionnaire){
+  <sh-questionflow-top-tracker
+    [currentStepIndex]="currentStepIndex"
+    [projectName]="project?.name ?? ''"
+    [stepsLength]="steps.length"
+    [stepsLabel]="steps[currentStepIndex].label"
+  ></sh-questionflow-top-tracker>
+
+  <div class="acrylic p-8 pt-4 rounded-2xl shadow-md">
+    <div class="step-content mb-6">
+      <ng-container #componentContainer></ng-container>
+    </div>
+
+    <div class="navigation-buttons flex justify-between">
+      <button
+        type="button"
+        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 disabled:hover:bg-gray-200 rounded disabled:opacity-50"
+        [disabled]="!canGoBack()"
+        (click)="previousStep()"
+        data-testid="questionnaire-back"
+      >
+        Zurück
+      </button>
+
+      @if (isLastStep()) {
+      <button
+        type="button"
+        class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded"
+        (click)="finishQuestionnaire()"
+        data-testid="questionnaire-finish"
+      >
+        Abschließen
+      </button>
+      } @else {
+      <button
+        type="button"
+        class="px-6 py-2 bg-primary text-white rounded hover:bg-primary-shade disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-not-allowed"
+        [disabled]="isCurrentStepBusy()"
+        (click)="submitCurrentStep()"
+        data-testid="questionnaire-next"
+      >
+        Weiter
+      </button>
+      }
+    </div>
+  </div>
+  } @else if (!lookedAtOverview) {
+  <div class="flex flex-col gap-6">
+    <sh-questionflow-answer-overview
+      [answers]="getValidAnswers()"
+      [steps]="steps"
+      [stSent]="stSent"
+      [gwSent]="gwSent"
+      [hwkSent]="hwkMailStatus?.status === 'sent'"
+      (continue)="handleContinueToSending()"
+      (back)="overviewBack()"
+    ></sh-questionflow-answer-overview>
+  </div>
+  } @else { @if (!roles.includes("bundID-high")) {
+  <div shCard class="max-w-[778px] z-10 relative">
+    <div shCardTitle>Du darfst Deinen Antrag nicht abschicken!</div>
+    <div shCardSubtitle>
+      Du hast Dich noch nicht mit Deinem Personalausweis über BundID
+      verifiziert. Hole das nun nach indem Du Deinen Ausweis in Deinem BundID
+      Konto hinterlegst und Dich neu anmeldest, oder Dich direkt mit Deinem
+      Personalausweis anmeldest. Im Anschluss kannst Du Deine Anträge
+      abschicken.
+    </div>
+  </div>
+  } @else { @if (shouldShowMeistergruendungspraemieReminder()) {
+  <div
+    class="mb-4 rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+    data-testid="meistergruendungspraemie-reminder"
+  >
+    <p>
+      Bist Du Meister im Handwerk und startest im Haupterwerb? Beantrage die
+      Meistergründungsprämie vor der Gewerbeanmeldung.
+    </p>
+    <p class="mt-2">
+      Offizielle Infos:
+      <a
+        [href]="meistergruendungspraemieUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline"
+      >
+        Meistergründungsprämie Schleswig-Holstein
+      </a>
+    </p>
+  </div>
+  } @if((errorMessageERiC != null && errorMessageERiC.length !== 0) ||
+  errorMessageOZG !== null){
+  <div class="z-20 left-5 md:left-36 top-28 md:top-60 fixed">
+    <sh-support-button-container></sh-support-button-container>
+  </div>
+  }
+  <div
+    class="flex flex-col lg:flex lg:flex-row z-10 relative justify-center mt-4"
+  >
+    <sh-send-application
+      class="p-4"
+      [catalogueId]="catalogueId"
+      [sendDisabled]="stSent || (enableAmtSelection && uniqueAmts.length === 0)"
+      [sent]="stSent"
+      [title]="isGewADisabled ? '' : '1'"
+      [downloadDisabled]="downloadDisabled"
+      [errorMessage]="errorMessageERiC"
+      [errorCardTitle]="'Fehler bei der Übertragung'"
+      [applicationType]="'elster'"
+      (sendData)="sendData($event)"
+      [subtitle]="this.project?.name ?? 'Fehler beim Laden des Projektnamens'"
+      (downloadData)="downloadData()"
+      content="Sende jetzt Deine steuerliche Erfassung ab!"
+    ></sh-send-application>
+    @if(!isGewADisabled) {
+    <sh-send-application
+      class="p-4"
+      [applicationType]="'gewerbeamt'"
+      [catalogueId]="catalogueId"
+      [title]="'2'"
+      (sendData)="sendOZGData()"
+      [sendDisabled]="
+        gwSent ||
+        (enableAmtSelection && uniqueAmts.length > 1 && !selectedAmtDomain) ||
+        (enableAmtSelection && uniqueAmts.length === 0)
+      "
+      [lockSend]="ozgSendInFlight"
+      [sent]="gwSent"
+      [downloadDisabled]="ozgDownloadDisabled"
+      [errorCardTitle]="'Fehler bei der Übertragung'"
+      [errorMessage]="errorMessageOZG"
+      [downloadVisible]="true"
+      (downloadData)="downloadOZGDoc()"
+      [subtitle]="this.project?.name ?? 'Fehler beim Laden des Projektnamens'"
+      content="Sende jetzt Deine Gewerbeanmeldung ab!"
+      [sendButtonText]="'Senden'"
+    >
+      @if(enableAmtSelection && uniqueAmts.length > 1) {
+      <label class="block text-sm font-medium text-gray-700 mt-2">
+        Zuständiges Amt auswählen
+      </label>
+      <div class="mt-2 relative w-full sm:w-5/6 mx-auto">
+        <select
+          class="w-full h-10 md:h-12 text-primary text-base md:text-lg bg-[rgba(var(--sh-color-primary-rgb),0.09)] border border-gray-200 rounded-xl pl-4 pr-10 py-2 transition duration-200 ease focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary appearance-none cursor-pointer hover:border-primary"
+          [value]="selectedAmtDomain ?? ''"
+          (change)="onSelectedAmtDomainChange($event)"
+        >
+          <option value="">Bitte auswählen...</option>
+          @for(amt of uniqueAmts; track amt.amtCode + '-' + amt.domain) {
+          <option [value]="amt.domain">{{ amt.amt }}</option>
+          }
+        </select>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          style="pointer-events: none"
+          class="size-5 md:size-6 absolute top-1/2 -translate-y-1/2 right-3 text-primary"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+          />
+        </svg>
+      </div>
+      }
+    </sh-send-application>
+    } @if(isHwkFlowAllowed() && hasHwkAnswers()) {
+    <sh-send-application
+      class="p-4"
+      [applicationType]="'hwk'"
+      [catalogueId]="catalogueId"
+      [title]="'3'"
+      (sendData)="sendHwkMailManual()"
+      [sendDisabled]="
+        hwkMailStatus?.status === 'sent' ||
+        (enableAmtSelection && uniqueAmts.length === 0)
+      "
+      [sent]="hwkMailStatus?.status === 'sent'"
+      [downloadDisabled]="hwkPdfLoading"
+      [lockSend]="hwkPdfLoading || hwkSendInFlight"
+      [errorCardTitle]="'HWK-Antrag kann nicht versendet werden'"
+      [errorMessage]="getHwkErrorMessage()"
+      [downloadVisible]="true"
+      (downloadData)="downloadHwkPdf()"
+      [subtitle]="this.project?.name ?? 'Fehler beim Laden des Projektnamens'"
+      content="Sende jetzt Deinen Handwerkskammer-Antrag ab!"
+    ></sh-send-application>
+    }
+  </div>
+  @if(allRequiredApplicationsSent()) {
+  <div
+    class="mt-4 rounded border border-green-200 bg-green-50 p-4 text-sm text-green-900"
+    data-testid="all-applications-sent-message"
+  >
+    Du hast es geschafft, bei Fragen stehen dir deine Gründungslotsen beiseite.
+  </div>
+  }
+  } }
+</div>
+
+<ng-template #DownloadNotice>
+  <div shCard class="flex flex-col items-center justify-center">
+    <div shCardTitle>Wichtig: Protokoll jetzt speichern!</div>
+    <div shCardSubtitle>
+      Dein Antrag wurde erfolgreich abgesendet. Im nächsten Schritt kannst Du
+      unter „Angaben herunterladen“ Dein Protokoll herunterladen und speichern.
+      Bitte speichere das Protokoll unbedingt ab, da Deine Informationen aus
+      Datenschutzgründen nicht auf startuphafen.sh gespeichert werden. Ein
+      späterer Zugriff auf das Protokoll ist daher nicht möglich.
+    </div>
+    <div class="button-container flex justify-center items-center">
+      <div
+        shButton
+        (click)="close()"
+        data-testid="questionnaire-download-notice"
+      >
+        Ok
+      </div>
+    </div>
+  </div>
+</ng-template>

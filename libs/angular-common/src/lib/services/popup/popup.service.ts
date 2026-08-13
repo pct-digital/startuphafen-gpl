@@ -27,7 +27,6 @@ export class PopupService implements OnDestroy {
   open(
     content: TemplateRef<any>,
     options?: {
-      title?: string;
       width?: number;
       height?: number;
       context?: any[];
@@ -38,7 +37,6 @@ export class PopupService implements OnDestroy {
       projectableNodes: [content.createEmbeddedView(null).rootNodes],
     });
 
-    this.popupRef.instance.title = options?.title;
     this.popupRef.instance.width = options?.width;
     this.popupRef.instance.height = options?.height;
 
@@ -64,10 +62,6 @@ export class PopupService implements OnDestroy {
     }
 
     this.popupNotifier$?.complete();
-  }
-
-  contextClicked() {
-    this.popupRef?.instance.close();
   }
 
   ngOnDestroy() {

@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  caddy:
+    image: caddy:2.11-alpine
+    container_name: simple-test-app-web
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./index.html:/srv/index.html:ro
+      - simple-test-app-caddy-data:/data
+      - simple-test-app-caddy-config:/config
+    environment:
+      - CADDY_DOMAIN=${CADDY_DOMAIN:-localhost}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  simple-test-app-caddy-data:
+    external: true
+  simple-test-app-caddy-config:
+    external: true

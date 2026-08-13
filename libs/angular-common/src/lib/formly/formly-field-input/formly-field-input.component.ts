@@ -8,17 +8,12 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
   standalone: true,
   imports: [FormlyModule, ReactiveFormsModule, CommonModule],
   template: `
-    <div
-      class="flex flex-col gap-1"
-      [ngClass]="{
-          'mt-8': !props['additionalField'],
-          'mt-6': props['additionalField'],
-        }"
-    >
+    <div class="flex flex-col gap-1">
       <div class="relative">
         <input
-          class="w-full text-tertiary text-lg md:text-xl p-4 md:p-6 border rounded-2xl"
+          class="w-full h-14 text-tertiary text-md md:text-lg p-4 md:p-6 border rounded-2xl"
           [class.border-red-500]="formControl.touched && formControl.errors?.['required']"
+          [ngClass]="props['disabled'] ? 'cursor-not-allowed' : ''"
           style="background-color: rgba(var(--sh-color-primary-rgb), 0.09)"
           type="input"
           [name]="props['name']"
@@ -35,9 +30,14 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
         }
       </div>
     </div>
-    @if (formControl.touched && formControl.errors?.['required']) {
+    @if (formControl.touched && formControl.errors) { @if
+    (formControl.errors['required']) {
     <div class="text-red-500 text-sm mt-1">Dieses Feld ist erforderlich</div>
-    }
+    } @else { @for (errorKey of getErrorKeys(); track errorKey) {
+    <div class="text-red-500 text-sm mt-1">
+      {{ getErrorMessage(errorKey) }}
+    </div>
+    } } }
   `,
   styles: ``,
 })
@@ -49,5 +49,37 @@ export class FormlyFieldInputComponent extends FieldType<FieldTypeConfig> {
         this.formControl.setValue(trimmedValue);
       }
     }
+  }
+
+  getErrorKeys(): string[] {
+    if (!this.formControl.errors) return [];
+    return Object.keys(this.formControl.errors).filter(
+      (key) => key !== 'required'
+    );
+  }
+
+  getErrorMessage(errorKey: string): string | undefined {
+    // Check if there's a custom message defined in field.validation.messages
+    if (this.field.validation?.messages?.[errorKey]) {
+      const message = this.field.validation.messages[errorKey];
+      if (typeof message === 'function') {
+        const result = message(this.formControl.errors?.[errorKey], this.field);
+        return typeof result === 'string' ? result : undefined;
+      }
+      return typeof message === 'string' ? message : undefined;
+    }
+
+    // Check if there's a message defined directly in the validator
+    if (this.field.validators?.[errorKey]?.message) {
+      const message = this.field.validators[errorKey].message;
+      if (typeof message === 'function') {
+        const result = message(this.formControl.errors?.[errorKey], this.field);
+        return typeof result === 'string' ? result : undefined;
+      }
+      return typeof message === 'string' ? message : undefined;
+    }
+
+    // Fallback to a generic error message
+    return 'Ungültiger Wert';
   }
 }

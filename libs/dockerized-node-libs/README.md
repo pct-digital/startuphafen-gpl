@@ -1,7 +1,6 @@
 # dockerized-node-libs
 
-This library was generated with [Nx](https://nx.dev).
+Test infrastructure that spins up dockerized services (PostgreSQL with pgvector) for integration tests.
 
 ## Running unit tests
 
-Run `nx test dockerized-node-libs` to execute the unit tests via [Jest](https://jestjs.io).

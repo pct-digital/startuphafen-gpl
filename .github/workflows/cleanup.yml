@@ -25,8 +25,9 @@ jobs:
           # Get all releases and process them
           gh api \
             -H "Accept: application/vnd.github+json" \
+            --paginate \
             /repos/${{ github.repository }}/releases | \
-          jq -r '.[] | select(.created_at | fromdateiso8601 < '$cutoff') | .id' | \
+          jq -r --arg cutoff "$cutoff" '.[] | select(.created_at | fromdateiso8601 < ($cutoff | tonumber)) | .id' | \
           while read -r release_id; do
             echo "Deleting release $release_id..."
             gh api \

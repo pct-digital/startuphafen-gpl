@@ -1,0 +1,101 @@
+name: 97 - Reusable Destroy Environment Workflow, ignore me
+
+on:
+  workflow_call:
+    inputs:
+      domain:
+        type: string
+        required: true
+
+jobs:
+  destroy-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print workflow invocation context
+        run: |
+          echo "[debug] Repository: $GITHUB_REPOSITORY"
+          echo "[debug] Run ID: $GITHUB_RUN_ID"
+          echo "[debug] Actor: $GITHUB_ACTOR"
+          echo "[debug] Ref: $GITHUB_REF"
+          echo "[debug] Inputs.domain='${{ inputs.domain }}'"
+
+      - name: Add Multihost SSH key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          ssh-keyscan "${{ vars.MULTI_HOST_DOMAIN }}" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "${{ secrets.MULTI_HOST_SSH_KEY }}" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add ~/.ssh/deploy_key
+          echo "[debug] SSH key added"
+
+      - name: Validate environment & container port
+        id: validate
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_FOR_ENVS }}
+        run: |
+          set -euo pipefail
+          DOMAIN='${{ inputs.domain }}'
+          SAFE_DOMAIN="${DOMAIN//./-}"
+          REPO="$GITHUB_REPOSITORY"
+          echo "[info] Checking if GitHub Environment '$DOMAIN' exists in $REPO"
+          EXISTS=$(node tools/deploy3/bin/gh-envs.cjs exists "$DOMAIN" --repo "$REPO") || { echo "[error] Failed existence check" >&2; exit 1; }
+          echo "[debug] Environment exists flag: $EXISTS (1=yes,0=no)"
+          if [ "$EXISTS" = "1" ]; then
+            echo "[info] Environment '$DOMAIN' exists; retrieving DEPLOY_SSH_PORT variable"
+            DEPLOY_SSH_PORT=$(node tools/deploy3/bin/gh-envs.cjs print "$DOMAIN" DEPLOY_SSH_PORT --repo "$REPO" || true)
+            if [ -z "${DEPLOY_SSH_PORT:-}" ]; then
+              echo "[error] DEPLOY_SSH_PORT variable not found in environment '$DOMAIN'" >&2
+              exit 1
+            fi
+            echo "[debug] DEPLOY_SSH_PORT from env: $DEPLOY_SSH_PORT"
+            echo "[info] Checking for PREVENT_DELETION protection"
+            PREVENT_DELETION=$(node tools/deploy3/bin/gh-envs.cjs print "$DOMAIN" PREVENT_DELETION --repo "$REPO" || true)
+            if [ -n "${PREVENT_DELETION:-}" ]; then
+              echo "[error] Environment '$DOMAIN' is protected by PREVENT_DELETION flag. Aborting deletion." >&2
+              exit 1
+            fi
+            echo "[debug] PREVENT_DELETION check passed; environment is not protected"
+            echo "[info] Inspecting container '$SAFE_DOMAIN' on host ${{ vars.MULTI_HOST_DOMAIN }}"
+            # Using an explicit key lookup to avoid Go template loop variables ($k,$v) which
+            # were being interpreted by bash under 'set -u' causing 'k: unbound variable'.
+            # Equivalent to prior logic: fetch the host port mapped to container's 22/tcp.
+            REMOTE_PORT=$(ssh ${{ vars.MULTI_HOST_USER }}@${{ vars.MULTI_HOST_DOMAIN }} "sudo docker inspect -f '{{ (index (index .NetworkSettings.Ports \"22/tcp\") 0).HostPort }}' $SAFE_DOMAIN" 2>/dev/null || true)
+            if [ -z "${REMOTE_PORT:-}" ]; then
+              echo "[error] Container '$SAFE_DOMAIN' not found or has no 22/tcp mapping; aborting destroy." >&2
+              exit 1
+            fi
+            echo "[debug] Remote container 22/tcp mapped host port: $REMOTE_PORT"
+            if [ "$DEPLOY_SSH_PORT" != "$REMOTE_PORT" ]; then
+              echo "[error] Port mismatch: environment DEPLOY_SSH_PORT=$DEPLOY_SSH_PORT but container exposes $REMOTE_PORT. Aborting (no deletion or stop)." >&2
+              exit 1
+            fi
+            echo "[info] Port match confirmed ($DEPLOY_SSH_PORT). Deleting environment before stopping container."
+            node tools/deploy3/bin/gh-envs.cjs delete "$DOMAIN" --repo "$REPO" || { echo "[error] Failed to delete environment '$DOMAIN'" >&2; exit 1; }
+            echo "[debug] Environment '$DOMAIN' deleted successfully"
+            echo "proceed_stop=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "[warn] Environment '$DOMAIN' does not exist; will proceed to stop container if present."
+            echo "proceed_stop=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop environment container on multi-host
+        if: steps.validate.outputs.proceed_stop == '1'
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          set -euo pipefail
+          DOMAIN='${{ inputs.domain }}'
+          SAFE_DOMAIN="${DOMAIN//./-}" # replace dots with dashes
+          echo "[info] Stopping container '$SAFE_DOMAIN' on ${{ vars.MULTI_HOST_DOMAIN }}"
+          ssh ${{ vars.MULTI_HOST_USER }}@${{ vars.MULTI_HOST_DOMAIN }} "sudo docker stop $SAFE_DOMAIN" \
+            && echo "[success] Container '$SAFE_DOMAIN' stopped" \
+            || echo "[warn] Container '$SAFE_DOMAIN' not running or does not exist"
+          echo "[debug] Destroy workflow completed"

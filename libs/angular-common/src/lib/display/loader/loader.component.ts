@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { Component } from '@angular/core';
 import { PctLoaderService } from '../../services/loader.service';
 
 @Component({
@@ -21,11 +21,9 @@ import { PctLoaderService } from '../../services/loader.service';
   ],
 })
 export class LoaderComponent {
-  forceShow = input(false);
-
   constructor(private loaderService: PctLoaderService) {}
 
   get isVisible(): boolean {
-    return this.forceShow() || this.loaderService.isLoading();
+    return this.loaderService.isLoading();
   }
 }

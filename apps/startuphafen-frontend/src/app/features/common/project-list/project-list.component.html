@@ -1,46 +1,91 @@
 <div data-testid="project-items" class="grid lg:grid-cols-2 px-5 gap-4">
   @for (project of projectList.slice(visibleStartIndex, visibleStartIndex +
   visibleSliceSize); track $index) {
-  <div class="flex flex-col justify-center items-center">
+  <div
+    class="flex flex-col justify-center items-center w-full cursor-pointer transition-transform hover:scale-[1.01] rounded-xl hover:shadow-md"
+    (click)="projectEditClick.emit(project.id)"
+    (keydown.enter)="projectEditClick.emit(project.id)"
+    data-testid="editButton"
+    tabindex="0"
+  >
     <div
-      class="border rounded-xl flex justify-center items-center text-primary-contrast py-6 px-12 sm:px-28 md:px-40 lg:p-3"
+      class="border rounded-xl flex justify-center items-center text-primary-contrast py-6 px-3 sm:px-4 lg:px-3 w-full max-w-xs sm:max-w-sm overflow-hidden"
       style="background-color: rgba(var(--sh-color-primary-rgb), 0.09)"
     >
-      <div class="flex flex-col justify-center items-center">
-        <span class="text-xl text-center text-secondary my-6">{{
-          project.name
-        }}</span>
-        <div class="flex flex-wrap justify-center items-center gap-x-4">
-          <button
-            (click)="projectEditClick.emit(project.id)"
-            [attr.data-testid]="'editButton'"
-            tabindex="0"
-            (keydown.enter)="projectEditClick.emit(project.id)"
-            class="bg-primary hover:bg-primary-shade rounded-full px-8 h-12 text-lg text-white mb-6"
+      <div class="flex flex-col justify-center items-center w-full mx-3">
+        <span
+          class="text-xl text-center text-secondary my-4 inline-block w-full"
+        >
+          @if (editingProjectId === project.id) {
+          <div class="flex items-center justify-center gap-2 w-full">
+            <input
+              shInput
+              type="text"
+              [(ngModel)]="editingProjectName"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="
+                saveEditingProjectName(project); $event.stopPropagation()
+              "
+              (keydown.escape)="cancelEditingProjectName()"
+              class="flex-1 min-w-full h-1"
+              autofocus
+              data-testid="projectNameInput"
+            />
+            <button
+              (click)="
+                saveEditingProjectName(project); $event.stopPropagation()
+              "
+              class="text-primary hover:text-primary-shade cursor-pointer flex-shrink-0"
+              data-testid="projectNameSaveButton"
+              title="Speichern"
+            >
+              <span
+                [ngStyle]="{
+                    'mask-image': 'url(/assets/icons/solid/check-solid.svg)',
+                    '-webkit-mask-image': 'url(/assets/icons/solid/check-solid.svg)',
+                    'background-color': 'currentColor',
+                    'background-position': 'center',
+                    'mask-repeat': 'no-repeat',
+                  }"
+                class="w-5 h-5 inline-block"
+              >
+              </span>
+            </button>
+          </div>
+          } @else {
+          <span
+            (click)="startEditingProjectName(project); $event.stopPropagation()"
+            class="cursor-pointer text-primary hover:text-primary-shade hover:underline"
+            data-testid="projectNameEdit"
           >
-            Bearbeiten
-          </button>
-          @if (!isPopup) {
+            {{ project.name }}
+          </span>
+          }
+        </span>
+        <div class="w-full flex justify-start h-8">
+          @if(!project.gwSent && !project.stSent){
           <button
-            (click)="onProjectDeleteClicked(project)"
+            (click)="onProjectDeleteClicked(project); $event.stopPropagation()"
             [attr.data-testid]="'deleteButton'"
-            class="hover:bg-primary-shade rounded-full bg-primary w-12 h-12 mb-6 disabled:opacity-50 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
-            [disabled]="project.gewASent || project.steErSent"
+            class="hover:bg-primary-shade rounded-full bg-primary w-8 h-8 disabled:opacity-50 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+            [disabled]="project.gwSent || project.stSent"
           >
             <div class="flex justify-center ml-0.5">
               <span
                 [ngStyle]="{
-              'mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
-              '-webkit-mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
-              'background-color': 'white',
-              'background-position': 'center',
-              'mask-repeat': 'no-repeat',
-            }"
-                class="w-5 h-5"
+                  'mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
+                  '-webkit-mask-image': 'url(/assets/icons/solid/trash-sharp-solid.svg)',
+                  'background-color': 'white',
+                  'background-position': 'center',
+                  'mask-repeat': 'no-repeat',
+                }"
+                class="w-4 h-4"
               >
               </span>
             </div>
           </button>
+          } @else {
+          <span class="w-8 h-8 invisible" aria-hidden="true"></span>
           }
         </div>
       </div>
@@ -49,35 +94,35 @@
   }
 </div>
 
-@if(!isPopup || visibleSliceSize === 1) {
 <div class="flex justify-center mt-5">
-  <button
-    (click)="scrollLeft()"
-    [attr.data-testid]="'scrollLeftButton'"
-    tabindex="0"
-    (keydown.enter)="scrollLeft()"
-    [ngStyle]="{
-              'mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
-              '-webkit-mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
-              'background-color': 'var(--sh-color-primary)',
-              'background-position': 'center',
-              'mask-repeat': 'no-repeat',
-            }"
-    class="w-8 h-8 mr-4"
-  ></button>
-  <button
-    (click)="scrollRight()"
-    [attr.data-testid]="'scrollRightButton'"
-    tabindex="0"
-    (keydown.enter)="scrollRight()"
-    [ngStyle]="{
-              'mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
-              '-webkit-mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
-              'background-color': 'var(--sh-color-primary)',
-              'background-position': 'center',
-              'mask-repeat': 'no-repeat',
-            }"
-    class="w-8 h-8"
-  ></button>
+  <div tabindex="0" (keydown.enter)="scrollLeft()">
+    <button
+      (click)="scrollLeft()"
+      [attr.data-testid]="'scrollLeftButton'"
+      tabindex="-1"
+      [ngStyle]="{
+                'mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/solid/angle-left-sharp-solid.svg)',
+                'background-color': 'var(--sh-color-primary)',
+                'background-position': 'center',
+                'mask-repeat': 'no-repeat',
+              }"
+      class="w-8 h-8 mr-4"
+    ></button>
+  </div>
+  <div tabindex="0" (keydown.enter)="scrollRight()">
+    <button
+      (click)="scrollRight()"
+      [attr.data-testid]="'scrollRightButton'"
+      tabindex="-1"
+      [ngStyle]="{
+                'mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
+                '-webkit-mask-image': 'url(/assets/icons/solid/angle-right-sharp-solid.svg)',
+                'background-color': 'var(--sh-color-primary)',
+                'background-position': 'center',
+                'mask-repeat': 'no-repeat',
+              }"
+      class="w-8 h-8"
+    ></button>
+  </div>
 </div>
-}

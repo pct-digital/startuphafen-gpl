@@ -1,6 +1,6 @@
 # spectator-help
 
-This library was generated with [Nx](https://nx.dev).
+Test helpers for @ngneat/spectator, including a typed mock tRPC client factory.
 
 ## Running unit tests
 

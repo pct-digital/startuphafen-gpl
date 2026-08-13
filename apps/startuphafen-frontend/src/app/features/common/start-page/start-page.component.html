@@ -4,15 +4,16 @@
       data-testid="start-page-title"
       class="text-4xl md:text-5xl text-secondary text-center font-bold"
     >
-      {{ getStartPageText()?.title }}
+      {{ getStartPageText().title }}
     </h1>
   </div>
 
   <section class="py-6 md:py-12">
     <div class="w-full mx-auto flex justify-center">
-      <p class="text-lg md:text-xl text-tertiary text-center max-w-4xl">
-        {{ getStartPageText()?.text }}
-      </p>
+      <div
+        class="text-lg md:text-xl text-tertiary max-w-4xl markdown-content"
+        [innerHTML]="getStartPageText().text"
+      ></div>
     </div>
   </section>
 
@@ -36,6 +37,7 @@
               }"
               class="w-16 h-16"
               aria-hidden="true"
+              [title]="'Symbol von ' + item.label"
             >
             </span>
             <h2
@@ -48,6 +50,7 @@
               [projectList]="projects"
               (projectDeleteClick)="deleteProject($event)"
               (projectEditClick)="editProject($event)"
+              (projectNameChange)="editProjectName($event.id, $event.newName)"
               class="py-5 w-full"
             ></sh-project-list>
             } @else {
@@ -83,10 +86,33 @@
   </section>
 </div>
 
+<ng-template #errorPopup>
+  <div class="flex flex-col items-center p-12 md:p-20 gap-4">
+    <div shCardTitle>Fehler beim Lesen des Projekts!</div>
+    <div shCardSubtitle class="mt-4">
+      Das Projekt hat keine Zuordnung zu einer Gesellschaftsform und kann nicht
+      editiert werden. Bitte erstellen Sie ein neues Projekt.
+    </div>
+    <button shButton (click)="closePopup()" class="w-full mt-8 md:w-auto">
+      OK
+    </button>
+  </div>
+</ng-template>
+
 <ng-template #createProjectPopup>
   <div class="flex flex-col items-center p-12 md:p-20gap-4">
     <div shCardTitle>Jetzt Startup anlegen</div>
     <div shCardSubtitle>Wie willst Du Dein Startup nennen?</div>
+    <div
+      class="mt-4 w-full max-w-sm mb-2 rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+      data-testid="project-deletion-notice"
+    >
+      <p>
+        Bitte stelle sicher, dass Du alle Anträge innerhalb von 7 Tagen
+        absendest! Aus Datenschutzgründen werden alle Anträge nach 7 Tagen von
+        startuphafen.sh gelöscht.
+      </p>
+    </div>
     <div shCardInner class="flex flex-col items-center gap-y-4 w-full">
       <input
         shInput
@@ -94,6 +120,7 @@
         type="text"
         data-testid="project-name-input"
         class="w-full"
+        (keyup.enter)="saveProject()"
       />
       <button shButton (click)="saveProject()" class="w-full md:w-auto">
         Loslegen!
@@ -105,7 +132,7 @@
 <ng-template #deleteProjectPopup>
   <div class="flex flex-col items-center p-12 md:p-20 gap-4">
     <div shCardTitle>Projekt löschen</div>
-    <div shCardSubtitle>Möchtest du das Projekt wirklich löschen?</div>
+    <div shCardSubtitle>Möchtest Du das Projekt wirklich löschen?</div>
     <div shCardInner class="flex flex-col items-center">
       <button
         shButton

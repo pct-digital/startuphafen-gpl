@@ -6,8 +6,8 @@ publiccodeYmlVersion: "0.2"
 name: Startuphafen
 url: "https://github.com/pct-digital/startuphafen-gpl"
 landingURL: "https://www.startuphafen.sh"
-softwareVersion: "1.0.0"
-releaseDate: "2025-03-25"
+softwareVersion: "2.0.0"
+releaseDate: "2026-08-13"
 developmentStatus: beta
 logo: logo.png
 platforms:

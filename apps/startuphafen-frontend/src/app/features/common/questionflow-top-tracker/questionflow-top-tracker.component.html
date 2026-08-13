@@ -1,40 +1,171 @@
 <div
-  class="flex justify-center space-x-6 py-3 px-8 bg-[#ffffff] shadow-lg rounded-full mt-8 max-w-max sm:max-w-[32rem] overflow-auto"
+  class="project-header relative mb-6 acrylic rounded-2xl shadow-md px-8 py-4 mt-8"
 >
-  <div class="relative flex flex-col items-center z-10 gap-2">
-    <button
-      class="w-8 h-8 text-lg flex items-center justify-center rounded-full border-2 font-bold bg-primary text-white border-secondary"
-    >
-      {{ this.tracking.length }}
-    </button>
-    <div class="relative">
-      <div
-        class="w-[240px] h-3 rounded-md"
-        style="background-color: rgba(var(--sh-color-primary-rgb), 0.1)"
-      ></div>
-      <div
-        class="absolute h-3 top-0 rounded-md"
-        [style]="
-          'width: ' +
-          progressWidth +
-          'px; background-color: rgba(var(--sh-color-primary-rgb), 0.4)'
-        "
-      ></div>
-      <svg
-        width="40px"
-        height="40px"
-        viewBox="0 0 512 512"
-        xmlns="http://www.w3.org/2000/svg"
-        class="absolute -top-5 transition-transform duration-300 ease-in-out"
-        [style]="'transform: translateX(' + boatPosition + 'px);'"
+  <div class="flex justify-between">
+    <h1 class="text-3xl font-bold mb-2 break-all">{{ projectName }}</h1>
+    <div class="flex">
+      <button
+        shButton
+        (click)="openFeedbackPopup()"
+        class="!rounded-full !w-8 !h-8 !p-0 shadow-lg hover:shadow-xl transition-all duration-200 mr-1"
+        data-testid="feedback-button"
+        aria-label="Rückmeldung geben"
+        title="Rückmeldung geben"
       >
-        <path
-          fill="#1a7bab"
-          stroke="#ffffff"
-          stroke-width="1"
-          d="M232.54 67.154l-17.08 5.692L241.513 151h18.976zM71.28 106.707l-14.56 10.586L71 136.928V230h18v-68.322L161.234 261h22.258zM272 117v18h39v16h18v-16h39v-18zm-23 52v126h108.943l-5.111-46H279v-80zm48 0v62h53.834l-6.889-62zM89 279v16h110v-16zm-70.012 34l41.248 110h319.68l114.25-110H140.588C157.022 318.35 169 333.85 169 352c0 22.537-18.463 41-41 41s-41-18.463-41-41c0-18.15 11.978-33.65 28.412-39zM128 329c-12.81 0-23 10.19-23 23s10.19 23 23 23s23-10.19-23-23zm208 0h80v18h-80zM96 439c-28.777 2.338-51.11 8.201-78.61 16.387l5.22 17.226C45.822 467.213 71.59 457.287 96 457c23.665 0 49.275 16 80 16s56.335-16 80-16s49.275 16 80 16s56.335-16 80-16c27.734 2.18 46.87 7.726 73.39 15.613l5.22-17.226C468.536 448.762 443.471 439.273 416 439c-30.725 0-56.335 16-80 16s-49.275-16-80-16s-56.335 16-80 16s-49.275-16-80-16z"
+        <img
+          src="/assets/icons/solid/comment-dots-sharp-solid.svg"
+          alt="Kontakt"
+          style="filter: brightness(0) invert(1)"
+          class="ml-[0.4rem] w-5 h-5"
         />
-      </svg>
+      </button>
+      <button
+        shButton
+        (click)="openContactPopup()"
+        class="!rounded-full !w-8 !h-8 !p-0 shadow-lg hover:shadow-xl transition-all duration-200"
+        data-testid="contact-button"
+        aria-label="Kontakt aufnehmen"
+        title="Kontakt aufnehmen"
+      >
+        <img
+          src="/assets/icons/solid/telephone.svg"
+          alt="Kontakt"
+          style="filter: brightness(0) invert(1)"
+          class="ml-[0.4rem] w-5 h-5"
+        />
+      </button>
     </div>
   </div>
+  <div class="relative w-full">
+    <div class="w-full h-2.5 bg-gray-200 rounded-full"></div>
+    <div
+      class="absolute h-2.5 top-0 left-0 rounded-full bg-primary progress-bar-fill"
+      [style.width.%]="progressPercent"
+    ></div>
+    <svg
+      width="40px"
+      height="40px"
+      viewBox="0 0 512 512"
+      xmlns="http://www.w3.org/2000/svg"
+      class="absolute -top-5 left-0 progress-boat"
+      [style]="'left: calc(' + progressPercent + '% - 20px);'"
+    >
+      <path
+        fill="#1a7bab"
+        stroke="#ffffff"
+        stroke-width="1"
+        d="M232.54 67.154l-17.08 5.692L241.513 151h18.976zM71.28 106.707l-14.56 10.586L71 136.928V230h18v-68.322L161.234 261h22.258zM272 117v18h39v16h18v-16h39v-18zm-23 52v126h108.943l-5.111-46H279v-80zm48 0v62h53.834l-6.889-62zM89 279v16h110v-16zm-70.012 34l41.248 110h319.68l114.25-110H140.588C157.022 318.35 169 333.85 169 352c0 22.537-18.463 41-41 41s-41-18.463-41-41c0-18.15 11.978-33.65 28.412-39zM128 329c-12.81 0-23 10.19-23 23s10.19 23 23 23s23-10.19-23-23zm208 0h80v18h-80zM96 439c-28.777 2.338-51.11 8.201-78.61 16.387l5.22 17.226C45.822 467.213 71.59 457.287 96 457c23.665 0 49.275 16 80 16s56.335-16 80-16s49.275 16 80 16s56.335-16 80-16c27.734 2.18 46.87 7.726 73.39 15.613l5.22-17.226C468.536 448.762 443.471 439.273 416 439c-30.725 0-56.335 16-80 16s-49.275-16-80-16s-56.335 16-80 16s-49.275-16-80-16z"
+      />
+    </svg>
+  </div>
+  <p class="text-sm text-gray-600 mt-2">
+    Schritt {{ currentStepIndex + 1 }} von {{ stepsLength }}:
+    {{ stepsLabel }}
+  </p>
 </div>
+<ng-template #ContactInfo class="popup-sizing">
+  <div shCard class="flex flex-col items-center justify-center max-w-md">
+    <div shCardTitle>Kontakt & Support</div>
+    @if(contact == null){
+    <div shCardSubtitle class="text-center mb-6">
+      Zur Zeit gibt es keine direkten Gründungslotsen für Deinen Kreis. Bitte
+      wende Dich an die allgemeine Anfrageadresse von Deinem zuständigen Amt.
+    </div>
+    }@else {
+
+    <div shCardSubtitle class="text-center mb-6">
+      Brauchst Du Hilfe? Kontaktiere gerne einen der Gründungslotsen!
+    </div>
+
+    <!-- Photo -->
+    <div class="hidden lg:flex items-center absolute right-3 top-40">
+      @if (contact !== null) {
+      <img
+        class="rounded-full w-28 h-28 object-cover"
+        [src]="contact.foto.url"
+        [alt]="'Bild von Kontakperson ' + contact.name"
+      />
+      }
+    </div>
+    <div class="w-full space-y-8 pt-8">
+      <!-- Name -->
+      <div class="flex items-center space-x-3">
+        <img
+          src="/assets/icons/solid/user-sharp-solid.svg"
+          alt="Name"
+          class="w-5 h-5"
+        />
+        <div>
+          <div class="font-semibold">{{ contact.name }}</div>
+        </div>
+      </div>
+
+      <div class="pl-8">
+        <!-- Company -->
+        <div class="flex items-center space-x-3">
+          <img
+            src="/assets/icons/solid/circle-info-sharp-solid.svg"
+            alt="Unternehmen"
+            class="w-5 h-5"
+          />
+          <div>
+            <div class="font-semibold">Unternehmen</div>
+            <div class="text-sm text-gray-600">{{ contact.unternehmen }}</div>
+          </div>
+        </div>
+        <!-- Email -->
+        <div class="flex items-center space-x-3">
+          <img
+            src="/assets/icons/solid/envelope-sharp-solid.svg"
+            alt="Email"
+            class="w-5 h-5"
+          />
+          <div>
+            <div class="font-semibold">E-Mail</div>
+            <div class="text-sm text-gray-600">{{ contact.mailadresse }}</div>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="flex items-center space-x-3">
+          <img
+            src="/assets/icons/solid/telephone.svg"
+            alt="Telefon"
+            class="w-5 h-5"
+          />
+          <div>
+            <div class="font-semibold">Telefon</div>
+            <div class="text-sm text-gray-600">{{ contact.telefon }}</div>
+          </div>
+        </div>
+      </div>
+      <!-- FAQ Link -->
+      <div class="flex items-center space-x-3 pt-8">
+        <img
+          src="/assets/icons/solid/circle-question-sharp-solid.svg"
+          alt="FAQ"
+          class="w-5 h-5"
+        />
+        <div>
+          <div class="font-semibold">Häufige Fragen</div>
+          <div class="text-sm text-gray-600">
+            <a
+              (click)="routeToFAQ()"
+              class="hover:text-primary hover:underline cursor-pointer"
+            >
+              Besuchen Sie unsere FAQ-Sektion</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container flex justify-center items-center mt-6">
+      <div shButton (click)="close()">Schließen</div>
+    </div>
+    }
+  </div>
+</ng-template>
+<ng-template #Feedback class="popup-sizing">
+  <sh-feedback (close)="close()"></sh-feedback>
+</ng-template>

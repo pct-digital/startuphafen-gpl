@@ -10,9 +10,11 @@
 <ng-template #LogoutNotice>
   <div shCard class="flex flex-col items-center justify-center">
     <div shCardTitle>Hinweis</div>
-    <div shCardSubtitle>Bitte schließe nach dem Abmelden deinen Browser</div>
+    <div shCardSubtitle>Bitte schließe nach dem Abmelden Deinen Browser</div>
     <div class="button-container flex justify-center items-center">
-      <div shButton (click)="close()">Ok</div>
+      <div shButton (click)="close()" tabindex="0" (keydown.enter)="close()">
+        Ok
+      </div>
     </div>
   </div>
 </ng-template>

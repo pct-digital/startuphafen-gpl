@@ -1,3 +1,5 @@
+import { generateKeyPairSync } from 'crypto';
+import jwt from 'jsonwebtoken';
 import {
   buildCachedValidateJwtFunction,
   buildTimedCacheTimer,
@@ -136,96 +138,117 @@ describe('the openid token validator', () => {
       return keyMap[kid];
     });
 
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+    });
+    const privateKeyPem = privateKey.export({
+      type: 'pkcs8',
+      format: 'pem',
+    }) as string;
+    const publicKeyPem = publicKey.export({
+      type: 'spki',
+      format: 'pem',
+    }) as string;
+
+    const validPayload = {
+      sub: 'f816772a-4022-4f75-82b6-9bd1a70f122a',
+      typ: 'Bearer',
+      iss: 'http://localhost:4000/kc/realms/startuphafen',
+      aud: 'account',
+      azp: 'startuphafen',
+      realm_access: { roles: ['user'] },
+      name: 'Alice Liddel',
+      preferred_username: 'alice',
+      given_name: 'Alice',
+      family_name: 'Liddel',
+      email: 'alice@keycloak.org',
+      email_verified: false,
+    };
+
+    function signToken(
+      payload: Record<string, unknown>,
+      key: string,
+      kid = 'kid-1'
+    ) {
+      return jwt.sign(payload, key, {
+        algorithm: 'RS512',
+        header: { alg: 'RS512', kid, typ: 'JWT' },
+        expiresIn: '1h',
+      });
+    }
+
     beforeEach(() => {
       nowTime = 5_000;
       keyGetter.mockClear();
-      keyMap[
-        'P4YPUFOUpfTE7bWe3KuWBKOyh76Chl2k4T0Ki5hzKxw'
-      ] = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtCwfwaHEOuCPa+R6fb1M
-TJSnQsg5KLJoojdm5wvWjgln+CBQplIF+a4F+CVRDeUrdwAcnG1XRP8k2d/xH6I6
-uVHPvIJYIsBSPRFsePXb5WZka+tNB0o7oojCzN07oiduwqQAQpwdyu5C7dEbaSvJ
-Y2l/S7gfE80OvBrdGp7NcgIPZs9Zew1w1SK2CPMgRbxbCf/8uCZHFuYsWVfe7xIu
-ZgpSN0YZmwvMdpB1qjc8++6ZDjILo2elNqKLmgJ7rHFHrQI54LPu9wQvgQqNMfMG
-LvWWw3QeY/5/ZNg+wvSjDVKh9QabvCRwUeUimcEcwOjTsKde+vkq7tXec0TtEXma
-xQIDAQAB
------END PUBLIC KEY-----`;
+      keyMap['kid-1'] = publicKeyPem;
     });
 
     it('validates a jwt', async () => {
-      const jwt =
-        'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQNFlQVUZPVXBmVEU3YldlM0t1V0JLT3loNzZDaGwyazRUMEtpNWh6S3h3In0.eyJleHAiOjE3MTI1MDI0MTksImlhdCI6MTcxMjUwMjExOSwiYXV0aF90aW1lIjoxNzEyNTAyMTE5LCJqdGkiOiI3NDEzMzBmZi1kNjEwLTRiNjUtYThlOS04NzM3ZWIxMTRlZWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAva2MvcmVhbG1zL3BvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJmODE2NzcyYS00MDIyLTRmNzUtODJiNi05YmQxYTcwZjEyMmEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWwiLCJub25jZSI6ImZhYzJkZGJkLTEzZmQtNGYyOC04NDgxLWI1NTE0MzVhN2QwOSIsInNlc3Npb25fc3RhdGUiOiJmYWQ4OTMzYi04ZjRlLTQyOWYtOWIwOC0wNTU0MTEzYTQwYWQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmFkODkzM2ItOGY0ZS00MjlmLTliMDgtMDU1NDExM2E0MGFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiQWxpY2UgTGlkZGVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxpY2UiLCJnaXZlbl9uYW1lIjoiQWxpY2UiLCJmYW1pbHlfbmFtZSI6IkxpZGRlbCIsImVtYWlsIjoiYWxpY2VAa2V5Y2xvYWsub3JnIn0.Ok4WxJtYf8dx1edCsBWDdlbum1wiaM8TgczUgGQKTwAGEL-hhwrkMMR3UWoimsO814uxRkPqjMcN2doQ9mzqCI3S1Vtf7j_nHciEKV6yjv4cN_fzCw-y37qO7eZZoHYYIhkHQwH-xOkvVwOO5XI9OJ3XXhHmkyQe8BkFK9vV-4H2xXYxljRK5NBEUw4JxTVwjpXDQAz7CERthAoLm-lw1CZtLfbh5OGKQZsqSqhoX-QDUcU0XwDlfxQf0Qhc7bDQlDpI02QC5B3XGcKTyg6DnDIeDuoDZ-DhlQZ1SeIrMkDET-7VUIqO2UrJ9K8NVKevwiLcsbg2k2Vra45KsFG04A';
+      const token = signToken(validPayload, privateKeyPem);
 
       const func = buildCachedValidateJwtFunction(
         'jwks',
         timer,
         keyGetter,
-        () => 1712502151
+        () => Math.floor(Date.now() / 1000)
       );
 
-      await expect(func(jwt)).resolves.toEqual({
-        exp: 1712502419,
-        iat: 1712502119,
-        auth_time: 1712502119,
-        jti: '741330ff-d610-4b65-a8e9-8737eb114eeb',
-        iss: 'http://localhost:4000/kc/realms/portal',
-        aud: 'account',
-        sub: 'f816772a-4022-4f75-82b6-9bd1a70f122a',
-        typ: 'Bearer',
-        azp: 'portal',
-        nonce: 'fac2ddbd-13fd-4f28-8481-b551435a7d09',
-        session_state: 'fad8933b-8f4e-429f-9b08-0554113a40ad',
-        acr: '1',
-        'allowed-origins': ['http://localhost:4000'],
-        realm_access: { roles: ['user'] },
-        resource_access: { account: { roles: ['manage-account'] } },
-        scope: 'openid email profile',
-        sid: 'fad8933b-8f4e-429f-9b08-0554113a40ad',
-        email_verified: false,
-        name: 'Alice Liddel',
-        preferred_username: 'alice',
-        given_name: 'Alice',
-        family_name: 'Liddel',
-        email: 'alice@keycloak.org',
-      });
+      await expect(func(token)).resolves.toEqual(
+        expect.objectContaining({
+          sub: 'f816772a-4022-4f75-82b6-9bd1a70f122a',
+          typ: 'Bearer',
+          name: 'Alice Liddel',
+          email: 'alice@keycloak.org',
+        })
+      );
     });
 
     it('rejects a forged token with false admin role', async () => {
-      const jwt =
-        'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQNFlQVUZPVXBmVEU3YldlM0t1V0JLT3loNzZDaGwyazRUMEtpNWh6S3h3In0.eyJleHAiOjE3MTI1MDI0MTksImlhdCI6MTcxMjUwMjExOSwiYXV0aF90aW1lIjoxNzEyNTAyMTE5LCJqdGkiOiI3NDEzMzBmZi1kNjEwLTRiNjUtYThlOS04NzM3ZWIxMTRlZWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAva2MvcmVhbG1zL3BvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJmODE2NzcyYS00MDIyLTRmNzUtODJiNi05YmQxYTcwZjEyMmEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWwiLCJub25jZSI6ImZhYzJkZGJkLTEzZmQtNGYyOC04NDgxLWI1NTE0MzVhN2QwOSIsInNlc3Npb25fc3RhdGUiOiJmYWQ4OTMzYi04ZjRlLTQyOWYtOWIwOC0wNTU0MTEzYTQwYWQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlciIsICJhZG1pbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmFkODkzM2ItOGY0ZS00MjlmLTliMDgtMDU1NDExM2E0MGFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiQWxpY2UgTGlkZGVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxpY2UiLCJnaXZlbl9uYW1lIjoiQWxpY2UiLCJmYW1pbHlfbmFtZSI6IkxpZGRlbCIsImVtYWlsIjoiYWxpY2VAa2V5Y2xvYWsub3JnIn0.Ok4WxJtYf8dx1edCsBWDdlbum1wiaM8TgczUgGQKTwAGEL-hhwrkMMR3UWoimsO814uxRkPqjMcN2doQ9mzqCI3S1Vtf7j_nHciEKV6yjv4cN_fzCw-y37qO7eZZoHYYIhkHQwH-xOkvVwOO5XI9OJ3XXhHmkyQe8BkFK9vV-4H2xXYxljRK5NBEUw4JxTVwjpXDQAz7CERthAoLm-lw1CZtLfbh5OGKQZsqSqhoX-QDUcU0XwDlfxQf0Qhc7bDQlDpI02QC5B3XGcKTyg6DnDIeDuoDZ-DhlQZ1SeIrMkDET-7VUIqO2UrJ9K8NVKevwiLcsbg2k2Vra45KsFG04A';
+      const forgedPayload = {
+        ...validPayload,
+        realm_access: { roles: ['user', 'admin'] },
+      };
+
+      // Sign with a different key to simulate forgery
+      const { privateKey: otherKey } = generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+      });
+      const otherKeyPem = otherKey.export({
+        type: 'pkcs8',
+        format: 'pem',
+      }) as string;
+
+      const token = signToken(forgedPayload, otherKeyPem);
 
       const func = buildCachedValidateJwtFunction(
         'jwks',
         timer,
         keyGetter,
-        () => 1712502151
+        () => Math.floor(Date.now() / 1000)
       );
 
-      await expect(func(jwt)).rejects.toThrow('invalid signature');
+      await expect(func(token)).rejects.toThrow('invalid signature');
     });
 
     it('rejects a token for a different public key', async () => {
-      // different public key
-      keyMap[
-        'P4YPUFOUpfTE7bWe3KuWBKOyh76Chl2k4T0Ki5hzKxw'
-      ] = `-----BEGIN PUBLIC KEY-----
-MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFe9DIniA/czqIRujiNkOiSt4VUG
-Q8fU63pyJIFZsVr4IvjttDV91GujGdGMfPDLYrSGZlIphdC/iHbhT9iI7KRUaoI6
-S3SyG3O9ZPN0X/cOiObXSbvgZrseBcdEhuky2R4m10xMTBmflEbLU3wG76BKevEg
-2kTcN33ThXbR/kwNAgMBAAE=
------END PUBLIC KEY-----`;
+      const { publicKey: otherPub } = generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+      });
+      keyMap['kid-1'] = otherPub.export({
+        type: 'spki',
+        format: 'pem',
+      }) as string;
 
-      const jwt =
-        'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQNFlQVUZPVXBmVEU3YldlM0t1V0JLT3loNzZDaGwyazRUMEtpNWh6S3h3In0.eyJleHAiOjE3MTI1MDI0MTksImlhdCI6MTcxMjUwMjExOSwiYXV0aF90aW1lIjoxNzEyNTAyMTE5LCJqdGkiOiI3NDEzMzBmZi1kNjEwLTRiNjUtYThlOS04NzM3ZWIxMTRlZWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAva2MvcmVhbG1zL3BvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJmODE2NzcyYS00MDIyLTRmNzUtODJiNi05YmQxYTcwZjEyMmEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWwiLCJub25jZSI6ImZhYzJkZGJkLTEzZmQtNGYyOC04NDgxLWI1NTE0MzVhN2QwOSIsInNlc3Npb25fc3RhdGUiOiJmYWQ4OTMzYi04ZjRlLTQyOWYtOWIwOC0wNTU0MTEzYTQwYWQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmFkODkzM2ItOGY0ZS00MjlmLTliMDgtMDU1NDExM2E0MGFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiQWxpY2UgTGlkZGVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxpY2UiLCJnaXZlbl9uYW1lIjoiQWxpY2UiLCJmYW1pbHlfbmFtZSI6IkxpZGRlbCIsImVtYWlsIjoiYWxpY2VAa2V5Y2xvYWsub3JnIn0.Ok4WxJtYf8dx1edCsBWDdlbum1wiaM8TgczUgGQKTwAGEL-hhwrkMMR3UWoimsO814uxRkPqjMcN2doQ9mzqCI3S1Vtf7j_nHciEKV6yjv4cN_fzCw-y37qO7eZZoHYYIhkHQwH-xOkvVwOO5XI9OJ3XXhHmkyQe8BkFK9vV-4H2xXYxljRK5NBEUw4JxTVwjpXDQAz7CERthAoLm-lw1CZtLfbh5OGKQZsqSqhoX-QDUcU0XwDlfxQf0Qhc7bDQlDpI02QC5B3XGcKTyg6DnDIeDuoDZ-DhlQZ1SeIrMkDET-7VUIqO2UrJ9K8NVKevwiLcsbg2k2Vra45KsFG04A';
+      const token = signToken(validPayload, privateKeyPem);
 
       const func = buildCachedValidateJwtFunction(
         'jwks',
         timer,
         keyGetter,
-        () => 1712502151
+        () => Math.floor(Date.now() / 1000)
       );
 
-      await expect(func(jwt)).rejects.toThrow('invalid signature');
+      await expect(func(token)).rejects.toThrow('invalid signature');
     });
   });
 
@@ -250,35 +273,48 @@ S3SyG3O9ZPN0X/cOiObXSbvgZrseBcdEhuky2R4m10xMTBmflEbLU3wG76BKevEg
       return keyMap[kid];
     });
 
+    const { privateKey: reqPrivateKey, publicKey: reqPublicKey } =
+      generateKeyPairSync('rsa', { modulusLength: 2048 });
+    const reqPrivateKeyPem = reqPrivateKey.export({
+      type: 'pkcs8',
+      format: 'pem',
+    }) as string;
+    const reqPublicKeyPem = reqPublicKey.export({
+      type: 'spki',
+      format: 'pem',
+    }) as string;
+
     beforeEach(() => {
       nowTime = 5_000;
       keyGetter.mockClear();
-      keyMap[
-        'P4YPUFOUpfTE7bWe3KuWBKOyh76Chl2k4T0Ki5hzKxw'
-      ] = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtCwfwaHEOuCPa+R6fb1M
-TJSnQsg5KLJoojdm5wvWjgln+CBQplIF+a4F+CVRDeUrdwAcnG1XRP8k2d/xH6I6
-uVHPvIJYIsBSPRFsePXb5WZka+tNB0o7oojCzN07oiduwqQAQpwdyu5C7dEbaSvJ
-Y2l/S7gfE80OvBrdGp7NcgIPZs9Zew1w1SK2CPMgRbxbCf/8uCZHFuYsWVfe7xIu
-ZgpSN0YZmwvMdpB1qjc8++6ZDjILo2elNqKLmgJ7rHFHrQI54LPu9wQvgQqNMfMG
-LvWWw3QeY/5/ZNg+wvSjDVKh9QabvCRwUeUimcEcwOjTsKde+vkq7tXec0TtEXma
-xQIDAQAB
------END PUBLIC KEY-----`;
+      keyMap['kid-1'] = reqPublicKeyPem;
     });
 
     it('parses a valid bearer token', async () => {
+      const token = jwt.sign(
+        {
+          sub: 'f816772a-4022-4f75-82b6-9bd1a70f122a',
+          typ: 'Bearer',
+        },
+        reqPrivateKeyPem,
+        {
+          algorithm: 'RS512',
+          header: { alg: 'RS512', kid: 'kid-1', typ: 'JWT' },
+          expiresIn: '1h',
+        }
+      );
+
       const reqFunc = buildTokenInformationForRequestFunction(
         'jwks',
         timer,
         keyGetter,
-        () => 1712502151
+        () => Math.floor(Date.now() / 1000)
       );
 
       await expect(
         reqFunc({
           headers: {
-            authorization:
-              'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQNFlQVUZPVXBmVEU3YldlM0t1V0JLT3loNzZDaGwyazRUMEtpNWh6S3h3In0.eyJleHAiOjE3MTI1MDI0MTksImlhdCI6MTcxMjUwMjExOSwiYXV0aF90aW1lIjoxNzEyNTAyMTE5LCJqdGkiOiI3NDEzMzBmZi1kNjEwLTRiNjUtYThlOS04NzM3ZWIxMTRlZWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAva2MvcmVhbG1zL3BvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJmODE2NzcyYS00MDIyLTRmNzUtODJiNi05YmQxYTcwZjEyMmEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWwiLCJub25jZSI6ImZhYzJkZGJkLTEzZmQtNGYyOC04NDgxLWI1NTE0MzVhN2QwOSIsInNlc3Npb25fc3RhdGUiOiJmYWQ4OTMzYi04ZjRlLTQyOWYtOWIwOC0wNTU0MTEzYTQwYWQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmFkODkzM2ItOGY0ZS00MjlmLTliMDgtMDU1NDExM2E0MGFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiQWxpY2UgTGlkZGVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxpY2UiLCJnaXZlbl9uYW1lIjoiQWxpY2UiLCJmYW1pbHlfbmFtZSI6IkxpZGRlbCIsImVtYWlsIjoiYWxpY2VAa2V5Y2xvYWsub3JnIn0.Ok4WxJtYf8dx1edCsBWDdlbum1wiaM8TgczUgGQKTwAGEL-hhwrkMMR3UWoimsO814uxRkPqjMcN2doQ9mzqCI3S1Vtf7j_nHciEKV6yjv4cN_fzCw-y37qO7eZZoHYYIhkHQwH-xOkvVwOO5XI9OJ3XXhHmkyQe8BkFK9vV-4H2xXYxljRK5NBEUw4JxTVwjpXDQAz7CERthAoLm-lw1CZtLfbh5OGKQZsqSqhoX-QDUcU0XwDlfxQf0Qhc7bDQlDpI02QC5B3XGcKTyg6DnDIeDuoDZ-DhlQZ1SeIrMkDET-7VUIqO2UrJ9K8NVKevwiLcsbg2k2Vra45KsFG04A',
+            authorization: `Bearer ${token}`,
           },
         } as any)
       ).resolves.toEqual(
@@ -295,13 +331,12 @@ xQIDAQAB
         'jwks',
         timer,
         keyGetter,
-        () => 1712502151
+        () => Math.floor(Date.now() / 1000)
       );
 
       const result = await reqFunc({
         headers: {
-          authorization:
-            'Bearer eyJhbGciOiJSUzIXNiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJQNFlQVUZPVXBmVEU3YldlM0t1V0JLT3loNzZDaGwyazRUMEtpNWh6S3h3In0.eyJleHAiOjE3MTI1MDI0MTksImlhdCI6MTcxMjUwMjExOSwiYXV0aF90aW1lIjoxNzEyNTAyMTE5LCJqdGkiOiI3NDEzMzBmZi1kNjEwLTRiNjUtYThlOS04NzM3ZWIxMTRlZWIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAva2MvcmVhbG1zL3BvcnRhbCIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJmODE2NzcyYS00MDIyLTRmNzUtODJiNi05YmQxYTcwZjEyMmEiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJwb3J0YWwiLCJub25jZSI6ImZhYzJkZGJkLTEzZmQtNGYyOC04NDgxLWI1NTE0MzVhN2QwOSIsInNlc3Npb25fc3RhdGUiOiJmYWQ4OTMzYi04ZjRlLTQyOWYtOWIwOC0wNTU0MTEzYTQwYWQiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDAwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlciJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmFkODkzM2ItOGY0ZS00MjlmLTliMDgtMDU1NDExM2E0MGFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiQWxpY2UgTGlkZGVsIiwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWxpY2UiLCJnaXZlbl9uYW1lIjoiQWxpY2UiLCJmYW1pbHlfbmFtZSI6IkxpZGRlbCIsImVtYWlsIjoiYWxpY2VAa2V5Y2xvYWsub3JnIn0.Ok4WxJtYf8dx1edCsBWDdlbum1wiaM8TgczUgGQKTwAGEL-hhwrkMMR3UWoimsO814uxRkPqjMcN2doQ9mzqCI3S1Vtf7j_nHciEKV6yjv4cN_fzCw-y37qO7eZZoHYYIhkHQwH-xOkvVwOO5XI9OJ3XXhHmkyQe8BkFK9vV-4H2xXYxljRK5NBEUw4JxTVwjpXDQAz7CERthAoLm-lw1CZtLfbh5OGKQZsqSqhoX-QDUcU0XwDlfxQf0Qhc7bDQlDpI02QC5B3XGcKTyg6DnDIeDuoDZ-DhlQZ1SeIrMkDET-7VUIqO2UrJ9K8NVKevwiLcsbg2k2Vra45KsFG04A',
+          authorization: 'Bearer eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6ImtpZC0xIn0.eyJzdWIiOiJ0ZXN0IiwidHlwIjoiQmVhcmVyIn0.invalid-signature',
         },
       } as any);
 

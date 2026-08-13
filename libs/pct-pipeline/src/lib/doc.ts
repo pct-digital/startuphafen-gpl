@@ -179,7 +179,6 @@ function packagePageData(specDirectory: string) {
     return Number(an) - Number(bn);
   });
 
-  //   console.log('features', JSON.stringify(features, undefined, 2));
 
   return { features };
 }

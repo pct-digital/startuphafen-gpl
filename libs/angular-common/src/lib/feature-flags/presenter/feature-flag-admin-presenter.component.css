@@ -1,0 +1,4 @@
+.dirty-outline {
+  box-shadow: 0 0 0 2px rgba(253, 186, 116, 0.6);
+  border-color: rgba(253, 186, 116, 0.8) !important;
+}

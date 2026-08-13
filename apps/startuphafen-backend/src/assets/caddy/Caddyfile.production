@@ -1,0 +1,16 @@
+{
+	admin off
+
+	on_demand_tls {
+		permission http http://127.0.0.1:9001/on-demand-tls-ask
+	}
+}
+
+import snippets.caddy
+
+{$APP_HOST} {
+	import app
+}
+
+import optional_www
+import healthcheck

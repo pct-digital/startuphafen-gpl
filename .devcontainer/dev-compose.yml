@@ -1,3 +1,5 @@
+name: "startuphafen-devcontainer"
+
 services:
   devcontainer:
     container_name: 'startuphafen-devcontainer'
@@ -7,14 +9,13 @@ services:
     volumes:
       # Relative to the location of the docker-compose.yml of the startuphafen-backend
       - ../../../../:/workspace:cached
-      - $HOME/.ssh:/home/node/.ssh:ro
     command: sleep infinity
 
   database:
     container_name: startuphafen-database
     restart: unless-stopped
     init: true
-    image: postgres:15.5-bookworm
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -53,7 +54,8 @@ services:
     ports:
       - 28080:8180
     #extra_hosts:
-    ## default IP, fond from the command "ip a". If we want to use local database in host machine
+    ## Linux only: Set host.docker.internal IP (find with "ip a" command)
+    ## Mac: host.docker.internal is provided automatically by Docker Desktop
     #  - "host.docker.internal:172.17.0.1"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
@@ -101,10 +103,10 @@ services:
       test: 'wget -O - http://127.0.0.1:1080/healthz || exit 1'
       start_interval: 1s
       start_period: 30s
-  nginx:
+  caddy:
     environment:
       BACKEND_HOST: 'devcontainer:5000'
-      WEB_APP_CONFIG_FILE: '/config-parts/devcontainer.conf'
+      FRONTEND_HOST: 'devcontainer:4201'
     ports:
       - '4000:8080'
 
@@ -112,7 +114,7 @@ services:
     container_name: startuphafen-pgadmin
     image: dpage/pgadmin4:8.12.0
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin@mycomp.com
+      PGADMIN_DEFAULT_EMAIL: pgadmin@example.com
       PGADMIN_DEFAULT_PASSWORD: secret
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:

@@ -30,6 +30,8 @@ describe('StartPageComponent', () => {
     getProjectSpy.mockResolvedValue([]);
     const getWebsiteTextSpy = jest.spyOn(spectator.component, 'getWebsiteText');
     getWebsiteTextSpy.mockResolvedValue(mockWebsiteText);
+    const keycloak = spectator.inject(KeycloakService);
+    jest.spyOn(keycloak, 'isUserInRole').mockReturnValue(false);
   });
 
   it('should create', () => {
@@ -50,6 +52,21 @@ describe('StartPageComponent', () => {
     const mainItems = spectator.query(byTestId('main-items'));
 
     expect(mainItems).toBeTruthy();
+  });
+
+  it('shows the 7-day deletion notice in the create-project modal', () => {
+    spectator.detectChanges();
+
+    const view = spectator.component.createProjectPopup!.createEmbeddedView(null);
+    view.detectChanges();
+    const html = view.rootNodes
+      .map((node: HTMLElement) => node.outerHTML ?? '')
+      .join('');
+
+    expect(html).toContain('data-testid="project-deletion-notice"');
+    expect(html).toContain('innerhalb von 7 Tagen');
+
+    view.destroy();
   });
 
   it('should call clickitem() when an item is clicked', () => {

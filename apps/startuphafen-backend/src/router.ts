@@ -1,57 +1,69 @@
 import { router } from '@startuphafen/trpc-root';
 import { createWatermarkRouter } from '@startuphafen/watermark/server';
-import { z } from 'zod';
-import { LocalSecrets, ServerConfig } from './config';
+import { ServerConfig } from './config';
+import { buildChatbotRouter } from './features/chatbot/chatbot-router';
 import { buildCMSRouter } from './features/cms/cms-router';
+import { buildBntkRouter } from './features/common/bntk-router';
+import { buildExtRouter } from './features/common/external-router';
+import { buildGenericMailRouter } from './features/common/generic-mail-router';
 import { buildLoginRouter } from './features/common/login-router';
 import { buildOZGRouter } from './features/common/ozg-router';
+import { createRateLimiter } from './features/common/rate-limiter';
 import { buildEricRouter } from './features/eric/eric-router';
-import { answersRouter } from './generic-routers/answer-router';
-import { flagTrackingRouter } from './generic-routers/flag-tracking-router';
+import { buildHwkAiRouter } from './features/hwk-ai/hwk-ai-router';
+import { buildHwkFormRouter } from './features/hwk-form/hwk-form-router';
+import { buildIdentificationDocumentsRouter } from './features/identification-documents/identification-documents-router';
+import { buildOzgInfoRouter } from './features/ozg-info/ozg-info-router';
+import { buildProfileInfoRouter } from './features/profile-info/profile-info-router';
+import { buildUserDocumentsRouter } from './features/user-documents/user-documents-router';
+import { answerRouter } from './generic-routers/answer-router';
+import { buildFeatureFlagRouter } from './generic-routers/feature-flag-router';
+import { buildFeedbackRouter } from './generic-routers/feedback-router';
 import { projectRouter } from './generic-routers/project-router';
-import { questionTrackingRouter } from './generic-routers/question-tracking-router';
-import { shAnswerRouter } from './generic-routers/sh-answers-router';
-import { shProjectRouter } from './generic-routers/sh-project-router';
-import { shQuestionTrackingRouter } from './generic-routers/sh-questiontracking-router';
+import { questionTrackingRouter } from './generic-routers/questiontracking-router';
 import { buildUserRouter } from './generic-routers/user-router';
-import { shRoute } from './sh-route';
 
 // !!!! when starting to change real APIs in use by real app-version out in the wild consider how to version the API for the app
 // since people may use month old app-versions we cannot just arbitrarily change the api surface.
 // -> Prefer to add new APIs in case of changes instead
 // !!!!
 
-export function createAppRouter(
-  serverConfig: ServerConfig,
-  localSecrets: LocalSecrets
-) {
-  return router({
-    hello: shRoute
-      .meta({
-        requiredRolesAny: ['login'],
-      })
-      .input(z.string())
-      .output(z.string())
-      .query(async (req) => {
-        console.log('Hello called by subject ' + req.ctx.token?.sub);
-        return 'Hello ' + req.ctx.token?.preferred_username;
-      }),
+export function createAppRouter(serverConfig: ServerConfig) {
+  const uploadLimiter = createRateLimiter(
+    serverConfig.rateLimit.upload,
+    'upload'
+  );
+  const chatLimiter = createRateLimiter(
+    serverConfig.rateLimit.chatbot,
+    'chatbot'
+  );
 
+  return router({
     WaterMark: createWatermarkRouter(serverConfig.watermarkConfig),
 
-    OZG: buildOZGRouter(localSecrets),
-    Project: projectRouter,
+    OZG: buildOZGRouter(serverConfig),
+    BNTK: buildBntkRouter(serverConfig),
+    CMS: buildCMSRouter(serverConfig),
     QuestionTracking: questionTrackingRouter,
-    Answers: answersRouter,
-    CMS: buildCMSRouter(localSecrets),
-    FlagTracking: flagTrackingRouter,
-    ShQuestionTracking: shQuestionTrackingRouter,
-    ShProject: shProjectRouter,
-    ShAnswers: shAnswerRouter,
+    Project: projectRouter,
+    Answers: answerRouter,
+    FeatureFlags: buildFeatureFlagRouter(),
+    ChatBot: buildChatbotRouter(serverConfig, chatLimiter),
+    HwkAi: buildHwkAiRouter(serverConfig),
 
-    Eric: buildEricRouter(serverConfig, localSecrets),
+    Eric: buildEricRouter(serverConfig),
     User: buildUserRouter(),
     Login: buildLoginRouter(serverConfig),
+    Ext: buildExtRouter(serverConfig),
+    HwkForm: buildHwkFormRouter(serverConfig),
+    UserDocuments: buildUserDocumentsRouter(uploadLimiter),
+    ProfileInfo: buildProfileInfoRouter(),
+    OzgInfo: buildOzgInfoRouter(serverConfig),
+    IdentificationDocuments: buildIdentificationDocumentsRouter(uploadLimiter),
+
+    Feedback: buildFeedbackRouter(serverConfig),
+
+    GenericMail: buildGenericMailRouter(serverConfig),
   });
 }
 

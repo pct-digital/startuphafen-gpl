@@ -1,4 +1,7 @@
-import { ProcessContext, waitForProcessSuccess } from '../../lib/ProcessContext';
+import {
+  ProcessContext,
+  waitForProcessSuccess,
+} from '@startuphafen/utility-server';
 import { DocBuilderExecutorSchema } from './schema';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -12,11 +15,17 @@ interface DocBuilderDirectories {
   specDirectory: string;
 }
 
-function setupDirectories(options: DocBuilderExecutorSchema): DocBuilderDirectories {
+function setupDirectories(
+  options: DocBuilderExecutorSchema
+): DocBuilderDirectories {
   const docDirectory = path.resolve(path.join('dist', 'doc'));
   const videoOutDirectory = path.join(docDirectory, 'video');
-  const videoInDirectory = path.resolve(path.join('apps', options.app + '-e2e', 'video'));
-  const specDirectory = path.resolve(path.join('apps', options.app + '-e2e', 'spec'));
+  const videoInDirectory = path.resolve(
+    path.join('apps', options.app + '-e2e', 'video')
+  );
+  const specDirectory = path.resolve(
+    path.join('apps', options.app + '-e2e', 'spec')
+  );
   fs.rmSync(docDirectory, { recursive: true, force: true });
   fs.mkdirSync(videoOutDirectory, { recursive: true });
   return {
@@ -28,25 +37,44 @@ function setupDirectories(options: DocBuilderExecutorSchema): DocBuilderDirector
 }
 
 function loadVersionInfo(options: DocBuilderExecutorSchema) {
-  const versionFilePath = path.join('dist', 'apps', options.app, 'version.json');
+  const versionFilePath = path.join(
+    'dist',
+    'apps',
+    options.app,
+    'version.json'
+  );
   if (!fs.existsSync(versionFilePath)) {
     return 'UNKNOWN_VERSION';
   }
 
+  // version.json is written by tools/pipeline/version.js and contains
+  // { time, sha, branchId }.
   const vjson = JSON.parse(fs.readFileSync(versionFilePath).toString());
-  return `${vjson.build} / ${vjson.time} / ${vjson.sha}`;
+  return `${vjson.sha} (${vjson.time})`;
 }
 
-export async function buildVideos(context: ProcessContext, options: DocBuilderExecutorSchema) {
+export async function buildVideos(
+  context: ProcessContext,
+  options: DocBuilderExecutorSchema
+) {
   console.log('Build documentation Videos');
   await waitForProcessSuccess(
-    context.startProcess('npx', ['nx', 'run', `${options.app}-e2e:test-accept`, '--documentationVideos', '--noDockerLog', '--skipBuild'])
+    context.startProcess('npx', [
+      'nx',
+      'run',
+      `${options.app}-e2e:test-accept`,
+      '--documentationVideos',
+      '--noDockerLog',
+      '--skipBuild',
+    ])
   );
 }
 
 async function processVideo(dirs: DocBuilderDirectories) {
   console.log('Process videos');
-  const cutsJson: VideosCutConfig = JSON.parse(fs.readFileSync(path.join(dirs.videoInDirectory, 'cuts.json')).toString());
+  const cutsJson: VideosCutConfig = JSON.parse(
+    fs.readFileSync(path.join(dirs.videoInDirectory, 'cuts.json')).toString()
+  );
   await cutVideos(dirs.videoInDirectory, dirs.videoOutDirectory, cutsJson);
 }
 
@@ -65,7 +93,11 @@ export default async function runExecutor(options: DocBuilderExecutorSchema) {
 
   await processVideo(dirs);
 
-  await buildEleventyDoc(dirs.specDirectory, dirs.docDirectory, loadVersionInfo(options));
+  await buildEleventyDoc(
+    dirs.specDirectory,
+    dirs.docDirectory,
+    loadVersionInfo(options)
+  );
 
   return {
     success: true,

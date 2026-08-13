@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { TrpcService } from '@startuphafen/angular-common';
-import { LoginPageTexts } from '@startuphafen/startuphafen-common';
 
 @Injectable({
   providedIn: 'root',
@@ -9,12 +8,24 @@ export class LoginService {
   private trpc = inject(TrpcService);
 
   async getRedirectHost() {
-    return this.trpc.client.Login.loadRedirectHost.query();
+    try {
+      const host = await this.trpc.client.Login.loadRedirectHost.query();
+      return host;
+    } catch (error) {
+      console.error(error);
+
+      throw error;
+    }
   }
 
   async getText() {
-    return (await this.trpc.client.CMS.getSingleTypeData.query(
-      'login-page-text'
-    )) as LoginPageTexts;
+    try {
+      const text = await this.trpc.client.CMS.getLoginText.query();
+      return text;
+    } catch (error) {
+      console.error(error);
+
+      throw error;
+    }
   }
 }

@@ -1,0 +1,98 @@
+<div>
+  <button shButton (click)="openPopup(support)" class="shadow-lg">
+    Support
+  </button>
+</div>
+<ng-template #support>
+  <div
+    shCard
+    class="flex flex-col items-center justify-center w-[33vw] min-h-[450px]"
+  >
+    @if (isUploading) {
+    <div class="flex flex-col items-center justify-center gap-4 flex-1">
+      <div class="sh-spinner"></div>
+      <div class="text-tertiary text-xl">Ticket wird gesendet...</div>
+    </div>
+    } @else if (sendResult === 'success') {
+    <div class="flex flex-col items-center justify-center gap-4 flex-1">
+      <div class="text-4xl text-green-500">✓</div>
+      <div class="text-xl font-semibold">Mail erfolgreich gesendet!</div>
+      <div class="text-tertiary text-lg">Wir kümmern uns um Dein Anliegen.</div>
+    </div>
+    } @else if (sendResult === 'error') {
+    <div class="flex flex-col items-center justify-center gap-4 flex-1">
+      <div class="text-2xl text-red-500">✗</div>
+      <div class="text-lg font-semibold text-red-500">Fehler beim Senden</div>
+      <div class="text-tertiary">Bitte versuche es später erneut.</div>
+    </div>
+    } @else {
+    <div shCardTitle>Sende uns ein Support Ticket!</div>
+    <div shCardSubtitle>
+      Ein Fehler ist aufgetreten und Du möchtest das mitteilen? Sende uns ein
+      Support Ticket und wir kümmern uns darum!
+    </div>
+    <div class="flex flex-col gap-3 w-full">
+      <input
+        shInput
+        [(ngModel)]="email"
+        type="email"
+        placeholder="E-Mail"
+        data-testid="support-email-input"
+        class="h-6"
+      />
+      <input
+        shInput
+        [(ngModel)]="phone"
+        type="tel"
+        placeholder="Telefonnummer (optional)"
+        data-testid="support-phone-input"
+        class="h-6"
+      />
+      <textarea
+        shInput
+        [(ngModel)]="description"
+        placeholder="Beschreibung des Problems"
+        rows="5"
+        class="resize-none"
+        data-testid="support-description-input"
+      ></textarea>
+    </div>
+    <div
+      class="flex justify-between w-full border border-dashed rounded-md p-2 border-tertiary"
+    >
+      <div class="text-tertiary mt-2">Lade ein Bild Deines Problems hoch!</div>
+      <div class="flex flex-row items-stretch gap-2">
+        <span
+          *ngIf="supportUpload"
+          class="text-sm text-tertiary break-all whitespace-normal text-left sm:text-right mr-4 mt-2"
+        >
+          {{ supportUpload.name }}
+        </span>
+        <input
+          #inputSupport
+          type="file"
+          class="hidden"
+          accept=".png, .jpg, .jpeg"
+          (change)="onFileSelected($event)"
+        />
+        <button
+          type="button"
+          shButton
+          data-testid="support-upload-btn"
+          class="text-sm h-9 px-4 w-full sm:w-auto self-start sm:self-end"
+          (click)="triggerFileInput(inputSupport)"
+        >
+          {{ supportUpload ? 'Ändern' : 'Auswählen' }}
+        </button>
+      </div>
+    </div>
+    <button
+      class="bg-primary text-white rounded-full hover:bg-primary-shade text-xl py-2 px-6 mt-4 disabled:opacity-50 disabled:hover:bg-primary"
+      (click)="submit()"
+      [disabled]="email === '' || description === ''"
+    >
+      Senden
+    </button>
+    }
+  </div>
+</ng-template>

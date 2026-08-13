@@ -103,16 +103,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const Base64Binary = {
   _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
 
-  /* will return a  Uint8Array type */
-  decodeArrayBuffer: function (input: any) {
-    input = this.removePaddingChars(input);
-    const bytes = (input.length / 4) * 3;
-    const ab = new ArrayBuffer(bytes);
-    this.decode(input, ab);
-
-    return ab;
-  },
-
   removePaddingChars: function (input: any) {
     const lkey = this._keyStr.indexOf(input.charAt(input.length - 1));
     if (lkey == 64) {
@@ -160,66 +150,9 @@ const Base64Binary = {
 };
 
 /**
- * Turns a base64 string into an  ArrayBuffer
- * @param input A base64 string
- */
-export function base64ToArrayBuffer(input: string): ArrayBuffer {
-  return Base64Binary.decodeArrayBuffer(input);
-}
-
-/**
  * Turns a base64 string into a Uint8Array
  * @param input A base64 string
  */
 export function base64ToUint8Array(input: string): Uint8Array {
   return Base64Binary.decode(input);
-}
-
-/**
- * Interprets a string as bytes and encodes these into base64. Useful e.g. for HTTP Basic Auth
- * @param txt an arbitrary string
- */
-export function stringToBase64(txt: string) {
-  const txtb = [];
-  for (let i = 0; i < txt.length; i++) {
-    txtb.push(txt[i].charCodeAt(0));
-  }
-  return bytesToBase64(new Uint8Array(txtb));
-}
-
-/**
- * Create a Data URL with given data and mime type.
- * @param mime
- * @param bytes
- */
-export function toDataURL(mime: string, bytes: Uint8Array) {
-  return 'data:' + mime + ';base64,' + bytesToBase64(bytes);
-}
-
-/**
- * Extracts mime type and data from a dataurl
- * @param durl The data url
- */
-export function fromDataURL(durl: string): { mime: string; bytes: Uint8Array } {
-  const dataPreifx = 'data:';
-  const b64Prefix = ';base64,';
-
-  const sliced = durl.slice(dataPreifx.length);
-  const endMime = sliced.indexOf(';');
-
-  const mime = sliced.slice(0, endMime);
-  const dataEnd = sliced.slice(endMime);
-
-  if (!dataEnd.startsWith(b64Prefix)) {
-    throw new Error(
-      'cannot decode data url that does not use base64, not implemented!'
-    );
-  }
-
-  const b64 = dataEnd.slice(b64Prefix.length);
-
-  return {
-    mime: mime,
-    bytes: Base64Binary.decode(b64),
-  };
 }

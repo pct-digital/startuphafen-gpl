@@ -1,0 +1,22 @@
+{
+  "name": "@startuphafen/deploy3",
+  "version": "1.0.0",
+  "description": "Refactored deployment and data copy tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "tsx bin/deploy.ts",
+    "copy": "tsx bin/copy.ts",
+    "prep-copy": "tsx bin/prep-copy.ts",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

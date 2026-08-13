@@ -1,0 +1,101 @@
+(app) {
+	root * /srv
+	encode zstd gzip
+
+	request_body {
+		max_size 100MB
+	}
+
+	@trpc path /trpc /trpc/*
+	@kcHealth path /kc/health /kc/health/*
+	@kcAdmin path /kc-admin /kc-admin/*
+	@kc path /kc /kc/*
+	@maildev path /maildev /maildev/*
+	@rootJs path_regexp rootJs ^/[^/]+\.js$
+	@mjs path *.mjs
+	@assets path /assets/* /svg/*
+
+	handle_errors {
+		@maintenance expression {http.error.status_code} == 502
+		handle @maintenance {
+			root * /etc/caddy/maintenance
+			rewrite * /maintenance.html
+			file_server
+		}
+	}
+
+	route {
+		handle @trpc {
+			header Cache-Control "no-store"
+			reverse_proxy {$BACKEND_HOST:backend:5000}
+		}
+
+		handle @kcHealth {
+			uri strip_prefix /kc
+			reverse_proxy keycloak:9000
+		}
+
+		handle @kcAdmin {
+			uri strip_prefix /kc-admin
+			reverse_proxy keycloak:8180
+		}
+
+		handle @kc {
+			uri strip_prefix /kc
+			reverse_proxy keycloak:8180
+		}
+
+		handle @maildev {
+			header Cache-Control "no-store"
+			reverse_proxy maildev:1080
+		}
+
+		handle @rootJs {
+			header Cache-Control "public, max-age=31536000, immutable"
+			file_server
+		}
+
+		handle @mjs {
+			header Cache-Control "public, max-age=3600"
+			header Content-Type "application/javascript"
+			file_server
+		}
+
+		handle @assets {
+			header Cache-Control "public, max-age=3600"
+			file_server
+		}
+
+		handle {
+			try_files {path} {path}/ /index.html
+			file_server
+		}
+	}
+}
+
+(healthcheck) {
+	http://:2020 {
+		respond /health "OK" 200
+		respond 404
+	}
+}
+
+(optional_www) {
+	http://127.0.0.1:9001 {
+		@allowOptionalWww {
+			path /on-demand-tls-ask
+			query domain=www.{$APP_HOST}
+		}
+
+		respond @allowOptionalWww 200
+		respond 403
+	}
+
+	www.{$APP_HOST} {
+		tls {
+			on_demand
+		}
+
+		redir https://{$APP_HOST}{uri} permanent
+	}
+}

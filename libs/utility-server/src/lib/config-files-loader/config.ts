@@ -1,9 +1,16 @@
+import * as fs from 'fs';
 import * as _ from 'lodash';
 import path from 'path';
 import { ZodTypeAny, z } from 'zod';
 import { FileAccess } from '../file-access';
 
-export type CONFIG_TYPE = 'dev' | 'e2e' | 'staging' | 'production';
+export const CONFIG_TYPE_SCHEMA = z.enum([
+  'dev',
+  'e2e',
+  'staging',
+  'production',
+]);
+export type CONFIG_TYPE = z.infer<typeof CONFIG_TYPE_SCHEMA>;
 
 function mergeExceptArrays(dest: any, source: any) {
   return _.mergeWith(dest, source, (_dest, source) => {
@@ -65,17 +72,24 @@ export class ConfigLoader<Z extends ZodTypeAny> {
   ) {
     const cfgPaths: string[] = [];
     cfgPaths.unshift(path.join(srcMainDir, 'assets', 'config.json'));
+    // Add local configuration file for secrets (will be ignored if it doesn't exist)
+    const localConfigPath = path.join(
+      srcMainDir,
+      'assets',
+      '.localConfigs.json'
+    );
+    if (fs.existsSync(localConfigPath)) {
+      cfgPaths.push(localConfigPath);
+    }
     switch (env) {
       case 'production':
         cfgPaths.push(path.join(srcMainDir, 'assets', 'config-staging.json'));
         cfgPaths.push(
           path.join(srcMainDir, 'assets', 'config-production.json')
         );
-        //cfgPaths.push(path.join(srcMainDir, 'assets', 'config-env.json'));
         break;
       case 'staging':
         cfgPaths.push(path.join(srcMainDir, 'assets', 'config-staging.json'));
-        //cfgPaths.push(path.join(srcMainDir, 'assets', 'config-env.json'));
         break;
       case 'e2e':
         cfgPaths.push(path.join(srcMainDir, 'assets', 'config-e2e.json'));

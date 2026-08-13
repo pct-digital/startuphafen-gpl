@@ -4,3 +4,7 @@
 /.nx/cache
 /.nx/workspace-data
 .angular
+libs/pct-pipeline/src/fixtures
+libs/pct-pipeline/src/doc-template
+tools/deploy3/dist
+tools/deploy3/node_modules

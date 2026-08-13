@@ -1,0 +1,30 @@
+@if (showHwkAiSection) {
+<div class="mb-6">
+  <sh-ki-pruefung-container
+    [answers]="model"
+    (answersUpdated)="onHwkAiAnswersUpdated($event)"
+    (answersRemoved)="onHwkAiAnswersRemoved($event)"
+    (loadingChange)="onAiLoadingChange($event)"
+  ></sh-ki-pruefung-container>
+</div>
+}
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  @if (showAiAutofillNotice) {
+  <div
+    class="mb-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"
+    data-testid="hwk-ai-autofill-notice"
+  >
+    {{ aiAutofillNotice }}
+  </div>
+  }
+  <!-- Branche selection is locked while the KI evaluation runs -->
+  <div
+    [class.pointer-events-none]="aiLoading"
+    [class.opacity-60]="aiLoading"
+    [attr.aria-busy]="aiLoading"
+    class="transition-opacity"
+  >
+    <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
+  </div>
+</form>

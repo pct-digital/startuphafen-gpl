@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { smoothScrollUnlessFirefox } from '../../helpers/helpers';
 import { HeaderLinkItem, HeaderNavigationItem } from './header-item';
 import { MobileDrawerComponent } from './mobile-drawer/mobile-drawer.component';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -50,12 +51,12 @@ export class HeaderComponent {
   @Output() logoutClick = new EventEmitter<void>();
 
   onClickNavigation(link: HeaderLinkItem) {
-    window.scrollTo({ top: -1, left: 0, behavior: 'smooth' });
+    smoothScrollUnlessFirefox(-1, 0);
     this.navigationClick.emit(link);
     this.showMobileDrawer = false;
   }
   async onLogoClick() {
-    window.scrollTo({ top: -1, left: 0, behavior: 'smooth' });
+    smoothScrollUnlessFirefox(-1, 0);
     await this.router.navigateByUrl('/start');
   }
 }

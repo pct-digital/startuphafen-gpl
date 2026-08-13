@@ -7,36 +7,22 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
   standalone: true,
   imports: [FormlyModule, ReactiveFormsModule],
   template: `
-    <div
-      class="p-4 md:p-8 rounded-2xl bg-[rgba(var(--sh-color-primary-rgb),0.09)]
-          w-full transition-all duration-200
-          hover:bg-[rgba(var(--sh-color-primary-rgb),0.15)]
-          peer-checked:ring-2 peer-checked:ring-primary
-          cursor-pointer"
-      (click)="toggleCheckbox()"
-    >
-      <div class="flex-1 flex flex-col items-start gap-3">
-        <div class="relative h-6 w-6">
-          <input
-            type="checkbox"
-            [name]="props['name']"
-            [formControl]="formControl"
-            class="hidden peer"
-          />
-          <div
-            class="absolute h-full w-full rounded-lg
-               bg-white transition-colors duration-200
-               peer-checked:border-primary-shade"
-          ></div>
-          <div
-            class="absolute inset-0 m-auto h-full w-full bg-primary rounded-lg
-               transition-transform duration-200 origin-center
-               scale-0 peer-checked:scale-100"
-          ></div>
+    <label class="flex items-start gap-3 cursor-pointer group">
+      <div class="relative flex items-center justify-center mt-1">
+        <input
+          type="checkbox"
+          [name]="props['name']"
+          [formControl]="formControl"
+          class="peer sr-only"
+        />
+        <div
+          class="h-5 w-5 rounded border-2 border-gray-300 bg-white
+                 transition-all duration-200
+                 peer-checked:border-primary peer-checked:bg-primary
+                 group-hover:border-primary-shade"
+        >
           <svg
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-               w-4 h-4 text-white transition-opacity duration-200
-               opacity-0 peer-checked:opacity-100"
+            class="w-full h-full text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200"
             viewBox="0 0 24 24"
             stroke="currentColor"
             stroke-width="3"
@@ -49,16 +35,12 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
             />
           </svg>
         </div>
-        <span class="text-lg md:text-xl text-primary font-semibold">
-          {{ formControl.value ? 'Ja' : 'Nein' }}
-        </span>
       </div>
-    </div>
+      <span class="flex-1 text-base text-gray-700 group-hover:text-gray-900">
+        {{ props['checkboxLabel'] }}
+      </span>
+    </label>
   `,
   styles: ``,
 })
-export class FormlyFieldCheckComponent extends FieldType<FieldTypeConfig> {
-  toggleCheckbox() {
-    this.formControl.setValue(!this.formControl.value);
-  }
-}
+export class FormlyFieldCheckComponent extends FieldType<FieldTypeConfig> {}

@@ -6,9 +6,6 @@
     "../apps/startuphafen-backend/src/assets/docker-compose.yml",
     "dev-compose.yml"
   ],
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached,readonly"
-  ],
   "service": "devcontainer",
   "workspaceFolder": "/workspace",
   // Features to add to the dev container. More info: https://containers.dev/features.
@@ -17,9 +14,11 @@
     "ghcr.io/devcontainers/features/desktop-lite:1": {}
   },
   "containerEnv": {
-    "TZ": "Europe/Berlin"
+    "TZ": "Europe/Berlin",
+    "CYPRESS_BROWSER": "chrome",
+    "CHROME_BIN": "/usr/bin/google-chrome"
   },
-  "forwardPorts": [6080, 5901, 3000, 4200, 4201, 5001, 1080],
+  "forwardPorts": [6080, 5901, 4000, 4201, 5000, 3838, 28080, 1080],
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "npm install && ./node_modules/.bin/cypress install",
   // Configure tool-specific properties.

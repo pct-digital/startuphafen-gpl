@@ -23,7 +23,7 @@ describe('FaqPageService', () => {
     spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
       CMS: {
         getArtikelList: {
-          query: async (_args: any) => {
+          query: async (_args: unknown) => {
             const res = [
               { id: 1, documentId: '', title: 'test' },
               { id: 2, documentId: '', title: 'test' },
@@ -32,8 +32,8 @@ describe('FaqPageService', () => {
           },
         },
       },
-    });
-    const response = await spectator.service.getArtikelList('test');
+    } as any);
+    const response = await spectator.service.getArtikelList('test-artikels');
     expect(response).toEqual([
       { id: 1, documentId: '', title: 'test' },
       { id: 2, documentId: '', title: 'test' },
@@ -44,7 +44,7 @@ describe('FaqPageService', () => {
     spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
       CMS: {
         getArtikel: {
-          query: async (_args) => {
+          query: async (_args: unknown) => {
             const res = {
               title: 'Test',
               documentId: '',
@@ -55,7 +55,7 @@ describe('FaqPageService', () => {
           },
         },
       },
-    });
+    } as any);
     const response = await spectator.service.getArtikel('testId');
     expect(response).toEqual({
       title: 'Test',
@@ -69,7 +69,7 @@ describe('FaqPageService', () => {
     spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
       CMS: {
         getFAQItemList: {
-          query: async (_args: any) => {
+          query: async (_args: unknown) => {
             const res: FAQItem[] = [
               { id: 1, question: '?', answer: '!', documentId: '' },
               { id: 2, question: '?', answer: '!', documentId: '' },
@@ -78,43 +78,19 @@ describe('FaqPageService', () => {
           },
         },
       },
-    });
-    const response = await spectator.service.getFAQItemList('test');
+    } as any);
+    const response = await spectator.service.getFAQItemList('test-faqs');
     expect(response).toEqual([
       { id: 1, question: '?', answer: '!', documentId: '' },
       { id: 2, question: '?', answer: '!', documentId: '' },
     ]);
   });
 
-  it('getFAQITem should call a valid trpc method', async () => {
-    spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
-      CMS: {
-        getFAQItem: {
-          query: async (_args) => {
-            const res: FAQItem = {
-              documentId: '',
-              id: 1,
-              question: '?',
-              answer: '!',
-            };
-            return res;
-          },
-        },
-      },
-    });
-    const response = await spectator.service.getFAQItem('testId');
-    expect(response).toEqual({
-      documentId: '',
-      id: 1,
-      question: '?',
-      answer: '!',
-    });
-  });
   it('searchArticles should call valid trpc method', async () => {
     spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
       CMS: {
         searchArticles: {
-          query: async (_args) => {
+          query: async (_args: unknown) => {
             const res = [
               {
                 title: 'Test',
@@ -127,7 +103,7 @@ describe('FaqPageService', () => {
           },
         },
       },
-    });
+    } as any);
     const response = await spectator.service.searchArticles('testId');
     expect(response).toEqual([
       {
@@ -143,7 +119,7 @@ describe('FaqPageService', () => {
     spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
       CMS: {
         getCategories: {
-          query: async (_args) => {
+          query: async (_args: unknown) => {
             const res = [
               {
                 categoryName: 'TestCategory',
@@ -155,7 +131,7 @@ describe('FaqPageService', () => {
           },
         },
       },
-    });
+    } as any);
     const response = await spectator.service.getCategories();
     expect(response).toEqual([
       {

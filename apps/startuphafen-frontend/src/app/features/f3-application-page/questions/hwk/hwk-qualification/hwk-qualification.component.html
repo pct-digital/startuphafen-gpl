@@ -1,0 +1,21 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
+</form>
+
+@if (shouldShowQualificationUpload()) {
+<sh-hwk-document-upload-container
+  [projectId]="projectId"
+  [documentCase]="qualificationDocumentCase"
+  [title]="'Qualifikationsnachweis hochladen'"
+  [description]="
+    'Für Eintragungen in die Handwerksrolle ist ein Qualifikationsnachweis als PDF verpflichtend.'
+  "
+  [isRequired]="true"
+  [requiredHint]="qualificationUploadRequiredHint"
+  [showRequiredError]="
+    qualificationDocumentUploadedControl.touched &&
+    qualificationDocumentUploadedControl.invalid
+  "
+  (documentsChanged)="onQualificationDocumentsChanged($event)"
+></sh-hwk-document-upload-container>
+}

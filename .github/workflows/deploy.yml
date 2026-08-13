@@ -5,24 +5,36 @@ on:
   workflow_dispatch:
     inputs:
       release:
-        description: 'Release Tag'
+        description: 'Release Tag, e.g. "26.0119.1848.18_dev_example_startuphafen"'
         type: string
-        required: false
+        required: true
       target:
-        description: 'Target environment'
+        description: 'Target environment, *-production needs the prod confirmation below'
         type: environment
         required: true
         default: startuphafen-staging
-      skip-keycloak-import:
-        description: 'Ignore existing keycloak? Enter DELETE_USERS, cause that is what that means! Discuss with team before using this option.'
+      confirm_prod:
+        description: 'Type "prod" to confirm production deployment - ignore for non-prod deploys'
         type: string
         required: false
 
 jobs:
+  validate-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check production confirmation
+        run: |
+          if [[ "${{ inputs.target }}" == *"-production" ]]; then
+            if [[ "${{ inputs.confirm_prod }}" != "prod" ]]; then
+              echo "Error: Production deployment requires 'prod' confirmation"
+              exit 1
+            fi
+          fi
+
   call-deploy:
+    needs: validate-prod
     uses: './.github/workflows/lib_deploy.yml'
     with:
       release: ${{inputs.release}}
       target: ${{inputs.target}}
-      skip-keycloak-import: ${{inputs.skip-keycloak-import}}
     secrets: inherit

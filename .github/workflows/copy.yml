@@ -1,0 +1,44 @@
+name: 6 - Copy Databases
+run-name: "Copy '${{inputs.source}}' -> '${{inputs.target}}'"
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Source environment'
+        type: environment
+        required: true
+        default: startuphafen-staging
+      target:
+        description: 'Target environment, DEPLOY_ENVIRONMENT=production needs the prod confirmation below'
+        type: environment
+        required: true
+        default: startuphafen-staging
+      confirm_prod:
+        description: 'Type "prod" to confirm overwriting a production environment (DEPLOY_ENVIRONMENT=production) - ignore for non-prod targets'
+        type: string
+        required: false
+
+# Production protection: whether the target is production is determined by the
+# DEPLOY_ENVIRONMENT variable of the target environment (checked in prep-copy.ts
+# after the env vars are fetched), NOT by the environment name. Without the
+# "prod" confirmation, prep-copy.ts aborts before anything is touched.
+jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject identical source and target
+        run: |
+          if [[ "${{ inputs.source }}" == "${{ inputs.target }}" ]]; then
+            echo "Error: Source and target environment must differ - the copy clears the target before dumping the source"
+            exit 1
+          fi
+
+  call-copy:
+    needs: validate-inputs
+    uses: './.github/workflows/lib_copy_database.yml'
+    with:
+      source: ${{inputs.source}}
+      target: ${{inputs.target}}
+      allow_production: ${{ inputs.confirm_prod == 'prod' }}
+    secrets: inherit

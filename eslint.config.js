@@ -10,7 +10,12 @@ const compat = new FlatCompat({
 module.exports = [
   { plugins: { '@nx': nxEslintPlugin } },
   {
-    ignores: ['node_modules', '**/*.html'],
+    ignores: [
+      'node_modules',
+      '**/*.html',
+      'tools/deploy3/dist',
+      'tools/deploy3/node_modules',
+    ],
   },
   {
     files: ['**/*.html'],
@@ -105,58 +110,4 @@ module.exports = [
     },
     languageOptions: { parser: require('jsonc-eslint-parser') },
   },
-  {
-    files: ['**/*.json'],
-    rules: {
-      '@nx/dependency-checks': [
-        'error',
-        { ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'] },
-      ],
-    },
-    languageOptions: { parser: require('jsonc-eslint-parser') },
-  },
-  {
-    files: ['**/*.json'],
-    rules: {
-      '@nx/dependency-checks': [
-        'error',
-        { ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'] },
-      ],
-    },
-    languageOptions: { parser: require('jsonc-eslint-parser') },
-  },
-  {
-    files: ['**/*.json'],
-    rules: {
-      '@nx/dependency-checks': [
-        'error',
-        { ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs}'] },
-      ],
-    },
-    languageOptions: { parser: require('jsonc-eslint-parser') },
-  },
-{
-    files: ["**/*.json"],
-    rules: { "@nx/dependency-checks": [
-            "error",
-            { ignoredFiles: ["{projectRoot}/eslint.config.{js,cjs,mjs}"] }
-        ] },
-    languageOptions: { parser: require("jsonc-eslint-parser") }
-},
-{
-    files: ["**/*.json"],
-    rules: { "@nx/dependency-checks": [
-            "error",
-            { ignoredFiles: ["{projectRoot}/eslint.config.{js,cjs,mjs}"] }
-        ] },
-    languageOptions: { parser: require("jsonc-eslint-parser") }
-},
-{
-    files: ["**/*.json"],
-    rules: { "@nx/dependency-checks": [
-            "error",
-            { ignoredFiles: ["{projectRoot}/eslint.config.{js,cjs,mjs}"] }
-        ] },
-    languageOptions: { parser: require("jsonc-eslint-parser") }
-},
 ];

@@ -61,9 +61,13 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": ["user"],
+          "realm": [
+            "user"
+          ],
           "client": {
-            "account": ["manage-account"]
+            "account": [
+              "manage-account"
+            ]
           }
         },
         "clientRole": false,
@@ -123,6 +127,15 @@
         "clientRole": false,
         "containerId": "fb1dab8f-f9f8-4886-9051-4f663f51a6b2",
         "attributes": {}
+      },
+      {
+        "id": "04df5225-f275-4be8-b4ca-7130218f0c49",
+        "name": "startuphafen-admin",
+        "description": "Admin for startuphafen.",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "fb1dab8f-f9f8-4886-9051-4f663f51a6b2",
+        "attributes": {}
       }
     ],
     "client": {
@@ -153,7 +166,10 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": ["query-groups", "query-users"]
+              "realm-management": [
+                "query-groups",
+                "query-users"
+              ]
             }
           },
           "clientRole": true,
@@ -185,7 +201,9 @@
           "composite": true,
           "composites": {
             "client": {
-              "realm-management": ["query-clients"]
+              "realm-management": [
+                "query-clients"
+              ]
             }
           },
           "clientRole": true,
@@ -378,8 +396,10 @@
     "clientRole": false,
     "containerId": "cf1bbadc-eeae-43cd-9aa7-1baa4bb7e6ef"
   },
-  "requiredCredentials": ["password"],
-  "passwordPolicy": "length(8) and maxLength(64) and lowerCase(1) and specialChars(1) and notUsername(undefined) and notEmail(undefined) and upperCase(1) and digits(1)",
+  "requiredCredentials": [
+    "password"
+  ],
+  "passwordPolicy": "length(8) and maxLength(64) and lowerCase(1) and specialChars(1) and notUsername() and notEmail() and upperCase(1) and digits(1)",
   "otpPolicyType": "totp",
   "otpPolicyAlgorithm": "HmacSHA1",
   "otpPolicyInitialCounter": 0,
@@ -399,11 +419,14 @@
       "profile.attributes.personalTitle": "Anrede",
       "profile.attributes.addressBundID": "Adresse",
       "profile.attributes.cellphoneNumber": "Mobilnummer",
-      "profile.attributes.phoneNumber": "Telefonnummer"
+      "profile.attributes.phoneNumber": "Telefonnummer",
+      "profile.attributes.inboxReference": "Inbox-Referenz"
     }
   },
   "webAuthnPolicyRpEntityName": "keycloak",
-  "webAuthnPolicySignatureAlgorithms": ["ES256"],
+  "webAuthnPolicySignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyRpId": "",
   "webAuthnPolicyAttestationConveyancePreference": "not specified",
   "webAuthnPolicyAuthenticatorAttachment": "not specified",
@@ -414,7 +437,9 @@
   "webAuthnPolicyAcceptableAaguids": [],
   "webAuthnPolicyExtraOrigins": [],
   "webAuthnPolicyPasswordlessRpEntityName": "startuphafen",
-  "webAuthnPolicyPasswordlessSignatureAlgorithms": ["ES256"],
+  "webAuthnPolicyPasswordlessSignatureAlgorithms": [
+    "ES256"
+  ],
   "webAuthnPolicyPasswordlessRpId": "",
   "webAuthnPolicyPasswordlessAttestationConveyancePreference": "not specified",
   "webAuthnPolicyPasswordlessAuthenticatorAttachment": "not specified",
@@ -427,7 +452,9 @@
   "scopeMappings": [
     {
       "clientScope": "offline_access",
-      "roles": ["offline_access"]
+      "roles": [
+        "offline_access"
+      ]
     }
   ],
   "clients": [
@@ -438,13 +465,17 @@
       "description": "",
       "rootUrl": "${authBaseUrl}",
       "adminUrl": "",
-      "baseUrl": "/realms/rnx/account/",
+      "baseUrl": "/realms/startuphafen/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["https://${{APP_HOST}}*"],
-      "webOrigins": ["*"],
+      "redirectUris": [
+        "https://${{APP_HOST}}*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -491,8 +522,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["https://${{APP_HOST}}*"],
-      "webOrigins": ["https://${{APP_HOST}}"],
+      "redirectUris": [
+        "https://${{APP_HOST}}*"
+      ],
+      "webOrigins": [
+        "https://${{APP_HOST}}"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -662,8 +697,12 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["/admin/startuphafen/console/*"],
-      "webOrigins": ["+"],
+      "redirectUris": [
+        "/admin/startuphafen/console/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -728,14 +767,18 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "redirectUris": ["https://${{APP_HOST}}*"],
-      "webOrigins": ["*"],
+      "redirectUris": [
+        "https://${{APP_HOST}}*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "serviceAccountsEnabled": false,
       "publicClient": true,
       "frontchannelLogout": false,
@@ -854,6 +897,20 @@
             "claim.name": "profilebild",
             "jsonType.label": "String"
           }
+        },
+        {
+          "id": "a1b2c3d4-5678-4def-9abc-def012345678",
+          "name": "startuphafen_app-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "startuphafen_app",
+            "id.token.claim": "false",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
         }
       ],
       "defaultClientScopes": [
@@ -868,6 +925,7 @@
         "acr",
         "firstName",
         "addressBundID",
+        "inboxReference",
         "phoneNumber",
         "phone",
         "roles",
@@ -875,7 +933,11 @@
         "basic",
         "email"
       ],
-      "optionalClientScopes": ["address", "offline_access", "microprofile-jwt"]
+      "optionalClientScopes": [
+        "address",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     }
   ],
   "clientScopes": [
@@ -1495,6 +1557,37 @@
       ]
     },
     {
+      "id": "a9b1689f-cdf6-4a4f-af1e-6fb6a743dc00",
+      "name": "inboxReference",
+      "description": "",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "id": "846414d3-5901-404b-a70c-18d6f0700869",
+          "name": "inboxReference",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "inboxReference",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "inbox_reference",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
       "id": "77c2d237-0658-4d00-925f-72682d02f648",
       "name": "phoneNumber",
       "description": "",
@@ -1714,6 +1807,7 @@
     "basic",
     "acr",
     "addressBundID",
+    "inboxReference",
     "firstName",
     "lastName",
     "academicTitle",
@@ -1744,10 +1838,10 @@
     "auth": "",
     "port": "1025",
     "host": "maildev",
-    "replyTo": "keycloak@startuphafen.pct-digital.de",
-    "from": "keycloak@startuphafen.pct-digital.de",
+    "replyTo": "keycloak@placeholder.invalid",
+    "from": "keycloak@placeholder.invalid",
     "fromDisplayName": "Startuphafen - Dev - Keycloak",
-    "envelopeFrom": "keycloak@startuphafen.pct-digital.de",
+    "envelopeFrom": "keycloak@placeholder.invalid",
     "ssl": "false"
   },
   "loginTheme": "startuphafen",
@@ -1755,7 +1849,10 @@
   "adminTheme": "",
   "emailTheme": "startuphafen",
   "eventsEnabled": false,
-  "eventsListeners": ["jboss-logging", "email"],
+  "eventsListeners": [
+    "jboss-logging",
+    "email"
+  ],
   "enabledEventTypes": [],
   "adminEventsEnabled": false,
   "adminEventsDetailsEnabled": false,
@@ -1788,7 +1885,7 @@
         "syncMode": "LEGACY",
         "clientSecret": "${{OIDC_CLIENT_SECRET}}",
         "allowedClockSkew": "0",
-        "defaultScope": "openid profile email default address authorization",
+        "defaultScope": "openid profile email default address authorization inbox",
         "userInfoUrl": "https://${{OIDC_HOST}}/webidp2/connect/userinfo",
         "validateSignature": "true",
         "clientId": "${{OIDC_CLIENT_ID}}",
@@ -1819,6 +1916,17 @@
       }
     },
     {
+      "id": "039eeb89-0e74-4a34-9fc6-b92b7fc4c65f",
+      "name": "inboxReferenceBundID",
+      "identityProviderAlias": "${{OIDC_ALIAS}}",
+      "identityProviderMapper": "oidc-user-attribute-idp-mapper",
+      "config": {
+        "syncMode": "FORCE",
+        "claim": "inbox_reference",
+        "user.attribute": "inboxReference"
+      }
+    },
+    {
       "id": "0d5f04f7-439b-4134-bd66-c149c0e2980c",
       "name": "firstNameBundID",
       "identityProviderAlias": "${{OIDC_ALIAS}}",
@@ -1835,7 +1943,7 @@
       "identityProviderAlias": "${{OIDC_ALIAS}}",
       "identityProviderMapper": "oidc-user-attribute-idp-mapper",
       "config": {
-        "syncMode": "INHERIT",
+        "syncMode": "FORCE",
         "claim": "family_name",
         "user.attribute": "lastName"
       }
@@ -1957,7 +2065,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": ["true"]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       },
       {
@@ -1975,7 +2085,9 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "max-clients": ["200"]
+          "max-clients": [
+            "200"
+          ]
         }
       },
       {
@@ -1985,7 +2097,9 @@
         "subType": "authenticated",
         "subComponents": {},
         "config": {
-          "allow-default-scopes": ["true"]
+          "allow-default-scopes": [
+            "true"
+          ]
         }
       },
       {
@@ -1995,8 +2109,12 @@
         "subType": "anonymous",
         "subComponents": {},
         "config": {
-          "host-sending-registration-request-must-match": ["true"],
-          "client-uris-must-match": ["true"]
+          "host-sending-registration-request-must-match": [
+            "true"
+          ],
+          "client-uris-must-match": [
+            "true"
+          ]
         }
       },
       {
@@ -2045,7 +2163,7 @@
         "subComponents": {},
         "config": {
           "kc.user.profile.config": [
-            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":4,\"max\":48},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"annotations\":{\"inputHelperTextAfter\":\"${registerUsernameRequirements}\"},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"firstName\",\"displayName\":\"${firstName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"lastName\",\"displayName\":\"${lastName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"dateOfBirth\",\"displayName\":\"${profile.attributes.dateOfBirth}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"academicTitle\",\"displayName\":\"${profile.attributes.academicTitle}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"personalTitle\",\"displayName\":\"${profile.attributes.personalTitle}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"addressBundID\",\"displayName\":\"${profile.attributes.addressBundID}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"cellphoneNumber\",\"displayName\":\"${profile.attributes.cellphoneNumber}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"phoneNumber\",\"displayName\":\"${profile.attributes.phoneNumber}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to usermetadata\"}]}"
+            "{\"attributes\":[{\"name\":\"username\",\"displayName\":\"${username}\",\"validations\":{\"length\":{\"min\":4,\"max\":48},\"username-prohibited-characters\":{},\"up-username-not-idn-homograph\":{}},\"annotations\":{\"inputHelperTextAfter\":\"${registerUsernameRequirements}\"},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"email\",\"displayName\":\"${email}\",\"validations\":{\"email\":{},\"length\":{\"max\":255}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"firstName\",\"displayName\":\"${firstName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\",\"user\"]},\"multivalued\":false},{\"name\":\"lastName\",\"displayName\":\"${lastName}\",\"validations\":{\"length\":{\"max\":255},\"person-name-prohibited-characters\":{}},\"required\":{\"roles\":[\"user\"]},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"dateOfBirth\",\"displayName\":\"${profile.attributes.dateOfBirth}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"academicTitle\",\"displayName\":\"${profile.attributes.academicTitle}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"personalTitle\",\"displayName\":\"${profile.attributes.personalTitle}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"addressBundID\",\"displayName\":\"${profile.attributes.addressBundID}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"cellphoneNumber\",\"displayName\":\"${profile.attributes.cellphoneNumber}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"phoneNumber\",\"displayName\":\"${profile.attributes.phoneNumber}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\",\"user\"],\"edit\":[\"admin\"]},\"multivalued\":false},{\"name\":\"inboxReference\",\"displayName\":\"${profile.attributes.inboxReference}\",\"validations\":{},\"annotations\":{},\"permissions\":{\"view\":[\"admin\"],\"edit\":[\"admin\"]},\"multivalued\":false}],\"groups\":[{\"name\":\"user-metadata\",\"displayHeader\":\"User metadata\",\"displayDescription\":\"Attributes, which refer to usermetadata\"}]}"
           ]
         }
       }
@@ -2057,8 +2175,12 @@
         "providerId": "rsa-generated",
         "subComponents": {},
         "config": {
-          "priority": ["-100"],
-          "algorithm": ["RS512"]
+          "priority": [
+            "-100"
+          ],
+          "algorithm": [
+            "RS512"
+          ]
         }
       },
       {
@@ -2067,8 +2189,12 @@
         "providerId": "rsa-enc-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "algorithm": ["RSA-OAEP"]
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "RSA-OAEP"
+          ]
         }
       },
       {
@@ -2077,7 +2203,9 @@
         "providerId": "rsa-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"]
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -2086,7 +2214,9 @@
         "providerId": "aes-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"]
+          "priority": [
+            "100"
+          ]
         }
       },
       {
@@ -2095,14 +2225,20 @@
         "providerId": "hmac-generated",
         "subComponents": {},
         "config": {
-          "priority": ["100"],
-          "algorithm": ["HS512"]
+          "priority": [
+            "100"
+          ],
+          "algorithm": [
+            "HS512"
+          ]
         }
       }
     ]
   },
   "internationalizationEnabled": true,
-  "supportedLocales": ["de"],
+  "supportedLocales": [
+    "de"
+  ],
   "defaultLocale": "de",
   "authenticationFlows": [
     {
@@ -2342,7 +2478,7 @@
           "authenticatorConfig": "${{OIDC_ALIAS}}",
           "authenticator": "identity-provider-redirector",
           "authenticatorFlow": false,
-          "requirement": "REQUIRED",
+          "requirement": "ALTERNATIVE",
           "priority": 25,
           "autheticatorFlow": false,
           "userSetupAllowed": false
@@ -2777,7 +2913,7 @@
     "shortVerificationUri": "",
     "actionTokenGeneratedByUserLifespan.reset-credentials": "3600"
   },
-  "keycloakVersion": "26.0.1",
+  "keycloakVersion": "26.1.2",
   "userManagedAccessAllowed": false,
   "organizationsEnabled": false,
   "clientProfiles": {

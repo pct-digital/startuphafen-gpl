@@ -12,6 +12,7 @@ export function getBuildProcedure(waterMarkConfig: WaterMarkConfig) {
     watermark: baseProcedure
       .meta({
         requiredRolesAny: AnonymousUser,
+        feature: null,
       })
       .input(z.void())
       .output(z.string())

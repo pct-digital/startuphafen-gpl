@@ -7,6 +7,7 @@ export const buildLoginRouter = (serverConfig: ServerConfig) => {
     loadRedirectHost: baseProcedure
       .meta({
         requiredRolesAny: ['anon'],
+        feature: null,
       })
       .input(z.void())
       .output(z.string())
@@ -14,6 +15,22 @@ export const buildLoginRouter = (serverConfig: ServerConfig) => {
         return serverConfig.allowedOrigins[0] != null
           ? serverConfig.allowedOrigins[0]
           : 'http://localhost:4000';
+      }),
+    loadAdminLoginOptions: baseProcedure
+      .meta({
+        requiredRolesAny: ['anon'],
+        feature: null,
+      })
+      .input(z.void())
+      .output(
+        z.object({
+          idpHint: z.string().nullable(),
+        })
+      )
+      .query(async () => {
+        return {
+          idpHint: serverConfig.keycloak.adminIdpHint ?? null,
+        };
       }),
   });
 };

@@ -3,9 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormlyModule } from '@ngx-formly/core';
 import { Contact, WebsiteText } from '@startuphafen/startuphafen-common';
+import { ContactCollectionService } from '../../../common/contact-collection/contact-collection.service';
 import { ContactGrouped } from '../../contact-grouped.model';
 import { ContactPagePresenterComponent } from '../../display/contact-page-presenter/contact-page-presenter.component';
-import { ContactCollectionService } from '../../services/contact-collection/contact-collection.service';
 
 @Component({
   selector: 'sh-contact-page-container',
@@ -36,9 +36,7 @@ export class ContactPageContainerComponent implements OnInit {
 
   async loadContactCollection() {
     try {
-      this.contactList = await this.contactCollectionService.getContentList(
-        'contacts'
-      );
+      this.contactList = await this.contactCollectionService.getContactList();
       this.contactList = await this.contactCollectionService.parseImageUrl(
         this.contactList
       );

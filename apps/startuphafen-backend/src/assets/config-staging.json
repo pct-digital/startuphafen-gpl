@@ -1,5 +1,15 @@
 {
   "watermarkConfig": {
     "text": "Testsystem"
+  },
+  "eric": {
+    "devMode": true,
+    "placeholder": null
+  },
+  "ozg": {
+    "placeholder": null,
+    "useStagingDomain": true,
+    "enableAmtSelection": false,
+    "globalOverride": null
   }
 }

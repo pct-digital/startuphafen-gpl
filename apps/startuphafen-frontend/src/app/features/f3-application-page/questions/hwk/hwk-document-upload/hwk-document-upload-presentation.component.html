@@ -1,0 +1,106 @@
+<div class="mt-6 rounded border border-gray-200 bg-white p-4">
+  <div class="flex flex-col gap-1">
+    <div class="text-base font-semibold text-secondary">{{ title }}</div>
+    <p class="text-sm text-tertiary">{{ description }}</p>
+    @if (isRequired) {
+    <p class="text-sm font-medium text-secondary">{{ requiredHint }}</p>
+    }
+    <p class="text-xs text-tertiary">
+      Pro Fall sind maximal {{ maxFiles }} PDF-Dateien mit insgesamt
+      {{ maxTotalSizeMb }} MB möglich.
+    </p>
+  </div>
+
+  @if (!canUpload) {
+  <div
+    class="mt-3 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"
+  >
+    {{ roleMissingHint }}
+  </div>
+  } @else {
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+    <input
+      #fileInput
+      type="file"
+      class="hidden"
+      accept=".pdf"
+      (change)="onFileChange($event)"
+      [disabled]="isUploading"
+    />
+
+    <button
+      type="button"
+      shButton
+      class="text-sm h-9 px-4"
+      [disabled]="isUploading"
+      (click)="triggerFileInput(fileInput)"
+      data-testid="hwk-upload-select"
+    >
+      {{ isUploading ? 'Lädt hoch...' : 'PDF auswählen' }}
+    </button>
+
+    <button
+      type="button"
+      shButton
+      [outline]="true"
+      class="text-sm h-9 px-4"
+      [disabled]="isLoading || isUploading"
+      (click)="onReloadRequested()"
+      data-testid="hwk-upload-reload"
+    >
+      Aktualisieren
+    </button>
+  </div>
+
+  <div class="mt-4 rounded border border-gray-200 bg-gray-50 p-3">
+    @if (documents.length === 0) {
+    <p class="text-sm text-tertiary">Noch keine Dokumente hochgeladen.</p>
+    } @else {
+    <ul class="space-y-2">
+      @for (document of documents; track trackByDocumentId($index, document)) {
+      <li
+        class="flex flex-col gap-2 rounded border border-gray-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <div class="text-sm font-medium text-secondary break-all">
+            {{ document.filename }}
+          </div>
+          <div class="text-xs text-tertiary">
+            Hochgeladen am {{ document.createdAt | date : 'dd.MM.yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          shButton
+          [outline]="true"
+          class="text-sm h-9 px-3"
+          [disabled]="isDeleting(document.id) || isUploading"
+          (click)="onDeleteRequested(document.id)"
+          [attr.data-testid]="'hwk-upload-delete-' + document.id"
+        >
+          {{ isDeleting(document.id) ? 'Löscht...' : 'Löschen' }}
+        </button>
+      </li>
+      }
+    </ul>
+    }
+  </div>
+  } @if (error) {
+  <div
+    class="mt-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    data-testid="hwk-upload-error"
+  >
+    {{ error }}
+  </div>
+  }
+
+  @if (showRequiredError) {
+  <div
+    class="mt-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    data-testid="hwk-upload-required-error"
+  >
+    {{ requiredHint }}
+  </div>
+  }
+</div>

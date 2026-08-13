@@ -42,7 +42,6 @@ import { marked } from 'marked';
   styles: ``,
 })
 export class FaqAccordionComponent implements OnInit {
-  @Input() isPopup = false;
   @Input() faqList: FAQItem[] = [];
 
   faqs: Faq[] = [];

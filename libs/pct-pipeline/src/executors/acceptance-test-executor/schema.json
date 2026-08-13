@@ -3,8 +3,8 @@
   "outputCapture": "direct-nodejs",
   "version": 2,
   "cli": "nx",
-  "title": "Funtional Acceptance Tester",
-  "description": "Needs a production build of an app to run our cucumber accptance tests against it using the docker-local configuration.",
+  "title": "Functional Acceptance Tester",
+  "description": "Needs a production build of an app to run our cucumber acceptance tests against it using the docker-local configuration.",
   "type": "object",
   "properties": {
     "headed": {
@@ -23,7 +23,7 @@
     },
     "documentationVideos": {
       "type": "boolean",
-      "description": "Set to true to generate documentation videos: run tests in slow motion and patch Cypress to add overlays. Meant to be used as a prepartion step to generate the documentation page, which needs these videos.",
+      "description": "Set to true to generate documentation videos: run tests in slow motion and patch Cypress to add overlays. Meant to be used as a preparation step to generate the documentation page, which needs these videos.",
       "default": false
     },
     "documentationScreenshots": {
@@ -33,13 +33,13 @@
     },
     "size": {
       "type": "string",
-      "description": "Set to web, iphone_65, iphone_55 or ipad_129 for various screen sizes to be used, meant for screenshots. The default value is android for a typical android size",
+      "description": "Set to iphone_65, iphone_55 or ipad_129 for various screen sizes to be used, meant for screenshots. The default value is android for a typical android size",
       "default": "android"
     },
     "skipBuild": {
       "type": "boolean",
       "default": false,
-      "description": "Should the app build be skiped before it is tested? Default is false, which build the app on each new test start."
+      "description": "Should the app build be skipped before it is tested? Default is false, which build the app on each new test start."
     },
     "noDockerLog": {
       "type": "boolean",
@@ -60,7 +60,7 @@
     },
     "e2eAppName": {
       "type": "string",
-      "description": "Mandatory field, spcecify the name of the e2e app"
+      "description": "Mandatory field, specify the name of the e2e app"
     },
     "baseDockerFilePath": {
       "type": "string",

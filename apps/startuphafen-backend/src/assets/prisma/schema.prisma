@@ -5,115 +5,219 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
   url      = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model ShUser {
-  id String @id
-  name String?
-  city String
-  postalCode String
-  country String
-  street String
-  firstName String
-  lastName String
-  dateOfBirth String
-  phoneNumber String
+  id              String         @id
+  name            String?
+  city            String
+  postalCode      String
+  country         String
+  street          String
+  firstName       String
+  lastName        String
+  dateOfBirth     String
+  phoneNumber     String
   cellPhoneNumber String
   email String
+  inboxReference String?
   title String?
   academicTitle String?
   roles String[]
   projects Project[]
-  shProjects ShProject[]
+  createdAt DateTime @default(now())
+  chatSessions ChatSession[]
+  documents       UserDocument[]
+  identificationDocuments  IdentificationDocument[]
+  profileInfo     ProfileInfo?
+}
+
+model FeatureFlag {
+  name        String   @id
+  enabled     Boolean  @default(false)
+  description String?
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Project {
-  id Int @id @default(autoincrement())
-  name String
-  user ShUser @relation(fields: [userId], references: [id])
-  userId String
-  progress Int @default(0)
+  id               Int                  @id @default(autoincrement())
+  name             String
+  user             ShUser               @relation(fields: [userId], references: [id])
+  userId           String
+  catalogueId      String               @default("none")
+  progress         Int                  @default(0)
   questionTracking QuestionTracking[]
-  answers Answers[]
-  flagTracking FlagTracking[]
-  steErSent Boolean @default(false)
-  gewASent Boolean @default(false)
+  answers          Answers[]
+  ozgInfo          OzgInfo[]
+  userDocuments    UserDocument[]
+  identificationDocuments IdentificationDocument[]
+  stSent           Boolean              @default(false)
+  gwSent           Boolean              @default(false)
+  lastPosition     Int
+  hwkMailLog       HwkMailLog?
+  createdAt        DateTime             @default(now())
+}
+
+model HwkMailLog {
+  id            Int      @id @default(autoincrement())
+  projectId     Int      @unique
+  userId        String
+  status        String
+  recipient     String
+  cc            String?
+  replyTo       String?
+  subject       String
+  mailBody      String?
+  mailFrom      String?
+  mailContentType String?
+  lastError     String?
+  attemptCount  Int      @default(0)
+  lastAttemptAt DateTime?
+  nextAttemptAt DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([nextAttemptAt])
 }
 
 model QuestionTracking {
-  id Int @id @default(autoincrement())
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int 
-  strapiQuestionFlowId String
-  strapiQDictPosIndex Int
-  posIndex Int
+  id               Int       @id @default(autoincrement())
+  project          Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        Int
+  answeredQuestions String[]
 }
 
 model Answers {
-  id Int @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId      Int
+  key            String
+  componentId    String
+  stringValue    String?
+  xmlKey         String
+  value          String
+  type           String
+  questionText   String @default("")
+  answerText     String @default("")
+  headerText     String?
+}
+
+model VectorEmbedding {
+  id        Int                   @id @default(autoincrement())
+  content   String
+  embedding Unsupported("vector")
+  metadata  Json?
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+}
+
+model ChatSession {
+  id        Int           @id @default(autoincrement())
+  user      ShUser        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  title     String        @default("Neuer Chat")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?
+  messages  ChatMessage[]
+
+  @@index([userId, deletedAt])
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id        Int         @id @default(autoincrement())
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId Int
+  author    ChatAuthor
+  content   String
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+enum ChatAuthor {
+  human
+  agent
+  system
+}
+
+model UserDocument {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  filename  String
+  mimeType  String
+  documentCase String?
+  data      Bytes
+  createdAt DateTime @default(now())
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        Int?
+
+  user ShUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model IdentificationDocument {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  taxId     String
+  projectId Int?
+  mimeType  String
+  fileName  String   @default("Personalausweis")
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  user ShUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+
+  @@index([userId])
+  @@unique([taxId, projectId])
+}
+
+model ProfileInfo {
+  id                 Int      @id @default(autoincrement())
+  userId             String   @unique
+  phoneInternational String
+  phoneNational      String
+  phoneNumber        String
+  website            String?
+  createdAt          DateTime @default(now())
+  birthCountry       String?
+  birthPlace         String?
+
+  user ShUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OzgInfo {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  plz       String
+  kreis     String
+  gemeinde  String
+  amt       String
+  amtCode   String
+  domain    String
+  createdAt DateTime @default(now())
+  oeid      String
+
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int 
-  key String
-  type String @default("string")
-  strapiAnswerId Int
-  xmlKey String
-  flowId String
-  value String
-}
 
-model FlagTracking {
-  id Int @id @default(autoincrement())
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int 
-  qId String
-  flag String
-}
-
-
-model ShProject {
-  id Int @id @default(autoincrement())
-  name String
-  user ShUser @relation(fields: [userId], references: [id])
-  userId String
-  progress Int @default(0)
-  questionTracking ShQuestionTracking[]
-  answers ShAnswers[]
-  steErSent Boolean @default(false)
-  gewASent Boolean @default(false)
-  catalogueVersion ShCatalogueVersions @relation(fields: [versionId], references: [id])
-  versionId Int
-}
-
-model ShQuestionTracking {
-  id Int @id @default(autoincrement())
-  project ShProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int 
-  strapiQuestionId String
-  posIndex Int
-}
-
-model ShAnswers {
-  id Int @id @default(autoincrement())
-  project ShProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int 
-  key String
-  type String @default("string")
-  strapiAnswerId String
-  xmlKey String
-  catalogueId String
-  value String
-}
-
-model ShCatalogueVersions{
-  id Int @id @default(autoincrement())
-  projects ShProject[]
-  catalogueJSON String
-  catalogueId String
-  createdAt DateTime
+  @@index([projectId])
 }

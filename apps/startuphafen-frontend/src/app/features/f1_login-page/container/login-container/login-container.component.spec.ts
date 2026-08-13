@@ -123,4 +123,19 @@ describe('LoginContainerComponent', () => {
 
     expect(registerSpy).toHaveBeenCalled();
   });
+
+  it('should log login failures', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    const testError = new Error('Login failed');
+    loginServiceMock.getRedirectHost.mockRejectedValueOnce(testError);
+
+    try {
+      await spectator.component.onLogin();
+    } catch {
+      // Expected to throw
+    }
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(testError);
+    consoleErrorSpy.mockRestore();
+  });
 });

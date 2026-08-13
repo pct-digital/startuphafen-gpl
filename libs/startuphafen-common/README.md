@@ -1,6 +1,6 @@
 # startuphafen-common
 
-This library was generated with [Nx](https://nx.dev).
+Domain types shared between frontend and backend: generated database entities, zod schemas, form data templates and builders, and the HWK application form filler.
 
 ## Running unit tests
 

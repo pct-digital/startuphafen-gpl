@@ -1,0 +1,189 @@
+<div
+  class="w-full flex flex-col items-center justify-start pt-20 pb-16 px-4 sm:px-6 lg:px-8 gap-2"
+>
+  <div
+    class="absolute top-28 left-0 w-full h-[400px]"
+    style="
+      background-color: rgba(var(--sh-color-primary-rgb), 0.2);
+      pointer-events: none;
+    "
+  >
+    <img
+      src="/assets/icons/sh-cutout.svg"
+      alt=""
+      class="absolute right-0 top-2 w-fit"
+    />
+  </div>
+
+  @if (showChecklist) {
+  <div [@slideTransition]="true" class="relative z-10 w-full max-w-6xl">
+    <div
+      class="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden"
+    >
+      <div
+        class="bg-gradient-to-r from-sky-600 to-sky-800 p-6 sm:p-8 text-white"
+      >
+        <h1
+          class="text-xl sm:text-3xl font-bold mb-2"
+          data-testid="checklist-title"
+        >
+          {{ title }}
+        </h1>
+        <p
+          class="text-sm sm:text-base opacity-90 max-w-3xl"
+          data-testid="checklist-description"
+        >
+          {{ description }}
+        </p>
+      </div>
+      <div class="p-6 sm:p-8 lg:p-10 bg-white space-y-10">
+        <section>
+          <div
+            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+          >
+            <div>
+              <span
+                class="block text-sm uppercase tracking-wide text-tertiary mb-2"
+                >Fortschritt</span
+              >
+              <h2
+                class="text-2xl font-semibold text-secondary"
+                data-testid="progress-counter"
+              >
+                {{ currentStepIndex }} / {{ checklistItems.length }}
+              </h2>
+            </div>
+            <div class="flex-1 max-w-md ml-auto">
+              <div
+                class="w-full bg-gray-100 rounded-full h-3 overflow-hidden"
+                data-testid="progress-bar"
+              >
+                <div
+                  class="bg-gradient-to-r from-sky-600 to-sky-800 h-full transition-all duration-300"
+                  [style.width.%]="getProgressPercentage()"
+                ></div>
+              </div>
+              <p
+                class="text-sm md:text-base text-tertiary mt-2"
+                data-testid="progress-percentage"
+              >
+                {{ getProgressPercentage() }}% abgeschlossen
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="space-y-4">
+            @for (item of checklistItems; track item.id; let index = $index) {
+            <div
+              class="p-5 sm:p-6 lg:p-7 bg-white rounded-2xl border border-gray-200 shadow-sm transition-all flex flex-col gap-5"
+              [attr.data-testid]="'checklist-item-' + index"
+              [ngClass]="{
+                'ring-2 ring-sky-500 shadow-lg': isStepCurrent(index),
+                'opacity-70': !isStepCompleted(index) && !isStepCurrent(index)
+              }"
+            >
+              <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                <div class="flex items-center justify-center sm:items-start">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-base transition-colors"
+                    [attr.data-testid]="'checklist-number-' + index"
+                    [ngClass]="{
+                      'bg-gradient-to-r from-sky-600 to-sky-800':
+                        isStepCurrent(index) || isStepCompleted(index),
+                      'bg-gray-200 text-tertiary':
+                        !isStepCurrent(index) && !isStepCompleted(index)
+                    }"
+                  >
+                    {{ index + 1 }}
+                  </div>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h3
+                    class="text-lg md:text-xl font-semibold text-secondary"
+                    [ngClass]="{
+                      'text-tertiary': isStepCompleted(index)
+                    }"
+                  >
+                    {{ item.title }}
+                  </h3>
+                  <p class="text-base text-tertiary mt-2">
+                    {{ item.description }}
+                  </p>
+                </div>
+              </div>
+
+              @if (index === 1 && isStepCurrent(index)) {
+              <sh-document-upload
+                (completionChange)="onUploadCompletion($event)"
+                (fileSelectedChange)="onFileSelected($event)"
+                [isUploading]="isUploading"
+                [projectId]="projectId"
+                #uploadDocuments
+              ></sh-document-upload>
+              }
+
+              <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end"
+              >
+                @if(index === 0 && isStepCurrent(index)){ @if (isBntkEnabled())
+                {
+                <div>
+                  <button
+                    shButton
+                    class="w-full sm:w-auto sm:min-w-[150px] justify-center"
+                    (click)="sendToBntk(index)"
+                    [disabled]="bntk.sent || bntk.sending"
+                    data-testid="notar-button"
+                  >
+                    @if (bntk.sending) { Daten werden gesendet... } @else if
+                    (bntk.sent) { Notarieller Antrag in neuem Tab geöffnet }
+                    @else { Notariellen Antrag stellen }
+                  </button>
+                  @if (bntk.unsuccessfulSend) {
+                  <div class="text-red-500">
+                    Fehler beim Senden an die Bundesnotarkammer
+                  </div>
+                  }
+                </div>
+                } @else {
+                <button
+                  shButton
+                  class="w-full sm:w-auto sm:min-w-[150px] justify-center"
+                  (click)="openNotar(index)"
+                  data-testid="notar-button"
+                >
+                  Zur Notarsuche
+                </button>
+                } }
+                <button
+                  shButton
+                  [attr.data-testid]="'checklist-item-button-' + index"
+                  (click)="handleItemClick(index)"
+                  [disabled]="!isStepClickable(index) || isUploading"
+                  [outline]="isStepCompleted(index)"
+                  [style.pointerEvents]="
+                    isStepCompleted(index) ? 'none' : 'auto'
+                  "
+                  class="w-full sm:w-auto sm:min-w-[150px] md:min-w-[160px] justify-center"
+                >
+                  {{ getButtonText(index) }}
+                </button>
+              </div>
+            </div>
+            } @empty {
+            <div class="text-center py-12">
+              <p class="text-lg text-tertiary">
+                Keine Checklist Items verfügbar.
+              </p>
+            </div>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+  }
+</div>

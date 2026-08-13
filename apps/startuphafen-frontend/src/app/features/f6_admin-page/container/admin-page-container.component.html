@@ -1,0 +1,9 @@
+<sh-loader></sh-loader>
+<sh-admin-page-presenter
+  [topCards]="topCards"
+  (kcRouteClicked)="routeToKC()"
+  (strapiRouteClicked)="routeStrapi()"
+  (featureFlagRouteClicked)="routeToFeatureFlags()"
+  [userChartOptions]="userChartOptions"
+  [errorMessage]="errorMessage"
+></sh-admin-page-presenter>

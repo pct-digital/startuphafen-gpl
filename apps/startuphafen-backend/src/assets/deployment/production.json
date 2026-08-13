@@ -1,0 +1,14 @@
+{
+  "appName": "startuphafen",
+  "composeFiles": [
+    "../docker-compose.yml",
+    "../docker-compose-staging.yml",
+    "../docker-compose-production.yml"
+  ],
+  "maintenanceMessage": "Aktuell finden Wartungsarbeiten an Startuphafen statt. Es wird in Kürze wieder erreichbar sein.",
+  "minDiskSpaceGB": 15,
+  "minFreeMemoryMB": 2000,
+  "postgresImage": "postgres:15",
+  "keycloakImage": "quay.io/keycloak/keycloak:26.1.2",
+  "dockerNetwork": "assets_local"
+}

@@ -7,8 +7,8 @@ import {
 import { FormlyModule } from '@ngx-formly/core';
 import { TrpcService } from '@startuphafen/angular-common';
 import { Contact, WebsiteText } from '@startuphafen/startuphafen-common';
+import { ContactCollectionService } from '../../../common/contact-collection/contact-collection.service';
 import { ContactPagePresenterComponent } from '../../display/contact-page-presenter/contact-page-presenter.component';
-import { ContactCollectionService } from '../../services/contact-collection/contact-collection.service';
 import { ContactPageContainerComponent } from './contact-page-container.component';
 
 describe('ContactPageContainerComponent', () => {
@@ -58,7 +58,7 @@ describe('ContactPageContainerComponent', () => {
       }),
       mockProvider(ContactCollectionService, {
         getWebsiteText: jest.fn().mockResolvedValue(mockWebsiteText),
-        getContentList: jest.fn().mockResolvedValue(mockContacts),
+        getContactList: jest.fn().mockResolvedValue(mockContacts),
         parseImageUrl: jest.fn().mockResolvedValue(mockContacts),
       }),
     ],

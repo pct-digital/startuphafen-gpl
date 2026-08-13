@@ -10,16 +10,7 @@
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "allowedCommonJsDependencies": [
-          "js-sha256",
-          "lodash",
-          "jszip",
-          "socket.io-client",
-          "seedrandom",
-          "assert",
-          "slugify",
-          "ejson"
-        ],
+        "allowedCommonJsDependencies": ["lodash"],
         "outputPath": "dist/apps/startuphafen-frontend",
         "index": "apps/startuphafen-frontend/src/index.html",
         "main": "apps/startuphafen-frontend/src/main.ts",
@@ -30,6 +21,11 @@
           {
             "glob": "**/*",
             "input": "apps/startuphafen-frontend/src/assets"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/ngx-extended-pdf-viewer/assets",
+            "output": "./assets"
           },
           {
             "glob": "**/**",
@@ -55,6 +51,12 @@
       "configurations": {
         "production": {
           "outputHashing": "all",
+          "sourceMap": {
+            "scripts": true,
+            "styles": true,
+            "vendor": true,
+            "hidden": true
+          },
           "styles": [
             "apps/startuphafen-frontend/src/styles.scss",
             {
@@ -63,6 +65,11 @@
           ],
           "assets": [
             "apps/startuphafen-frontend/src/assets",
+            {
+              "glob": "**/*",
+              "input": "node_modules/ngx-extended-pdf-viewer/assets",
+              "output": "./assets"
+            },
             {
               "glob": "**/**",
               "input": "libs/angular-common/src/assets",
@@ -97,6 +104,11 @@
           ],
           "assets": [
             "apps/startuphafen-frontend/src/assets",
+            {
+              "glob": "**/*",
+              "input": "node_modules/ngx-extended-pdf-viewer/assets",
+              "output": "./assets"
+            },
             {
               "glob": "**/**",
               "input": "libs/angular-common/src/assets",

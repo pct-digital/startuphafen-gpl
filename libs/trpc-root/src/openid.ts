@@ -158,11 +158,67 @@ export function getCachedKeyFactory(
   return getCachedKey;
 }
 
+export interface TokenValidationOptions {
+  clientId?: string;
+  realm?: string;
+}
+
+function hasAudience(
+  audienceClaim: string | string[] | undefined,
+  expectedAudience: string
+) {
+  if (typeof audienceClaim === 'string') {
+    return audienceClaim === expectedAudience;
+  }
+
+  if (Array.isArray(audienceClaim)) {
+    return audienceClaim.includes(expectedAudience);
+  }
+
+  return false;
+}
+
+function ensureExpectedTokenContext(
+  payload: KeycloakToken,
+  options?: TokenValidationOptions
+) {
+  if (payload['typ'] !== 'Bearer') {
+    throw new Error('unexpected token type');
+  }
+
+  if (!options) {
+    return;
+  }
+
+  if (
+    options.realm &&
+    (typeof payload.iss !== 'string' ||
+      !payload.iss.endsWith(`/realms/${options.realm}`))
+  ) {
+    throw new Error('unexpected token issuer');
+  }
+
+  if (options.clientId) {
+    if (payload['azp'] !== options.clientId) {
+      throw new Error('unexpected token client');
+    }
+
+    const hasExpectedAudience =
+      hasAudience(payload.aud, options.clientId) ||
+      hasAudience(payload.aud, 'account');
+
+    if (!hasExpectedAudience) {
+      throw new Error('unexpected token audience');
+    }
+  }
+}
+
 export function buildCachedValidateJwtFunction(
   jwksUri: string,
   cacheTimer: CacheTimer,
   getKey = getPublicKey,
-  getNowSeconds = () => Math.floor(Date.now() / 1000)
+  getNowSeconds = () => Math.floor(Date.now() / 1000),
+  validationOptions?: TokenValidationOptions
 ) {
   const cachedKeys = getCachedKeyFactory(jwksUri, cacheTimer, getKey);
 
@@ -186,6 +242,7 @@ export function buildCachedValidateJwtFunction(
 
     const publicKey = await cachedKeys(kid);
     const validated = jwt.verify(token, publicKey, {
+      algorithms: ['RS256', 'RS512'],
       complete: true,
       clockTimestamp: getNowSeconds(),
     });
@@ -194,7 +251,10 @@ export function buildCachedValidateJwtFunction(
       throw new Error('unexpected string payload ' + validated.payload);
     }
 
-    return validated.payload as KeycloakToken;
+    const payload = validated.payload as KeycloakToken;
+    ensureExpectedTokenContext(payload, validationOptions);
+
+    return payload;
   }
 
   return validateJwt;
@@ -204,7 +264,8 @@ export function buildTokenInformationForRequestFunction(
   jwksUri: string,
   cacheTimer: CacheTimer = buildTimedCacheTimer(),
   getKey = getPublicKey,
-  getNowSeconds = () => Math.floor(Date.now() / 1000)
+  getNowSeconds = () => Math.floor(Date.now() / 1000),
+  validationOptions?: TokenValidationOptions
 ) {
   const BEARER = 'Bearer ';
 
@@ -212,7 +273,8 @@ export function buildTokenInformationForRequestFunction(
     jwksUri,
     cacheTimer,
     getKey,
-    getNowSeconds
+    getNowSeconds,
+    validationOptions
   );
 
   return async (msg: IncomingMessage) => {
@@ -226,7 +288,8 @@ export function buildTokenInformationForRequestFunction(
     try {
       return await func(jwt);
     } catch (e) {
-      console.log('Failed to validate a token: ' + jwt, e);
+      const tokenPrefix = jwt.substring(0, 20) + '...[redacted]';
+      console.log('Failed to validate a token: ' + tokenPrefix, e);
       return undefined;
     }
   };
@@ -237,6 +300,7 @@ export const KeycloakAccessConfigSchema = z.object({
   host: z.string(),
   user: z.string(),
   password: z.string(),
+  realm: z.string().min(1),
+  clientId: z.string().min(1),
+  adminIdpHint: z.string().min(1).optional(),
 });
-
-export type KeycloakAccessConfig = z.infer<typeof KeycloakAccessConfigSchema>;

@@ -1,7 +1,7 @@
 <div class="tooltip z-50" (click)="onTooltipClick($event)">
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="w-6 h-6 text-[var(--sh-color-tertiary)]"
+    class="w-{{ size }} h-{{ size }} text-[var(--sh-color-tertiary)]"
     viewBox="0 0 31.989 31.989"
   >
     <path
@@ -11,9 +11,9 @@
     />
   </svg>
 
-  <span
+  <div
     class="tooltiptext"
     [class.mobile-visible]="isMobile && isTooltipVisible"
-    >{{ content }}</span
-  >
+    [innerHTML]="content"
+  ></div>
 </div>

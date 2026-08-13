@@ -1,6 +1,6 @@
 # utility-server
 
-This library was generated with [Nx](https://nx.dev).
+Server-side utilities: configuration loader (config.json + environment overlays + .localConfigs.json), server startup helpers and database sequence fixes for tests.
 
 ## Running unit tests
 

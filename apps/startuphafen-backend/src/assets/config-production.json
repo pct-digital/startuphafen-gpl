@@ -1,8 +1,12 @@
 {
   "watermarkConfig": {
-    "text": "PROD-WIP"
+    "text": ""
   },
   "eric": {
     "devMode": false
+  },
+  "ozg": {
+    "useStagingDomain": false,
+    "globalOverride": null
   }
 }

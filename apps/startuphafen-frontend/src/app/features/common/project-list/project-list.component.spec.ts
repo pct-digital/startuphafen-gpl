@@ -16,24 +16,33 @@ describe('ProjectListComponent', () => {
       name: 'Project 1',
       progress: 50,
       userId: 'okmsdoks',
-      gewASent: false,
-      steErSent: false,
+      gwSent: false,
+      catalogueId: 'eun',
+      lastPosition: 1,
+      stSent: false,
+      createdAt: new Date(),
     },
     {
       id: 2,
       name: 'Project 2',
       progress: 75,
       userId: 'okmsdoks',
-      gewASent: false,
-      steErSent: false,
+      catalogueId: 'eun',
+      gwSent: false,
+      lastPosition: 1,
+      stSent: false,
+      createdAt: new Date(),
     },
     {
       id: 3,
       name: 'Project 3',
       progress: 25,
       userId: 'okmsdoks',
-      gewASent: false,
-      steErSent: false,
+      gwSent: false,
+      lastPosition: 1,
+      catalogueId: 'eun',
+      stSent: false,
+      createdAt: new Date(),
     },
   ];
 
@@ -110,6 +119,42 @@ describe('ProjectListComponent', () => {
       }
 
       expect(spy).toHaveBeenCalledWith(mockProjects[0].id);
+    });
+
+    it('should start editing project name', () => {
+      const firstProject = mockProjects[0];
+
+      spectator.component.startEditingProjectName(firstProject);
+
+      expect(spectator.component.editingProjectId).toBe(firstProject.id);
+      expect(spectator.component.editingProjectName).toBe(firstProject.name);
+    });
+
+    it('should cancel editing project name', () => {
+      spectator.component.editingProjectId = 1;
+      spectator.component.editingProjectName = 'Test Project';
+
+      spectator.component.cancelEditingProjectName();
+
+      expect(spectator.component.editingProjectId).toBeNull();
+      expect(spectator.component.editingProjectName).toBe('');
+    });
+
+    it('should save edited project name', () => {
+      const spy = jest.spyOn(spectator.component.projectNameChange, 'emit');
+      const firstProject = mockProjects[0];
+      spectator.component.startEditingProjectName(firstProject);
+      spectator.component.editingProjectName = 'Updated Project Name';
+
+      spectator.component.saveEditingProjectName(firstProject);
+
+      expect(firstProject.name).toBe('Updated Project Name');
+      expect(spectator.component.editingProjectId).toBeNull();
+      expect(spectator.component.editingProjectName).toBe('');
+      expect(spy).toHaveBeenCalledWith({
+        id: firstProject.id,
+        newName: 'Updated Project Name',
+      });
     });
 
     it('should handle delete for last project', () => {

@@ -35,8 +35,12 @@ testem.log
 core.*
 pgroll-migration-config.json
 /typings
-config-secrets.json
+.localConfigs.json
 
+
+
+# Environment files - local secrets (development only)
+apps/startuphafen-frontend/src/environments/
 # System Files
 .DS_Store
 Thumbs.db
@@ -54,9 +58,10 @@ version.json
 
 core
 
-libs/eric-connector/src/lib/ERiC*
 eric.log
-.claude
-.codegraph
-.codex
+
+*_startuphafen.zip
+
 devcontainer-lock.json
+
+*.p12

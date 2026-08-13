@@ -1,19 +1,32 @@
 import {
   CMSInterface,
-  QuestionFlow,
-  SingleTypeData,
+  LoginPageTexts,
   WebsiteText,
 } from '@startuphafen/startuphafen-common';
 import axios, { AxiosInstance } from 'axios';
-import { LocalSecrets } from '../../config';
+import { z } from 'zod';
+import { ServerConfig } from '../../config';
+
+const OPEN_PLZ_FALLBACK_KREIS = 'Universal';
+const OPEN_PLZ_FIRST_PAGE = 1;
+const OPEN_PLZ_PAGE_SIZE = 10;
+const OpenPlzLocalitiesSchema = z.array(
+  z.object({
+    district: z
+      .object({
+        name: z.string(),
+      })
+      .nullish(),
+  })
+);
 
 export class CMSTool implements CMSInterface {
   token = {};
   axi: AxiosInstance | null = null;
-  constructor(private localSecrets: LocalSecrets) {
-    this.token = this.localSecrets.strapi.token;
+  constructor(private config: ServerConfig) {
+    this.token = this.config.strapi.token;
     this.axi = axios.create({
-      baseURL: this.localSecrets.strapi.host,
+      baseURL: this.config.strapi.host,
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'bearer ' + this.token,
@@ -36,6 +49,35 @@ export class CMSTool implements CMSInterface {
     return res;
   }
 
+  async getContacts(kreis: string) {
+    if (this.axi == null) throw new Error('No axios Instance');
+    const filterString = `filters[kreis][$eq]=${kreis}&filters[kreis][$eq]=Universal`;
+    const res = (await this.axi.get(`/contacts?${filterString}&populate=*`))
+      .data.data;
+    return res;
+  }
+
+  async getKreis(plz: string) {
+    const axiosOpenPLZ = axios.create({
+      baseURL: 'https://openplzapi.org/de',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const response = (
+      await axiosOpenPLZ.get(
+        `/Localities?postalCode=${encodeURIComponent(plz)}&page=${OPEN_PLZ_FIRST_PAGE}&pageSize=${OPEN_PLZ_PAGE_SIZE}`
+      )
+    ).data;
+    const localities = OpenPlzLocalitiesSchema.safeParse(response);
+    if (!localities.success) return OPEN_PLZ_FALLBACK_KREIS;
+
+    // Unknown or placeholder postal codes can produce no locality rows.
+    const kreis = localities.data[0]?.district?.name;
+    return kreis ?? OPEN_PLZ_FALLBACK_KREIS;
+  }
+
   async getContent(contentName: string, docId: string) {
     if (this.axi == null) throw new Error('No axios Instance');
 
@@ -54,34 +96,6 @@ export class CMSTool implements CMSInterface {
     return res;
   }
 
-  async getQuestionFlowByFlowId(flowId: string) {
-    if (this.axi == null) throw new Error('No axios Instance');
-
-    const res = (
-      await this.axi.get(
-        `/question-flows?filters[flowId][$eq]=${flowId}&populate=questionDict&populate=questionDict.answerDict&populate=questionDict.answerDict.question_flow&populate=questionDict.answerDict.additionalFields&populate=questionDict.answerDict.additionalQuestionflowLink&populate=questionDict.answerDict.additionalQuestionflowLink.question_flow&populate=questionDict.answerDict.additionalQuestionflowLink.multipleRequirements`
-      )
-    ).data.data;
-    return res[0] as QuestionFlow;
-  }
-  async getQuestionFlow(docId: string) {
-    if (this.axi == null) throw new Error('No axios Instance');
-
-    const res: QuestionFlow = (
-      await this.axi.get(
-        `/question-flows/${docId}?populate=questionDict&populate=questionDict.answerDict&populate=questionDict.answerDict.question_flow&populate=questionDict.answerDict.additionalFields&populate=questionDict.answerDict.additionalQuestionflowLink&populate=questionDict.answerDict.additionalQuestionflowLink.question_flow&populate=questionDict.answerDict.additionalQuestionflowLink.multipleRequirements`
-      )
-    ).data.data;
-    return res;
-  }
-  async getSingleTypeData(typeId: string): Promise<SingleTypeData> {
-    if (this.axi == null) throw new Error('No axios Instance');
-
-    const response = (await this.axi.get(`/${typeId}`)).data.data;
-
-    const parsedData = SingleTypeData.parse(response);
-    return parsedData;
-  }
   async getWebsiteText(placeToPutList: string[]) {
     if (this.axi == null) throw new Error('No axios Instance');
 
@@ -96,14 +110,13 @@ export class CMSTool implements CMSInterface {
     return res;
   }
 
-  async getQuestionatalogue(catalogueID: string) {
+  async getLoginText() {
     if (this.axi == null) throw new Error('No axios Instance');
 
-    const res = (
-      await this.axi.get(
-        `/question-catalogues?filters[catalogueId][$eq]=${catalogueID}&populate=questions&populate=questions.answerOptions&populate=questions.validations&populate=questions.validations.ruleType`
-      )
+    const res: LoginPageTexts = (
+      await this.axi.get(`/login-page-text?populate=*`)
     ).data.data;
-    return res[0];
+    return res;
   }
+
 }

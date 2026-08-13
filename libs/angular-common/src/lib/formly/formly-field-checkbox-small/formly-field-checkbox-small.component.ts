@@ -9,14 +9,11 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
   imports: [FormlyModule, ReactiveFormsModule, CommonModule],
   template: `
     <div class="inline-flex items-start mx-4 md:mx-8 mt-2">
-      <label
-        class="flex items-start cursor-pointer relative"
-        for="check-with-description"
-      >
+      <label class="flex items-start cursor-pointer relative" [for]="id">
         <input
           type="checkbox"
           class=" peer h-5 w-5 cursor-pointer transition-all appearance-none rounded border border-slate-300 checked:bg-[var(--sh-color-primary)] checked:border-[var(--sh-color-primary)]"
-          id="check-with-description"
+          [id]="id"
           [formControl]="formControl"
           [formlyAttributes]="field"
         />
@@ -41,7 +38,7 @@ import { FieldType, FieldTypeConfig, FormlyModule } from '@ngx-formly/core';
       </label>
       <label
         class="cursor-pointer ml-2 text-[var(--sh-color-secondary)] text-sm"
-        for="check-with-description"
+        [for]="id"
       >
         <div>
           <p class="font-medium text-base">

@@ -8,11 +8,8 @@ import { generate as generateZod } from 'ts-to-zod';
 import { distinctGroupBy } from '@startuphafen/utility';
 import schemaInspector from 'knex-schema-inspector';
 
-import { DBMigrationSchema } from '@startuphafen/db-migration';
-import { ConfigLoader } from '@startuphafen/utility-server';
 import { Knex } from 'knex';
 import prettier from 'prettier';
-import { z } from 'zod';
 
 export interface EntitiesInformationFiles {
   entitiesFileContent: string;
@@ -34,8 +31,7 @@ function determineCommonSrcPath() {
 }
 
 export async function prepareAllEntitiesOutputs(
-  appName: string,
-  migrationMode: 'push' | 'deploy'
+  appName: string
 ) {
   const projectPath = path.join('apps', appName);
   const commonPath = determineCommonSrcPath();
@@ -45,7 +41,7 @@ export async function prepareAllEntitiesOutputs(
   const typesOutputPath = path.join(commonPath, fileNames.entitiesFileName);
   const schemaOutputPath = path.join(commonPath, fileNames.schemaFileName);
 
-  const files = await buildEntitiesFilesForProject(projectPath, migrationMode);
+  const files = await buildEntitiesFilesForProject(projectPath);
 
   const typesFileContent = (
     await prettier.format(files.entitiesFileContent, {
@@ -54,10 +50,9 @@ export async function prepareAllEntitiesOutputs(
   )
     .replace(
       'Rerun sql-ts to regenerate this file.',
-      `\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * Rerun npx nx run ${appName}-server:entities to update this file from the newest database migration files. * Begin using this by defining a file called user-entities.ts in common where you can define entity types not present in the database
- * and especially define your full ENTITY_SCHEMA:
- * 
- * export const YOUR_APP_ENTITY_SCHEMA = buildEntitySchemaConfigurations({... fill this as enforced by the type system});`
+      `\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * !!!!DO NOT MODIFY THIS FILE BY HAND!!!!\n * Rerun npx nx run ${appName}:entities to update this file from the newest database migration files. * This file already exports the generated entity schema (see the
+ * buildEntitySchemaConfigurations() call and the *_ENTITY_SCHEMA export at
+ * the bottom of the file).`
     )
     .replace(
       'export const TABLES',
@@ -101,8 +96,7 @@ GROUP BY constraint_name, table_name;
 }
 
 export async function buildEntitiesFilesForProject(
-  projectPath: string,
-  migrationMode: 'push' | 'deploy'
+  projectPath: string
 ): Promise<EntitiesInformationFiles> {
   const postgres = new DockerizedPostgres();
 
@@ -110,25 +104,7 @@ export async function buildEntitiesFilesForProject(
 
   try {
     const serverSrc = path.join(projectPath, 'src');
-    const serverAssets = path.join(serverSrc, 'assets');
-    const serverConfigLoader = new ConfigLoader(
-      [path.join(serverAssets, 'config.json')],
-      z.object({
-        dbMigration: DBMigrationSchema,
-      })
-    );
-    // your server/assets/config.json must have a property "dbMigration" which should configure the dbMigrator
-    // this is already setup for the startuphafen-backend
-    // loadConfig() will verify the content of this config file and throw a ZodError if it does not match
-    const serverConfig = await serverConfigLoader.loadConfig();
-
-    const dbMigration = new DbMigrator(
-      serverConfig.dbMigration,
-      postgres.knex,
-      serverSrc,
-      'dev',
-      migrationMode
-    );
+    const dbMigration = new DbMigrator(postgres.knex, serverSrc, true);
     await dbMigration.migrate();
 
     const schema = await sqlts.toObject(

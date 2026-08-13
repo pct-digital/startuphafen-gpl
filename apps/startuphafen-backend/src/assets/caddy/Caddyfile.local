@@ -1,0 +1,54 @@
+{
+	admin off
+}
+
+http://:2020 {
+	respond /health "OK" 200
+	respond 404
+}
+
+http://:8080 {
+	encode zstd gzip
+
+	request_body {
+		max_size 100MB
+	}
+
+	@trpc path /trpc /trpc/*
+	@kcHealth path /kc/health /kc/health/*
+	@kcAdmin path /kc-admin /kc-admin/*
+	@kc path /kc /kc/*
+	@ngCliWs path /ng-cli-ws /ng-cli-ws/*
+
+	route {
+		handle @trpc {
+			header Cache-Control "no-store"
+			reverse_proxy {$BACKEND_HOST:backend:5000}
+		}
+
+		handle @kcHealth {
+			uri strip_prefix /kc
+			reverse_proxy keycloak:9000
+		}
+
+		handle @kcAdmin {
+			uri strip_prefix /kc-admin
+			reverse_proxy keycloak:8180
+		}
+
+		handle @kc {
+			uri strip_prefix /kc
+			reverse_proxy keycloak:8180
+		}
+
+		handle @ngCliWs {
+			header Cache-Control "no-store"
+			reverse_proxy {$FRONTEND_HOST:devcontainer:4201}
+		}
+
+		handle {
+			header Cache-Control "no-store"
+			reverse_proxy {$FRONTEND_HOST:devcontainer:4201}
+		}
+	}
+}

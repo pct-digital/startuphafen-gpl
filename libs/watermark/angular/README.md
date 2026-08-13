@@ -1,6 +1,6 @@
-# angular
+# watermark/angular
 
-This library was generated with [Nx](https://nx.dev).
+Angular component that renders the environment watermark banner (e.g. on staging systems), fed by the watermark tRPC router.
 
 ## Running unit tests
 

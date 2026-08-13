@@ -1,6 +1,6 @@
 # pct-pipeline
 
-This library was generated with [Nx](https://nx.dev).
+Build/CI tooling library: Nx executors for entity generation and documentation building, static site generation via Eleventy, and ffmpeg helpers for e2e videos.
 
 ## Running unit tests
 

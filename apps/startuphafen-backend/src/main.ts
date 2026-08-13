@@ -1,30 +1,31 @@
-import { DbMigrator } from '@startuphafen/db-migration';
+require('console-stamp')(console, {
+  format: ':date(yyyy-mm-dd HH:MM:ss.l)',
+});
+
 import { createRepeatedSerializedKnexTransaction } from '@startuphafen/serialized-transaction';
 import { VERSION } from '@startuphafen/startuphafen-common';
 import {
   buildTokenInformationForRequestFunction,
   logServerSideError,
   readConfigValueFrom,
+  redactSecrets,
 } from '@startuphafen/trpc-root';
 import { CONFIG_TYPE, prepServerStart } from '@startuphafen/utility-server';
 import * as trpcExpress from '@trpc/server/adapters/express';
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import cors from 'cors';
-import express from 'express';
+import helmet from 'helmet';
 import knex from 'knex';
-import _ from 'lodash';
 import { promises as fs } from 'node:fs';
 import { IncomingMessage } from 'node:http';
-import { getAssetPath } from './assets-loader';
-import {
-  LocalSecrets,
-  ServerConfig,
-  loadLocalSecrets,
-  loadServerConfiguration,
-} from './config';
-import { createE2ERoutes } from './e2e-utilites/e2e-routes';
+import { getAssetPath, migrateDatabase } from './assets-loader';
+import { loadServerConfiguration, ServerConfig } from './config';
+import { createE2ERoutes } from './e2e-utilities/e2e-routes';
+import { HwkMailScheduler } from './features/hwk-form/hwk-mail-scheduler';
+import { HwkMailService } from './features/hwk-form/hwk-mail-service';
+import { ProjectCleanupScheduler } from './features/project-cleanup/project-cleanup-scheduler';
+import { ProjectCleanupService } from './features/project-cleanup/project-cleanup-service';
 import { createAppRouter } from './router';
-// import { MailClient } from './features/common/mail';
 
 prepServerStart(VERSION);
 
@@ -32,31 +33,50 @@ prepServerStart(VERSION);
   const configType = (readConfigValueFrom(process.argv, '--config') ??
     'dev') as CONFIG_TYPE;
   const config: ServerConfig = await loadServerConfiguration(configType);
-  const localSecrets: LocalSecrets = await loadLocalSecrets(
-    configType === 'e2e'
-  );
+
+  const { default: express } = await import('express');
 
   try {
     const debugConfigOutput = getAssetPath('debug_config_output.json');
-    await fs.writeFile(debugConfigOutput, JSON.stringify(config, undefined, 2));
+    // Secrets (passwords, tokens, api keys) are redacted before writing.
+    await fs.writeFile(
+      debugConfigOutput,
+      JSON.stringify(config, redactSecrets, 2)
+    );
     console.log(
-      'Wrote full configuration for debugging access to ' + debugConfigOutput
+      'Wrote redacted configuration for debugging access to ' +
+        debugConfigOutput
     );
   } catch (error) {
     console.log('Failed to write debug full config for some reason?', error);
   }
 
-  console.log('!!! Mail config is', _.omit(config.mail, 'password'));
+  // Log ERiC and OZG service status
+  console.log('--- ERiC Service Status ---');
+  console.log(`  Host: ${config.eric.host || '(not configured)'}`);
+  console.log(`  Dev Mode: ${config.eric.devMode}`);
+  console.log(
+    `  Placeholder: ${
+      config.eric.placeholder
+        ? config.eric.placeholder
+        : '(disabled - real API calls enabled)'
+    }`
+  );
+  console.log(`Finanzämter currently configured: ${config.eric.finanzaemter}`);
+
+  console.log('--- OZG Service Status ---');
+  console.log(`  Host: ${config.ozg.host || '(not configured)'}`);
+  console.log(
+    `  Placeholder: ${
+      config.ozg.placeholder
+        ? config.ozg.placeholder
+        : '(disabled - real API calls enabled)'
+    }`
+  );
 
   const kx = knex(config.knex);
 
-  const dbMigration = new DbMigrator(
-    config.dbMigration,
-    kx,
-    __dirname,
-    configType
-  );
-  await dbMigration.migrate();
+  await migrateDatabase(kx, false);
 
   const host = config.express.host;
   const port = config.express.port;
@@ -64,6 +84,8 @@ prepServerStart(VERSION);
   let counter = 0;
 
   const app = express();
+
+  app.use(helmet());
 
   const corsHandler = cors({
     origin: (origin, callback) => {
@@ -95,27 +117,45 @@ prepServerStart(VERSION);
     counter++;
   });
 
-  app.listen(port, host, () => {
-    console.log(`[ ready ] http://${host}:${port}`);
-  });
-
-  // const mailClient = new MailClient(config.mail);
-
   const trxFactory = createRepeatedSerializedKnexTransaction(kx);
   const tokenFactory = buildTokenInformationForRequestFunction(
-    config.keycloak.jwksUri
+    config.keycloak.jwksUri,
+    undefined,
+    undefined,
+    undefined,
+    {
+      realm: config.keycloak.realm,
+      clientId: config.keycloak.clientId,
+    }
   );
+
+  const hwkMailService = new HwkMailService(config, trxFactory);
+  const hwkMailScheduler = new HwkMailScheduler(hwkMailService);
+  hwkMailScheduler.start();
+
+  const projectCleanupService = new ProjectCleanupService(trxFactory);
+  const projectCleanupScheduler = new ProjectCleanupScheduler(
+    projectCleanupService
+  );
+  projectCleanupScheduler.start();
 
   async function createContext(opts: CreateNextContextOptions) {
     const msg: IncomingMessage = opts.req;
     const token = await tokenFactory(msg);
-    return { trxFactory, token };
+    const authHeader = msg.headers.authorization;
+    const bearerPrefix = 'Bearer ';
+    const rawToken =
+      authHeader != null && authHeader.startsWith(bearerPrefix)
+        ? authHeader.substring(bearerPrefix.length).trim()
+        : undefined;
+    const origin = msg.headers.origin;
+    return { trxFactory, token, rawToken, origin };
   }
 
   app.use(
     '/trpc',
     trpcExpress.createExpressMiddleware({
-      router: createAppRouter(config, localSecrets),
+      router: createAppRouter(config),
       createContext,
       maxBodySize: 10e6,
       onError(opts) {
@@ -132,7 +172,7 @@ prepServerStart(VERSION);
 
   if (configType === 'e2e') {
     console.log(
-      '!!! This server is running in e2e mode, it provides non authenticated full access to the database !!!'
+      '!!! This server is running in e2e mode with test helper routes enabled !!!'
     );
     app.use(
       '/e2e',
@@ -152,4 +192,13 @@ prepServerStart(VERSION);
       })
     );
   }
+
+  app.use(function onError(_err: any, _req: any, res: any, _next: any) {
+    res.statusCode = 500;
+    res.end('Internal Server Error\n');
+  });
+
+  app.listen(port, host, () => {
+    console.log(`[ ready ] http://${host}:${port}`);
+  });
 })();

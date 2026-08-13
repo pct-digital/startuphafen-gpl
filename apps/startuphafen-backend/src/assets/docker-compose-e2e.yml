@@ -90,11 +90,16 @@ services:
       start_interval: 1s
       start_period: 30s
 
-  nginx:
-    container_name: 'startuphafen-nginx-${API_PORT}-${WEB_PORT}'
+  caddy:
+    container_name: 'startuphafen-caddy-${API_PORT}-${WEB_PORT}'
+    restart: unless-stopped
+    init: true
+    image: caddy:2.11-alpine
+    command: ['caddy', 'run', '--config', '/etc/caddy/Caddyfile.e2e', '--adapter', 'caddyfile']
     environment:
-      WEB_APP_CONFIG_FILE: '/config-parts/e2e.conf'
+      BACKEND_HOST: 'backend:5000'
     volumes:
-      - ../../startuphafen-frontend:/usr/share/nginx/html:ro
+      - ./caddy:/etc/caddy:ro
+      - ../../startuphafen-frontend:/srv:ro
     ports:
       - '${WEB_PORT:-4000}:8080'

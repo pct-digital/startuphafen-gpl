@@ -32,6 +32,8 @@ export class PortalHeaderComponent implements OnInit {
 
   isLoggedIn = false;
 
+  roles: string[] = [];
+
   @ViewChild('LogoutNotice', { static: true })
   logoutNoticeTemplate?: TemplateRef<any>;
 
@@ -44,6 +46,7 @@ export class PortalHeaderComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.isLoggedIn = this.keycloak.isLoggedIn();
+    this.getRoles();
   }
 
   async onNavigation(link: HeaderLinkItem) {
@@ -55,6 +58,10 @@ export class PortalHeaderComponent implements OnInit {
       await this.router.navigateByUrl(link.path);
       this.getRootPath();
     }
+  }
+
+  getRoles() {
+    this.roles = this.keycloak.getUserRoles();
   }
 
   getRootPath() {
@@ -87,20 +94,29 @@ export class PortalHeaderComponent implements OnInit {
       {
         id: 3,
         type: 'HEADER_LINK_ITEM',
-        label: 'FAQ / Wissen',
+        label: 'Wissensbereich',
         path: this.nav.faqPage(),
         icon: '/assets/icons/thin/square-question-sharp-thin.svg',
         activeIcon: '/assets/icons/solid/square-question-sharp-solid.svg',
         isActive: this.isLoggedIn,
       },
       {
-        id: 3,
+        id: 4,
         type: 'HEADER_LINK_ITEM',
         label: 'Mein Profil',
         path: this.nav.profilePage(),
         icon: '/assets/icons/thin/user-sharp-thin.svg',
         activeIcon: '/assets/icons/solid/user-sharp-solid.svg',
         isActive: this.isLoggedIn,
+      },
+      {
+        id: 5,
+        type: 'HEADER_LINK_ITEM',
+        label: 'Admin Seite',
+        path: this.nav.adminPage(),
+        icon: '/assets/icons/thin/settings-smooth-outline.svg',
+        activeIcon: '/assets/icons/solid/settings-smooth-solid.svg',
+        isActive: this.roles.includes('startuphafen-admin'),
       },
     ];
 
@@ -112,9 +128,7 @@ export class PortalHeaderComponent implements OnInit {
       this.popup
         .open(popupTemplate)
         .pipe(takeUntil(this.destroy$))
-        .subscribe((action) => {
-          console.log('popupAction', action);
-        });
+        .subscribe();
     }
   }
 

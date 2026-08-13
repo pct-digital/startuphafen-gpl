@@ -1,13 +1,24 @@
 import { byTestId } from '@ngneat/spectator';
 import { createComponentFactory, Spectator } from '@ngneat/spectator/jest';
+import { TrpcService } from '@startuphafen/angular-common';
+import { createMockTrpcClient } from '@startuphafen/spectator-help';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import type { AppRouter } from 'apps/startuphafen-backend/src/router';
 import { SendApplicationComponent } from './send-application.component';
 
 describe('SendApplicationComponent', () => {
   let spectator: Spectator<SendApplicationComponent>;
 
+  const mockFinanzaemter = [
+    { name: 'Nordfriesland', bufaNr: 2117 },
+    { name: 'Dithmarschen', bufaNr: 2116 },
+  ];
+
   const createComponent = createComponentFactory({
     component: SendApplicationComponent,
+    mocks: [TrpcService],
     shallow: true,
+    detectChanges: false,
   });
 
   beforeEach(() => {
@@ -19,6 +30,16 @@ describe('SendApplicationComponent', () => {
         subtitle: 'Test subtitle',
       },
     });
+
+    spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
+      Ext: {
+        getFinanzaemter: {
+          query: jest.fn().mockResolvedValue(mockFinanzaemter),
+        },
+      },
+    });
+
+    spectator.detectChanges();
   });
 
   it('should create', () => {
@@ -30,7 +51,7 @@ describe('SendApplicationComponent', () => {
       const titleElement = spectator.query(
         byTestId('send-application-card-title')
       );
-      expect(titleElement?.textContent).toBe('Test title');
+      expect(titleElement?.textContent?.trim()).toBe('Test title');
     });
 
     it('should display the subtitle correctly', () => {
@@ -39,6 +60,18 @@ describe('SendApplicationComponent', () => {
       );
       expect(subtitleElement?.textContent?.trim()).toBe(
         'Test subtitle: Finanzamt'
+      );
+    });
+
+    it('should display the subtitle correctly for hwk', () => {
+      spectator.setInput('applicationType', 'hwk');
+      spectator.detectChanges();
+
+      const subtitleElement = spectator.query(
+        byTestId('send-application-card-subtitle')
+      );
+      expect(subtitleElement?.textContent?.trim()).toBe(
+        'Test subtitle: Handwerkskammer'
       );
     });
 
@@ -51,29 +84,27 @@ describe('SendApplicationComponent', () => {
   });
 
   describe('Button text and emissions', () => {
-    it('should show "An das Finanzamt senden" for elster type', () => {
+    it('should show "Senden" button for elster type', () => {
       const sendButton = spectator.query(
         byTestId('send-application-send-data-btn')
       );
-      expect(sendButton?.textContent?.trim()).toContain(
-        'An das Finanzamt senden'
-      );
+      expect(sendButton?.textContent?.trim()).toContain('Senden');
     });
 
-    it('should show "An das Gewerbeamt senden" for gewerbeamt type', () => {
+    it('should show "Senden" button for gewerbeamt type', () => {
       spectator.setInput('applicationType', 'gewerbeamt');
       spectator.detectChanges();
 
       const sendButton = spectator.query(
         byTestId('send-application-send-data-btn')
       );
-      expect(sendButton?.textContent?.trim()).toContain(
-        'An das Gewerbeamt senden'
-      );
+      expect(sendButton?.textContent?.trim()).toContain('Senden');
     });
 
     it('should emit sendData event when send button is clicked', () => {
       const sendSpy = jest.spyOn(spectator.component.sendData, 'emit');
+      spectator.component.bufaNrSelected = 1111;
+      spectator.detectChanges();
 
       const sendButton = spectator.query(
         byTestId('send-application-send-data-btn')
@@ -124,7 +155,7 @@ describe('SendApplicationComponent', () => {
       const sendButton = spectator.query(
         byTestId('send-application-send-data-btn')
       );
-      expect(sendButton?.textContent?.trim()).toContain('An das  senden');
+      expect(sendButton?.textContent?.trim()).toContain('Senden');
     });
 
     it('should handle null content, title, and subtitle', () => {
@@ -141,13 +172,9 @@ describe('SendApplicationComponent', () => {
       const subtitleElement = spectator.query(
         byTestId('send-application-card-subtitle')
       );
-      const contentElement = spectator.query(
-        byTestId('send-application-card-content')
-      );
 
       expect(titleElement?.textContent?.trim()).toBe('');
       expect(subtitleElement?.textContent?.trim()).toBe('');
-      expect(contentElement?.textContent?.trim()).toBe('');
     });
   });
 });

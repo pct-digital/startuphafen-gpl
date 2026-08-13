@@ -56,7 +56,7 @@ export default defineConfig({
       if (config.video) {
         on('before:browser:launch', (browser, launchOptions) => {
           const width = Number(process.env['VIDEO_RESOLUTION_WIDTH'] || 1680);
-          const height = Number(process.env['VIDEO_RESULTION_HEIGHT'] || 1050);
+          const height = Number(process.env['VIDEO_RESOLUTION_HEIGHT'] || 1050);
 
           console.log(
             'setting the browser window size to %d x %d for video recording',

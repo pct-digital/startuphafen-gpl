@@ -1,6 +1,6 @@
 # serialized-transaction
 
-This library was generated with [Nx](https://nx.dev).
+Knex transaction factory that runs PostgreSQL transactions with SERIALIZABLE isolation and automatic retries on serialization failures.
 
 ## Running unit tests
 

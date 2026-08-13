@@ -1,0 +1,5 @@
+ALTER TABLE "HwkMailLog"
+  DROP COLUMN IF EXISTS "pdfData",
+  DROP COLUMN IF EXISTS "pdfFilename",
+  DROP COLUMN IF EXISTS "pdfMimeType",
+  DROP COLUMN IF EXISTS "pdfCreatedAt";

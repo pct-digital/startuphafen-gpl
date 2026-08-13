@@ -1,6 +1,6 @@
 # utility
 
-This library was generated with [Nx](https://nx.dev).
+Small framework-agnostic utilities shared across apps and libraries.
 
 ## Running unit tests
 

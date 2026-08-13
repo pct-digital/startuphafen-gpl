@@ -36,9 +36,15 @@ export class LoginContainerComponent implements OnInit {
   }
 
   async onLogin() {
-    await this.keycloak.login({
-      redirectUri: (await this.login.getRedirectHost()) + '/start',
-    });
+    try {
+      await this.keycloak.login({
+        redirectUri: (await this.login.getRedirectHost()) + '/start',
+      });
+    } catch (error) {
+      console.error(error);
+
+      throw error;
+    }
   }
 
   async onRegister() {

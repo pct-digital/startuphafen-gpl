@@ -46,3 +46,13 @@ export function resolvePathWithParameters(
   }
   return r;
 }
+
+export async function withClock(func: () => Promise<void>, text: string) {
+  console.log(`[${text}] started`);
+
+  const startTime = Date.now();
+  await func();
+  const endTime = Date.now();
+
+  console.log(`[${text}] finished in ${endTime - startTime} ms`);
+}

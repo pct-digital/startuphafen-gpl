@@ -9,6 +9,7 @@
         <img
           src="/assets/icons/startuphafen-logo.svg"
           class="cursor-pointer"
+          alt="Logo von startuphafen"
           (click)="onLogoClick()"
         />
       </div>
@@ -69,6 +70,8 @@
       </li>
       <li
         (click)="loginClick.emit()"
+        tabindex="0"
+        (keydown.enter)="loginClick.emit()"
         *ngIf="!hasLogin"
         data-testid="login-btn"
         class="hidden xl:block bg-primary cursor-pointer transition-all w-[116px] h-[120px] relative hover:bg-primary-shade"
@@ -97,6 +100,8 @@
       <li
         (click)="logoutClick.emit()"
         *ngIf="hasLogin"
+        tabindex="0"
+        (keydown.enter)="logoutClick.emit()"
         data-testid="logout-btn"
         class="hidden xl:grid bg-primary cursor-pointer transition-all w-[116px] h-[120px] relative hover:bg-primary-shade"
       >

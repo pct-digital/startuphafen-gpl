@@ -19,20 +19,52 @@
     "port": 1025,
     "user": "sh",
     "password": "sh",
-    "from": "test@datatogo.de"
+    "from": "noreply@placeholder.invalid",
+    "hwkRecipient": "hwk@placeholder.invalid",
+    "supportRecipient": "support@placeholder.invalid",
+    "supportCC": "support@placeholder.invalid",
+    "feedbackRecipient": "feedback@placeholder.invalid"
   },
   "allowedOrigins": [],
   "keycloak": {
     "jwksUri": "http://keycloak:8180/realms/startuphafen/protocol/openid-connect/certs",
     "host": "http://keycloak:8180",
     "user": "admin",
-    "password": "admin"
+    "password": "admin",
+    "realm": "startuphafen",
+    "clientId": "startuphafen_app"
   },
   "watermarkConfig": {
     "text": ""
   },
-  "dbMigration": {},
   "eric": {
-    "devMode": true
+    "devMode": true,
+    "placeholder": "placeholders/eric.pdf",
+    "finanzaemter": []
+  },
+  "ozg": {
+    "placeholder": "placeholders/ozg.pdf",
+    "useStagingDomain": false,
+    "enableAmtSelection": true,
+    "globalOverride": null
+  },
+  "matchingStrapi": {
+    "url": "https://example.com"
+  },
+  "rateLimit": {
+    "upload": {
+      "enabled": true,
+      "max": 10,
+      "windowMs": 300000
+    },
+    "chatbot": {
+      "enabled": true,
+      "max": 30,
+      "windowMs": 300000
+    }
+  },
+  "strapi": {
+    "host": "",
+    "token": ""
   }
 }

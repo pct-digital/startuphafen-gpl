@@ -1,0 +1,41 @@
+<div class="w-full max-w-3xl mx-auto animate-fade-in">
+  <div class="bg-white backdrop-blur-sm rounded-2xl p-2 sm:p-8">
+    <form [formGroup]="form" (ngSubmit)="saveProfile()" class="space-y-4">
+      <formly-form
+        [form]="form"
+        [model]="model"
+        [fields]="fields"
+        data-testid="profile-form"
+      ></formly-form>
+
+      @if (phoneError) {
+      <p class="text-red-500 text-sm -mt-2">{{ phoneError }}</p>
+      }
+
+      <p class="text-xs text-tertiary">
+        Vorwahl (international) | Vorwahl (national) | Rufnummer
+      </p>
+
+      @if (error) {
+      <div
+        data-testid="profile-error"
+        class="p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200"
+      >
+        {{ error }}
+      </div>
+      }
+
+      <div class="pt-6">
+        <button
+          shButton
+          type="submit"
+          data-testid="profile-save-btn"
+          [disabled]="!isFormValid"
+          class="w-full justify-center"
+        >
+          <span>Speichern und fortfahren</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

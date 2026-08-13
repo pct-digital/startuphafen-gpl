@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <formly-form [form]="form" [fields]="fields" [model]="model"></formly-form>
+</form>
+
+@if (shouldShowMeistergruendungspraemieHint()) {
+<section
+  class="mt-4 rounded border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+  data-testid="meistergruendungspraemie-hint"
+>
+  <p>
+    Bist Du Meister im Handwerk und startest im Haupterwerb? Beantrage die
+    Meistergründungsprämie vor der Gewerbeanmeldung.
+  </p>
+  <p class="mt-2">
+    Weitere Infos:
+    <a
+      [href]="meistergruendungspraemieUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline"
+    >
+      Meistergründungsprämie Schleswig-Holstein
+    </a>
+  </p>
+</section>
+}

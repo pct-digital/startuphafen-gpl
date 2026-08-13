@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { PortalFooterComponent } from '@startuphafen/angular-common';
+import {
+  FeatureFlagsService,
+  LoaderComponent,
+  PortalFooterComponent,
+} from '@startuphafen/angular-common';
+import { WatermarkAngularModule } from '@startuphafen/watermark/angular';
 import { KeycloakService } from 'keycloak-angular';
-import { FaqQuicklinkComponent } from './features/common/faq-quicklink/faq-quicklink.component';
 import { PortalHeaderComponent } from './features/common/portal-header/portal-header.component';
+import { ChatBubbleComponent } from './features/f6_chat-page/container/chat-bubble.component';
 
 @Component({
   standalone: true,
@@ -11,7 +16,9 @@ import { PortalHeaderComponent } from './features/common/portal-header/portal-he
     RouterModule,
     PortalHeaderComponent,
     PortalFooterComponent,
-    FaqQuicklinkComponent,
+    ChatBubbleComponent,
+    WatermarkAngularModule,
+    LoaderComponent,
   ],
   selector: 'sh-root',
   templateUrl: './app.component.html',
@@ -19,14 +26,14 @@ import { PortalHeaderComponent } from './features/common/portal-header/portal-he
 })
 export class AppComponent {
   title = 'startuphafen-frontend';
-
-  constructor(private keycloak: KeycloakService) {}
-
-  async login() {
-    await this.keycloak.login();
-  }
+  private keycloak = inject(KeycloakService);
+  private featureFlags = inject(FeatureFlagsService);
 
   checkUser() {
     return this.keycloak.isLoggedIn();
+  }
+
+  isChatEnabled() {
+    return this.featureFlags.isEnabled('chat');
   }
 }

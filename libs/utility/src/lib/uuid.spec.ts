@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { generateUUID, generateUUIDs, md5UUID } from './uuid';
+import { generateUUID, generateUUIDs } from './uuid';
 
 // These tests are not deterministic.
 // the bigger the more test runs are done to detect errors that happen randomly, but the longer the tests will take
@@ -76,17 +76,4 @@ describe('UUID helper code', function () {
     });
   });
 
-  describe('the md5 hash based UUID generator function', function () {
-    it('should produce distinct, but predictable, UUIDs for distinct input data', function () {
-      for (let i = 0; i < 10; i++) {
-        const seed = uuidv4();
-        const prevMap1 = generateUUIDs(N, seed);
-        const seq1 = prevMap1.map(md5UUID);
-        expect(prevMap1).not.toEqual(seq1);
-        const seq2 = prevMap1.map(md5UUID);
-
-        checkPredictableAndNoCollisions(seq1, seq2);
-      }
-    });
-  });
 });

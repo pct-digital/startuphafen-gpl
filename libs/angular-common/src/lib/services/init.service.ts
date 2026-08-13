@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
 import { printLog } from '@startuphafen/utility';
 import { KeycloakEventType, KeycloakService } from 'keycloak-angular';
+import { FeatureFlagsService } from './feature-flags.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InitService {
-  constructor(private keycloak: KeycloakService) {}
+  constructor(
+    private keycloak: KeycloakService,
+    private featureFlags: FeatureFlagsService
+  ) {}
 
   async initApp() {
     await this.keycloakInit();
+    await this.featureFlags.initialize();
   }
 
   private async keycloakInit() {
@@ -21,12 +26,12 @@ export class InitService {
       },
       initOptions: {
         onLoad: 'check-sso',
-        // silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
         checkLoginIframe: false,
       },
     });
 
-    // dumb, but hopefully effective, I feel the OnTokenExpired thing somehow did not always work
+    // Proactively refresh the token on a fixed interval in addition to the
+    // OnTokenExpired event, which does not fire reliably in all situations.
     setInterval(() => {
       this.keycloak.updateToken().catch(printLog);
     }, 7 * 60 * 1000);
@@ -34,7 +39,6 @@ export class InitService {
     // no unsubscribe, as this subscription is added once at app-startup and never goes away until the browser tab is closed
     this.keycloak.keycloakEvents$.subscribe((event) => {
       if (event.type === KeycloakEventType.OnTokenExpired) {
-        console.log('Token expired, update token!');
         this.keycloak.updateToken().catch(printLog);
       }
     });

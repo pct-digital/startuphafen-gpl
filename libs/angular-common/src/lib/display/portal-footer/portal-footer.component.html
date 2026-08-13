@@ -41,6 +41,15 @@
         class="text-primary-contrast text-center"
         >Kontakt</a
       >
+      @if (adminLoginVisible) {
+      <a
+        data-testid="admin-login-secret"
+        class="text-primary-contrast text-center hover:underline hover:cursor-pointer"
+        (click)="onAdminLoginClick()"
+      >
+        Admin Login
+      </a>
+      }
     </nav>
   </div>
 
@@ -54,62 +63,4 @@
     </div>
   </div>
 
-  <!--<a
-        data-testid="linkedIn"
-        [href]=""
-        target="_blank"
-        class="text-primary-contrast text-center"
-      >
-        <img
-          class="w-10 h-10 align-middle bg-contain bg-center bg-no-repeat"
-          [ngStyle]="{
-              'mask-image': 'url(../../../assets/icons/solid/linkedin-50.svg)',
-              '-webkit-mask-image': 'url(../../../assets/icons/solid/linkedin-50.svg)',
-              'background-color': 'var(--sh-color-primary-contrast)',
-              'mask-repeat': 'no-repeat',
-            }"
-      /></a>
-      <a
-        data-testid="youTube"
-        [href]=""
-        target="_blank"
-        class="text-primary-contrast text-center"
-      >
-        <img
-          class="w-10 h-9 align-middle bg-contain bg-center bg-no-repeat"
-          [ngStyle]="{
-              'mask-image': 'url(../../../assets/icons/solid/youtube.svg)',
-              '-webkit-mask-image': 'url(../../../assets/icons/solid/youtube.svg)',
-              'background-color': 'var(--sh-color-primary-contrast)',
-              'mask-repeat': 'no-repeat',
-            }"
-      /></a>
-      <a
-        data-testid="faceBook"
-        [href]=""
-        target="_blank"
-        class="text-primary-contrast text-center"
-        ><img
-          class="w-9 h-9 align-middle bg-contain bg-center bg-no-repeat"
-          [ngStyle]="{
-              'mask-image': 'url(../../../assets/icons/solid/facebook.svg)',
-              '-webkit-mask-image': 'url(../../../assets/icons/solid/facebook.svg)',
-              'background-color': 'var(--sh-color-primary-contrast)',
-              'mask-repeat': 'no-repeat',
-            }"
-      /></a>
-      <a
-        data-testid="instagram"
-        [href]=""
-        target="_blank"
-        class="text-primary-contrast text-center"
-        ><img
-          class="w-9 h-9 align-middle bg-contain bg-center bg-no-repeat"
-          [ngStyle]="{
-              'mask-image': 'url(../../../assets/icons/solid/instagram.svg)',
-              '-webkit-mask-image': 'url(../../../assets/icons/solid/instagram.svg)',
-              'background-color': 'var(--sh-color-primary-contrast)',
-              'mask-repeat': 'no-repeat',
-            }"
-      /></a>-->
 </footer>

@@ -1,7 +1,6 @@
-# common
+# entity-engine/common
 
-This library was generated with [Nx](https://nx.dev).
+Shared types and schema configuration for the generic entity engine (generated database entities + zod schemas).
 
 ## Running unit tests
 
-Run `nx test common` to execute the unit tests via [Jest](https://jestjs.io).

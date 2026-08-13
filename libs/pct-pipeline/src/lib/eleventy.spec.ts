@@ -95,23 +95,23 @@ describe('The eleventy actor', () => {
           experts: [
             {
               id: 1,
-              forename: 'Pierre',
-              surname: 'Nguyen',
+              forename: 'Erika',
+              surname: 'Mustermann',
             },
             {
               id: 2,
-              forename: 'Colin',
-              surname: 'Clausen',
+              forename: 'Max',
+              surname: 'Mustermann',
             },
             {
               id: 3,
-              forename: 'Thomas',
-              surname: 'Tucker',
+              forename: 'John',
+              surname: 'Doe',
             },
             {
               id: 4,
-              forename: 'Isabel',
-              surname: 'Blomberg',
+              forename: 'Jane',
+              surname: 'Doe',
             },
           ],
         },
@@ -120,10 +120,10 @@ describe('The eleventy actor', () => {
       const indexHTML = (await fs.readFile(tmpDir + '/index.html')).toString();
       expect(indexHTML).toContain('head');
       expect(indexHTML).toContain('Hello world!');
-      expect(indexHTML).toContain('Colin');
-      expect(indexHTML).toContain('Pierre');
-      expect(indexHTML).toContain('Thomas');
-      expect(indexHTML).toContain('Blomberg');
+      expect(indexHTML).toContain('Erika');
+      expect(indexHTML).toContain('Max');
+      expect(indexHTML).toContain('John');
+      expect(indexHTML).toContain('Doe');
     } finally {
       await fs.rm(tmpDir, { recursive: true, force: true });
     }

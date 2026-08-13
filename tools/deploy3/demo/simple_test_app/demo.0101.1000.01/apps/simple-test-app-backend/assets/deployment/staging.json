@@ -1,0 +1,7 @@
+{
+  "appName": "simple-test-app",
+  "minDiskSpaceGB": 5,
+  "minFreeMemoryMB": 1200,
+  "composeFiles": ["docker-compose.yml"],
+  "maintenanceMessage": "Staging Game server undergoing maintenance. Please try again shortly."
+}

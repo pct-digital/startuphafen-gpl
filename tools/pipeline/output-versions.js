@@ -8,4 +8,4 @@ const vfile = JSON.parse(
   fs.readFileSync('dist/apps/' + appName + '-version/version.json').toString()
 );
 
-console.log(vfile.time + '_' + appName);
+console.log(vfile.time + '_' + vfile.branchId + '_' + appName);

@@ -14,7 +14,13 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
     FormlySelectModule,
   ],
   template: `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      class="grid gap-4"
+      [ngClass]="{
+          'grid-cols-1 md:grid-cols-3': this.optionsLength >2,
+          'grid-cols-1 md:grid-cols-2': this.optionsLength <=2,
+        }"
+    >
       @if(this.optionsLength > 15) {
 
       <div class="relative col-span-full w-5/6">
@@ -22,8 +28,9 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
           [formControl]="formControl"
           [formlyAttributes]="field"
           style="background-color: rgba(var(--sh-color-primary-rgb), 0.09);"
-          class="w-full h-14 md:h-16 placeholder:text-slate-400 text-[var(--sh-color-primary)] text-lg border border-slate-200 rounded-2xl pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none appearance-none cursor-pointer focus:border-[var(--sh-color-primary)] hover:border-[var(--sh-color-primary)]"
+          class="w-full h-10 md:h-16 placeholder:text-slate-400 text-[var(--sh-color-primary)] text-lg border border-slate-200 rounded-2xl pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none appearance-none cursor-pointer focus:border-[var(--sh-color-primary)] hover:border-[var(--sh-color-primary)]"
         >
+          <option [value]="undefined" disabled hidden>Bitte auswählen</option>
           @for(option of to.options | formlySelectOptions : field | async; track
           $index){
           <option class="rounded-2xl" [value]="option.value">
@@ -54,8 +61,8 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
       >
         <label
           class="p-4 md:p-8 rounded-2xl bg-[rgba(var(--sh-color-primary-rgb),0.09)] 
-        h-full hover:bg-[rgba(var(--sh-color-primary-rgb),0.15)] flex items-start 
-            cursor-pointer gap-4 overflow-hidden border transition-colors"
+        h-full  hover:bg-[rgba(var(--sh-color-primary-rgb),0.15)] flex items-start 
+            cursor-pointer gap-4 overflow-hidden border transition-colors focus-within:ring-2 focus-within:ring-[var(--sh-color-primary)] focus-within:outline-none"
           [class.border-red-500]="formControl.touched && formControl.errors?.['required']"
           [class.border-transparent]="
             !(formControl.touched && formControl.invalid)
@@ -70,7 +77,15 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
             class="hidden"
           />
           <div class="flex-1 flex flex-col items-start gap-3">
-            <div class="h-6 w-6 bg-white rounded-lg relative flex-shrink-0">
+            <div
+              class="h-6 w-6 bg-white rounded-lg relative flex-shrink-0 focus:ring-2 focus:ring-[var(--sh-color-primary)] focus:outline-none"
+              [tabIndex]="0"
+              role="radio"
+              [attr.aria-checked]="formControl.value === option.value"
+              [attr.aria-label]="option.label"
+              (keydown)="onKeyDown($event, option)"
+              (click)="selectOption(option)"
+            >
               <div
                 class="absolute inset-0 m-auto h-6 w-6 bg-primary rounded-lg
                     transition-transform duration-200"
@@ -94,7 +109,7 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
                 />
               </svg>
             </div>
-            <span class="text-lg md:text-xl text-primary font-semibold">
+            <span class="text-md md:text-lg text-primary font-semibold">
               {{ option.label }}
             </span>
           </div>
@@ -111,7 +126,21 @@ import { FormlySelectModule } from '@ngx-formly/core/select';
 })
 export class FormlyFieldRadioComponent extends FieldType<FieldTypeConfig> {
   optionsLength = 0;
+
   ngOnInit() {
-    this.optionsLength = this.props['optionsLength'];
+    const options = this.props['options'] as [];
+    this.optionsLength = options.length;
+  }
+
+  onKeyDown(event: KeyboardEvent, option: any): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectOption(option);
+    }
+  }
+
+  selectOption(option: any): void {
+    this.formControl.setValue(option.value);
+    this.formControl.markAsTouched();
   }
 }

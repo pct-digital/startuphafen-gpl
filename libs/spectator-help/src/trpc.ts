@@ -64,28 +64,19 @@ const followPath = (func: any, path: string[]) => {
 };
 
 /**
- * 
- * You need to do a import type for the AppRouter for this, like so:
- * 
+ *
+ * You need to do an import type for the AppRouter for this, like so:
+ *
  * // eslint-disable-next-line @nx/enforce-module-boundaries
-   import type { AppRouter } from '../../../../../../server/src/app/router';
- * 
+   import type { AppRouter } from 'apps/startuphafen-backend/src/router';
+ *
  * Then use like this:
- * 
+ *
  * spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
-      Milestone: {
+      Project: {
         readFiltered: {
           async query() {
-            return [
-              {
-                id: 1,
-                leistungsdatum: null,
-                name: 'M1',
-                number: 1,
-                percentagePurchaseVolume: 10,
-                projectId: 1,
-              }
-            ];
+            return [{ id: 1, name: 'My project', progress: 0 }];
           },
         },
       },
@@ -96,24 +87,15 @@ const followPath = (func: any, path: string[]) => {
   wants those plus one more route.
 
   spectator.inject(TrpcService).client = createMockTrpcClient<AppRouter>({
-      Milestone: {
+      Project: {
         readFiltered: {
           async query() {
-            return [
-              {
-                id: 1,
-                leistungsdatum: null,
-                name: 'M1',
-                number: 1,
-                percentagePurchaseVolume: 10,
-                projectId: 1,
-              }
-            ];
+            return [{ id: 1, name: 'My project', progress: 0 }];
           },
         },
       },
     }, spectator.inject(TrpcService).client); // <- provide the existing client as a fallback
- * 
+ *
  */
 export const createMockTrpcClient = <TRouter extends AnyRouter>(
   ...impls: PartialDecoratedProcedureRecord<TRouter['_def']['record']>[]

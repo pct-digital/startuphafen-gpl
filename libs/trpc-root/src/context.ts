@@ -5,12 +5,20 @@ import { KeycloakToken } from './openid';
 export type StandardRequestContext = {
   trxFactory: TransactionFactory;
   token?: KeycloakToken;
+  rawToken?: string;
   user?: ShUser;
   featureFlags?: Record<string, boolean>;
+  origin?: string;
 };
 
 export const RouteAnon = 'anon';
 export const RouteLogin = 'login';
+
+export type Feature =
+  | 'chat'
+  | 'ug_questionflow'
+  | 'eu_questionflow'
+  | 'bntk';
 
 export interface Meta {
   /**
@@ -22,6 +30,12 @@ export interface Meta {
    * Login means any role is fine, as long as the user is logged in.
    */
   requiredRolesAny: string[];
+
+  /**
+   * Feature flag that must be active before the route can be executed.
+   * Use null to indicate no feature gating.
+   */
+  feature: Feature | null;
 
   /**
    * none/undefined does not log

@@ -1,5 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavService } from '@startuphafen/angular-common';
 import {
@@ -19,19 +18,12 @@ import { FaqPageService } from '../../services/faq-page.service';
   styles: ``,
 })
 export class FaqPageContainerComponent implements OnInit {
-  @Input() isPopup = false;
-  articleListLength = 20;
   articles: any[] = [];
-  articleFilterResultList: Artikel[] = [];
-  articleCategories: string[] = [];
-  articleCategoriesFormControl = new FormControl([]);
   articleSearchResults: Artikel[] = [];
-  //faqCategories: string[] = [];
   isArticleSearch = false;
   isArticleNotFound = false;
 
   faqList: FAQItem[] = [];
-  faqListLength = 10;
   categories: ArticleCategory[] = [];
 
   constructor(
@@ -54,7 +46,7 @@ export class FaqPageContainerComponent implements OnInit {
   onArticleClicked(urlParam: string | number) {
     this.router
       .navigateByUrl(this.nav.faqArticlePage(urlParam))
-      .catch(() => console.log('error'));
+      .catch((e) => console.error(e));
   }
 
   async searchSubmit(form: any) {

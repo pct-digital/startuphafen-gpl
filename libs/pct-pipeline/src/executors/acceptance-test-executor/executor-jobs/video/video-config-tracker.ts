@@ -28,11 +28,15 @@ export class VideoConfigTracker {
     });
   }
   private writeVideosConfigFile() {
-    fs.writeFileSync(this.videoConfigFilePath, JSON.stringify(this.videosConfig, null, 2));
+    fs.writeFileSync(
+      this.videoConfigFilePath,
+      JSON.stringify(this.videosConfig, null, 2)
+    );
   }
 
   private updateVideoConfigForLog(logLine: string) {
-    const videoTimestampRegex = /test:(before|after):run:([^:]*):([^:]*):(\d*)/gm;
+    const videoTimestampRegex =
+      /test:(before|after):run:([^:]*):([^:]*):(\d*)/gm;
     const vstamps = logLine.matchAll(videoTimestampRegex);
     for (const vstamp of vstamps) {
       const state = vstamp[1];
@@ -40,12 +44,17 @@ export class VideoConfigTracker {
       const specFile = vstamp[3];
       const offset = Number(vstamp[4]);
 
-      const videoConfig = this.videosConfig.byFile[specFile] ?? { timestamps: {} };
+      const videoConfig = this.videosConfig.byFile[specFile] ?? {
+        timestamps: {},
+      };
 
       const prev = videoConfig.timestamps[scenario];
       const isStartElseEnd = state === 'before';
       if (prev == null && !isStartElseEnd) {
-        throw new Error('Video timestamping failed, was after printed before before? ' + vstamp[0]);
+        throw new Error(
+          'Video timestamping failed, was after printed before before? ' +
+            vstamp[0]
+        );
       } else {
         if (prev == null) {
           videoConfig.timestamps[scenario] = {
@@ -68,7 +77,9 @@ export class VideoConfigTracker {
           const specFile = rowPart.substring(0, nextSeparator);
           const frameJson = rowPart.substring(nextSeparator + 1);
           console.log(specFile, frameJson);
-          const videoConfig = this.videosConfig.byFile[specFile] ?? { timestamps: {} };
+          const videoConfig = this.videosConfig.byFile[specFile] ?? {
+            timestamps: {},
+          };
           const frame = JSON.parse(frameJson);
           videoConfig.frame = frame;
           this.videosConfig.byFile[specFile] = videoConfig;

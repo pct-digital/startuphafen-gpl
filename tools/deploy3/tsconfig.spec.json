@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist-test",
+    "types": ["jest", "node"]
+  },
+  "include": ["lib/**/*.ts", "lib/**/*.spec.ts", "infra/**/*.ts"]
+}

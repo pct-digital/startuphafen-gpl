@@ -10,7 +10,7 @@ export class DockerizedPostgres {
   constructor() {}
   async start() {
     this.container = await new PostgreSqlContainer(
-      'postgres:15.5-bookworm'
+      'pgvector/pgvector:pg15'
     ).start();
   }
 

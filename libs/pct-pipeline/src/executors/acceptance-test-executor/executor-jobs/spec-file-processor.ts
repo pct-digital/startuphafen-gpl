@@ -29,7 +29,10 @@ import { AcceptanceTesterSchema } from '../schema';
 
 export class SpecFileProcessor {
   private specFiles: string[] = [];
-  constructor(private e2eAppName: string, private options: AcceptanceTesterSchema) {}
+  constructor(
+    private e2eAppName: string,
+    private options: AcceptanceTesterSchema
+  ) {}
 
   async hasOnlyInFileList() {
     const list = await this.getSpecFilesList();
@@ -69,7 +72,9 @@ export class SpecFileProcessor {
   }
 
   public getSpecFilePattern() {
-    const specsFolder = this.options.documentationScreenshots ? 'screens' : 'spec';
+    const specsFolder = this.options.documentationScreenshots
+      ? 'screens'
+      : 'spec';
     if (this.options.restrict != null) {
       return `${specsFolder}/${this.options.restrict}*.feature`;
     } else {
@@ -84,7 +89,9 @@ export class SpecFileProcessor {
     const specFileCandidates = await glob(pattern, {
       cwd: e2eLocation,
     });
-    this.specFiles = specFileCandidates.map((sf) => path.join(e2eLocation, sf)).filter((sf) => fs.statSync(sf).isFile());
+    this.specFiles = specFileCandidates
+      .map((sf) => path.join(e2eLocation, sf))
+      .filter((sf) => fs.statSync(sf).isFile());
     return this.specFiles;
   }
 }

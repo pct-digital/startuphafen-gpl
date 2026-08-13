@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavService } from '@startuphafen/angular-common';
+import {
+  NavService,
+  smoothScrollUnlessFirefox,
+} from '@startuphafen/angular-common';
 import { Artikel } from '@startuphafen/startuphafen-common';
 import { marked } from 'marked';
 import { FaqArticlePagePresenterComponent } from '../../display/faq-article-page-presenter/faq-article-page-presenter.component';
@@ -25,7 +28,7 @@ export class FaqArticlePageContainerComponent implements OnInit {
 
   async ngOnInit() {
     await this.reload();
-    window.scrollTo({ top: -1, left: 0, behavior: 'smooth' });
+    smoothScrollUnlessFirefox(-1, 0);
   }
 
   async reload() {
@@ -45,11 +48,7 @@ export class FaqArticlePageContainerComponent implements OnInit {
   onBackButtonClicked() {
     this.router
       .navigateByUrl(this.nav.faqPage())
-      .catch(() => console.log('error'));
-  }
-
-  onDownloadClicked() {
-    console.log('Download');
+      .catch((e) => console.error(e));
   }
 
   addHeadingStyling(body: string) {

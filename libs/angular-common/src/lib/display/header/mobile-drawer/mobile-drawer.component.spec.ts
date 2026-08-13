@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MobileDrawerComponent } from './mobile-drawer.component';
 
-describe('FormlyFieldSpartanInputComponentTsComponent', () => {
+describe('MobileDrawerComponent', () => {
   let component: MobileDrawerComponent;
   let fixture: ComponentFixture<MobileDrawerComponent>;
 

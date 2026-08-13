@@ -1,0 +1,127 @@
+<div class="mt-6 animate-fade-in">
+  <h4 class="text-lg font-semibold text-secondary mb-4">Dokumente hochladen</h4>
+
+  <div class="space-y-4">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded border border-gray-200"
+    >
+      <div>
+        <h5 class="font-medium text-secondary">Gesellschaftsvertrag</h5>
+        <p class="text-sm text-tertiary">Bitte als PDF hochladen</p>
+      </div>
+
+      <div class="flex flex-col items-stretch sm:items-end gap-2 w-full">
+        <span
+          *ngIf="contractFile"
+          class="text-sm text-tertiary break-all whitespace-normal text-left sm:text-right pb-2"
+        >
+          {{ contractFile.name }}
+        </span>
+        <input
+          #contractInput
+          type="file"
+          class="hidden"
+          accept=".pdf"
+          (change)="onFileSelected($event, 'contract')"
+        />
+        <button
+          type="button"
+          shButton
+          data-testid="upload-contract-btn"
+          class="text-sm h-9 px-4 w-full sm:w-auto self-start sm:self-end"
+          (click)="triggerFileInput(contractInput)"
+          [disabled]="isUploading"
+        >
+          {{
+            contractFile || previouslyUploaded.contract ? 'Ändern' : 'Auswählen'
+          }}
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded border border-gray-200"
+    >
+      <div>
+        <h5 class="font-medium text-secondary">
+          Vertrag zwischen Gesellschaft und Gesellschafter(n)
+        </h5>
+        <p class="text-sm text-tertiary">Bitte als PDF hochladen</p>
+      </div>
+
+      <div class="flex flex-col items-stretch sm:items-end gap-2 w-full">
+        <span
+          *ngIf="shareholderFile"
+          class="text-sm text-tertiary break-all whitespace-normal text-left sm:text-right pb-2"
+        >
+          {{ shareholderFile.name }}
+        </span>
+        <input
+          #shareholderInput
+          type="file"
+          class="hidden"
+          accept=".pdf"
+          (change)="onFileSelected($event, 'shareholder')"
+        />
+        <button
+          type="button"
+          shButton
+          data-testid="upload-shareholder-btn"
+          class="text-sm h-9 px-4 w-full sm:w-auto self-start sm:self-end"
+          (click)="triggerFileInput(shareholderInput)"
+          [disabled]="isUploading"
+        >
+          {{
+            shareholderFile || previouslyUploaded.shareholder
+              ? 'Ändern'
+              : 'Auswählen'
+          }}
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded border border-gray-200"
+    >
+      <div>
+        <h5 class="font-medium text-secondary">Handelsregisterauszug</h5>
+        <p class="text-sm text-tertiary">Bitte als PDF hochladen</p>
+      </div>
+
+      <div class="flex flex-col items-stretch sm:items-end gap-2 w-full">
+        <span
+          *ngIf="hrgFile"
+          class="text-sm text-tertiary break-all whitespace-normal text-left sm:text-right pb-2"
+        >
+          {{ hrgFile.name }}
+        </span>
+        <input
+          #hrgInput
+          type="file"
+          class="hidden"
+          accept=".pdf"
+          (change)="onFileSelected($event, 'hrg')"
+        />
+        <button
+          type="button"
+          shButton
+          data-testid="upload-hrg-btn"
+          class="text-sm h-9 px-4 w-full sm:w-auto self-start sm:self-end"
+          (click)="triggerFileInput(hrgInput)"
+          [disabled]="isUploading"
+        >
+          {{ hrgFile || previouslyUploaded.hrg ? 'Ändern' : 'Auswählen' }}
+        </button>
+      </div>
+    </div>
+
+    @if (error) {
+    <div
+      data-testid="upload-error"
+      class="p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200 mt-2"
+    >
+      {{ error }}
+    </div>
+    }
+  </div>
+</div>

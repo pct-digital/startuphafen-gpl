@@ -1,0 +1,54 @@
+# Caddy configuration for the Guess the Number game
+# Automatically handles HTTPS via Let's Encrypt
+{
+	on_demand_tls {
+		permission http http://127.0.0.1:9001/on-demand-tls-ask
+	}
+}
+
+(app) {
+	file_server {
+		root /srv
+	}
+
+	# Handle API requests for the game logic
+	handle /api/* {
+		respond "OK" 200
+	}
+
+	# Fallback to index.html for SPA routing
+	try_files {path} /index.html
+
+	# Enable compression
+	encode gzip
+
+	# Log requests
+	log {
+		output stdout
+		format console
+	}
+}
+
+{$CADDY_DOMAIN:localhost} {
+	import app
+}
+
+http://127.0.0.1:9001 {
+	@allowOptionalWww {
+		path /on-demand-tls-ask
+		query domain=www.{$CADDY_DOMAIN:localhost}
+	}
+
+	respond @allowOptionalWww 200
+	respond 403
+}
+
+www.{$CADDY_DOMAIN:localhost} {
+	tls {
+		on_demand
+	}
+
+	import app
+}
+
+# HTTP redirect to HTTPS (Caddy handles this automatically)

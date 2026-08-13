@@ -1,27 +1,36 @@
 services:
-  nginx:
-    container_name: startuphafen-nginx
+  caddy:
+    container_name: startuphafen-caddy
     restart: unless-stopped
     init: true
-    image: nginxinc/nginx-unprivileged:1.27.3-alpine
+    image: caddy:2.11-alpine
+    command:
+      [
+        'caddy',
+        'run',
+        '--config',
+        '/etc/caddy/Caddyfile.local',
+        '--adapter',
+        'caddyfile',
+      ]
     environment:
-      NGINX_HOST: localhost
-      MAIN_PORT: 8080
-      TZ: 'Europe/Berlin'
-      REDIRECT_PORT: 8443
-      SSL_LINE1: ''
-      SSL_LINE2: ''
-      SSL_LINE3: ''
       BACKEND_HOST: 'backend:5000'
+      TZ: 'Europe/Berlin'
     volumes:
-      - ./nginx/templates:/etc/nginx/templates:ro
-      - ./nginx/config-parts:/config-parts:ro
+      - ./caddy:/etc/caddy:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:2020/health || exit 1']
+      start_interval: 1s
+      start_period: 30s
+      interval: 30s
+      timeout: 2s
+      retries: 3
 
   keycloak:
     container_name: startuphafen-keycloak
     init: true
     restart: unless-stopped
-    image: startuphafen-keycloak:26.1.0
+    image: startuphafen-keycloak:26.1.2
     environment:
       KC_HTTP_PORT: 8180
       KC_LOG_CONSOLE_COLOR: 'true'

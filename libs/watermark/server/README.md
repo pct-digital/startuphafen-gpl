@@ -1,6 +1,6 @@
-# server
+# watermark/server
 
-This library was generated with [Nx](https://nx.dev).
+tRPC router that exposes the configured environment watermark text to the frontend.
 
 ## Running unit tests
 

@@ -1,0 +1,45 @@
+import { Injectable } from '@angular/core';
+import { TrpcService } from '@startuphafen/angular-common';
+import { Contact } from '@startuphafen/startuphafen-common';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ContactCollectionService {
+  constructor(private trpc: TrpcService) {}
+
+  async getContactList() {
+    const res: Contact[] = await this.trpc.client.CMS.getContactList.query({});
+
+    return res;
+  }
+
+  async getContactsUniversal() {
+    const res: Contact[] = await this.trpc.client.CMS.getContactList.query({
+      kreis: 'Universal',
+    });
+    return res;
+  }
+
+  getWebsiteText(placeToPutList: string[]) {
+    return this.trpc.client.CMS.getWebsiteText.query(placeToPutList);
+  }
+
+  async parseImageUrl(contacts: Contact[]) {
+    const filledInIcons: Contact[] = [];
+
+    for (const contact of contacts) {
+      if (contact.foto == null) {
+        filledInIcons.push(contact);
+      } else {
+        const fotoUrl = await this.trpc.client.CMS.getFileUrl.query(
+          contact.foto.url
+        );
+        contact.foto.url = fotoUrl;
+        filledInIcons.push(contact);
+      }
+    }
+
+    return filledInIcons;
+  }
+}

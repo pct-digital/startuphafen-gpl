@@ -1,73 +1,55 @@
-import { knex, Knex } from 'knex';
-import util from 'util';
+import { Knex } from 'knex';
+import { withClock } from '@startuphafen/utility';
 import {
-  DbMigrationConfig,
-  DbMigrationFullConfig,
-} from './db-migration/entities';
-const exec = util.promisify(require('child_process').exec);
+  ProcessContext,
+  waitForProcessSuccess,
+} from '@startuphafen/utility-server';
 
 export class DbMigrator {
-  private knex: Knex;
-
-  private configNode: DbMigrationFullConfig;
-
-  private schemaPath: string;
-
-  private migrationMode: 'push' | 'deploy' | undefined;
-
   constructor(
-    configNodeParam: DbMigrationConfig,
-    globalKnex: Knex,
-    serverSrcPath: string,
-    envType: string,
-    migrationMode?: 'push' | 'deploy'
-  ) {
-    this.configNode = Object.assign(
-      {
-        migrationsDirectory: serverSrcPath + '/assets/prisma/migrations',
-      },
-      configNodeParam
-    );
-
-    this.knex = knex(globalKnex.client.config);
-    const url = `postgres://${globalKnex.client.config.connection.user}:${globalKnex.client.config.connection.password}@${globalKnex.client.config.connection.host}:${globalKnex.client.config.connection.port}/${globalKnex.client.config.connection.database}`;
-    process.env['DATABASE_URL'] = url;
-
-    this.schemaPath =
-      envType === 'dev'
-        ? 'apps/startuphafen-backend/src/assets/prisma/schema.prisma'
-        : 'app/assets/prisma/schema.prisma';
-    this.migrationMode = migrationMode;
-  }
+    private knex: Knex,
+    private serverSrcPath: string,
+    private silent: boolean
+  ) {}
 
   async migrate() {
-    try {
-      if (this.configNode.disable) {
-        console.log('Database migration is disabled!');
-        return;
-      } else {
-        console.log('Will run prisma database migration!');
+    const schemaPath = this.serverSrcPath + '/assets/prisma/schema.prisma';
+
+    const work = async () => {
+      const DATABASE_URL = `postgres://${this.knex.client.config.connection.user}:${this.knex.client.config.connection.password}@${this.knex.client.config.connection.host}:${this.knex.client.config.connection.port}/${this.knex.client.config.connection.database}`;
+
+      if (!this.silent) {
+        console.log('Migration will run on db ' + DATABASE_URL);
+        console.log('Migration schema path is ' + schemaPath);
+        console.log('Migration working directory is' + process.cwd());
       }
 
-      let prismaDeployRes: { stdout: string; stderr: string } | null = null;
-      if (this.migrationMode === 'deploy' || this.migrationMode == null) {
-        prismaDeployRes = await exec(
-          'npx prisma migrate deploy --schema=' + this.schemaPath
-        );
-      } else if (this.migrationMode === 'push') {
-        prismaDeployRes = await exec(
-          'npx prisma db push --schema=' + this.schemaPath
-        );
-      }
+      const procs = new ProcessContext();
+      const prismaProc = procs.startProcess(
+        'npx',
+        ['-y', 'prisma@6.19.1', 'migrate', 'deploy', '--schema=' + schemaPath],
+        {
+          // there are two possible cases: Either this is a local dev run or it is run inside a docker container
+          cwd:
+            this.serverSrcPath !== '/home/node/app'
+              ? process.cwd()
+              : '/home/node/app', // Important or prisma migrate somehow hangs inside the docker container
+          env: {
+            ...process.env,
+            DATABASE_URL,
+          },
+        },
+        true,
+        this.silent
+      );
 
-      if (prismaDeployRes != null) {
-        console.log(prismaDeployRes.stdout);
-        if (prismaDeployRes.stderr !== '') {
-          console.log(prismaDeployRes.stderr);
-        }
-      }
-    } finally {
-      await this.knex.destroy();
+      await waitForProcessSuccess(prismaProc);
+    };
+
+    if (this.silent) {
+      await work();
+    } else {
+      await withClock(work, 'Prisma DB migration');
     }
   }
 }

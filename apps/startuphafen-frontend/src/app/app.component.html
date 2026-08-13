@@ -1,15 +1,17 @@
+<sh-loader></sh-loader>
 <div class="bg-header border-b sticky top-0 z-20 h-16 lg:h-28">
   <sh-portal-header></sh-portal-header>
 </div>
 
 <div class="flex flex-col min-h-screen overflow-hidden m-0 p-0 bg-background">
   <div class="flex-grow">
+    <sp-watermark-display></sp-watermark-display>
     <router-outlet></router-outlet>
   </div>
-  <sh-faq-quicklink
-    class="z-50"
-    [style]="checkUser() ? 'display: block' : 'display: none'"
-  ></sh-faq-quicklink>
+
+  @if (checkUser() && isChatEnabled()) {
+  <sh-chat-bubble style="display: block"></sh-chat-bubble>
+  }
 
   <sh-portal-footer class="z-20"></sh-portal-footer>
 </div>
